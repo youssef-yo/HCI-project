@@ -23,5 +23,9 @@ aiofiles
 owlready2
 rdflib
 
+# Password hashing and JWT
+passlib[bcrypt]
+python-jose[cryptography]
+
 pandas
 pdfplumber

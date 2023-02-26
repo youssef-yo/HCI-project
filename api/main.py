@@ -1,13 +1,15 @@
 from fastapi import FastAPI, Response, status
-from routers import annotation, doc, ontology, upload
+from routers import annotation, auth, doc, ontology, upload, user
 
 
 app = FastAPI()
 
 app.include_router(annotation.router)
+app.include_router(auth.router)
 app.include_router(doc.router)
 app.include_router(ontology.router)
 app.include_router(upload.router)
+app.include_router(user.router)
 
 
 @app.get("/", status_code=status.HTTP_204_NO_CONTENT)

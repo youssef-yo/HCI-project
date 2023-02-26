@@ -1,8 +1,35 @@
+import json
+import os
 from typing import Optional
 
 from fastapi import HTTPException, status
 
-from utilities.configuration import configuration, logger
+from schemas.users import UserDB
+
+from utils.configuration import configuration, logger
+
+
+def load_user(email: str) -> Optional[UserDB]:
+    user_path = os.path.join(configuration.users_directory, f"{email}.json")
+    exists = os.path.exists(user_path)
+
+    if not exists:
+        return None
+
+    with open(user_path) as f:
+        user = json.load(f)
+        return UserDB(
+            email=user["email"],
+            password=user["password"],
+            role=user["role"]
+        )
+
+
+def save_user(user: UserDB):
+    user_path = os.path.join(configuration.users_directory, f"{user.email}.json")
+
+    with open(user_path, "w+") as f:
+        json.dump(user.dict(), f)
 
 
 def get_user_from_header(user_email: Optional[str]) -> Optional[str]:

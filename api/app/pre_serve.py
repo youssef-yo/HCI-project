@@ -25,6 +25,7 @@ class Configuration(NamedTuple):
     directory_extracted_annotations: str
     extracted_data_from_ontology_directory: str
     output_directory: str
+    users_directory: str
     labels: List[Dict[str, str]]
     relations: List[Dict[str, str]]
     users_file: str

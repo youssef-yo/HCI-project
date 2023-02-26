@@ -2,21 +2,21 @@ import json
 import os
 import shutil
 from pathlib import Path
-from typing import Union
 import uuid
 
 from owlready2 import *
 from rdflib import Graph
 
-from fastapi import APIRouter, File, Header, UploadFile, HTTPException, status
+from fastapi import APIRouter, File, Header, UploadFile
 from fastapi.encoders import jsonable_encoder
 
-from app.annotations import OntoClass, OntoProperty, OntologyData
+from schemas.annotations import OntoClass, OntoProperty, OntologyData
+
 from app.assign import assign
 from app.preprocess import preprocess
 
-from utilities.configuration import configuration
-from utilities.user_utilities import get_user_from_header
+from utils.configuration import configuration
+from utils.user_utils import get_user_from_header
 
 
 router = APIRouter(

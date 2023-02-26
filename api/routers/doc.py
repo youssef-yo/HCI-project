@@ -6,10 +6,10 @@ from fastapi import APIRouter, Body, HTTPException, Header, status
 from fastapi.responses import FileResponse
 from fastapi.encoders import jsonable_encoder
 
-from app.annotations import Annotation, PdfAnnotation, RelationGroup
+from schemas.annotations import Annotation, PdfAnnotation, RelationGroup
 
-from utilities.configuration import configuration
-from utilities.user_utilities import get_user_from_header
+from utils.configuration import configuration
+from utils.user_utils import get_user_from_header
 
 
 router = APIRouter(

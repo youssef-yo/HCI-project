@@ -7,11 +7,11 @@ from fastapi import APIRouter, HTTPException, Header, status
 from fastapi.responses import FileResponse
 
 from app import export
-from app.metadata import Allocation, PaperStatus
-from app.annotations import OntoClass, OntoProperty, OntologyData
+from schemas.metadata import Allocation, PaperStatus
+from schemas.annotations import OntoClass, OntoProperty, OntologyData
 
-from utilities.configuration import configuration
-from utilities.user_utilities import get_user_from_header
+from utils.configuration import configuration
+from utils.user_utils import get_user_from_header
 
 
 router = APIRouter(

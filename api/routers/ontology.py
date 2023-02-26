@@ -1,7 +1,7 @@
 import os
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter
 
-from utilities.configuration import configuration
+from utils.configuration import configuration
 
 
 router = APIRouter(
