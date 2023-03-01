@@ -1,5 +1,6 @@
 import os
-from fastapi import APIRouter
+from typing import List
+from fastapi import APIRouter, status
 
 from utils.configuration import configuration
 
@@ -10,8 +11,8 @@ router = APIRouter(
 )
 
 
-@router.delete("/{filename}")
-def deleteOntology(filename: str):
+@router.delete("/{filename}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_ontology(filename: str):
     def removeOntology():
         file_location = os.path.join(configuration.upload_ontology_directory, f"{filename}")
         path = os.path.abspath(file_location)
@@ -29,8 +30,8 @@ def deleteOntology(filename: str):
     return "Files removed..."
 
 
-@router.get("/names")
-def getNamesOntologiesAlreadyUploaded():
+@router.get("/names", response_model=List[str])
+def get_names_ontologies_already_uploaded():
     namesOfOnto = list()
 
     for file in os.listdir(configuration.extracted_data_from_ontology_directory):

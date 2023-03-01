@@ -26,9 +26,9 @@ class Configuration(NamedTuple):
     extracted_data_from_ontology_directory: str
     output_directory: str
     users_directory: str
+    users_file: str
     labels: List[Dict[str, str]]
     relations: List[Dict[str, str]]
-    users_file: str
 
 
 def load_configuration(filepath: str) -> Configuration:

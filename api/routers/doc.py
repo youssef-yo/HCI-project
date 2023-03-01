@@ -37,7 +37,7 @@ async def get_pdf(sha: str):
     return FileResponse(pdf, media_type="application/pdf")
 
 
-@router.get("/{sha}/title")
+@router.get("/{sha}/title", response_model=Optional[str])
 async def get_pdf_title(sha: str) -> Optional[str]:
     """
     Fetches a PDF's title.
@@ -104,7 +104,7 @@ def set_pdf_finished(
     return {}
 
 
-@router.get("/{sha}/annotations")
+@router.get("/{sha}/annotations", response_model=PdfAnnotation)
 def get_annotations(
     sha: str, x_auth_request_email: str = Header(None)
 ) -> PdfAnnotation:

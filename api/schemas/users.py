@@ -1,21 +1,23 @@
+from typing import Union
 from pydantic import BaseModel
 
 
-class UserDB(BaseModel):
+class UserBase(BaseModel):
     email: str
+    full_name: str
+    role: Union[str, None] = None
+
+
+class UserDB(UserBase):
     password: str
-    role: str
 
 
-class UserCreate(BaseModel):
-    email: str
+class UserIn(UserBase):
     password: str
-    role: str
 
 
-class User(BaseModel):
-    email: str
-    role: str
+class UserOut(UserBase):
+    pass
 
 
 class Token(BaseModel):

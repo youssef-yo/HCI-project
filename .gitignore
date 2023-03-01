@@ -15,11 +15,12 @@ ui/*.log
 # Docker compose env files
 .env
 
-# Ignore any files in ./skiff_files (.gitkeep for keeping folders)
+# Ignore any files in directories created by the app
 skiff_files/apps/pawls/papers/*
 skiff_files/apps/pawls/users/*
-!skiff_files/apps/pawls/papers/.gitkeep
-!skiff_files/apps/pawls/users/.gitkeep
+api/onto/*
+api/users/*
+api/extracted_annotations/*
 
 ### Python Build Related ### 
 

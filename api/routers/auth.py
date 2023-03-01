@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.post("/")
+@router.post("/", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
     user = user_utils.load_user(form_data.username)
 

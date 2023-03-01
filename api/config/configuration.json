@@ -3,7 +3,8 @@
     "directory_extracted_annotations": "extracted_annotations/",
     "extracted_data_from_ontology_directory": "onto/extractedData",
     "output_directory": "/skiff_files/apps/pawls/papers/",
-    "users_directory": "/skiff_files/apps/pawls/users/",
+    "users_directory": "users/",
+    "users_file": "users.json",
     "labels": [
         {
             "text": "Plan",
@@ -75,6 +76,5 @@
             "text": "Represented in figure",
             "color": "#D9E4DD"
         }
-    ],
-    "users_file": "/users/allowed.txt"
+    ]
 }
