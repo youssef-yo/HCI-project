@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 class UserBase(BaseModel):
     email: str
-    full_name: str
+    fullName: str
     role: Union[str, None] = None
 
 
@@ -21,8 +21,9 @@ class UserOut(UserBase):
 
 
 class Token(BaseModel):
-    access_token: str
-    token_type: str
+    role: str
+    accessToken: str
+    tokenType: str
 
 
 class TokenData(BaseModel):

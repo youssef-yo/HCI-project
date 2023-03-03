@@ -1,6 +1,12 @@
 import axios from 'axios';
 import { Annotation, RelationGroup, PdfAnnotations } from '../context';
 
+export interface JWTToken {
+    role: string;
+    accessToken: string;
+    tokenType: string;
+}
+
 export interface Token {
     x: number;
     y: number;
@@ -66,6 +72,17 @@ function docURL(sha: string): string {
 
 export function pdfURL(sha: string): string {
     return `${docURL(sha)}/pdf`;
+}
+
+export async function login(formData: FormData): Promise<JWTToken> {
+    return axios
+        .post('/api/login/', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err));
 }
 
 export async function getTokens(sha: string): Promise<PageTokens[]> {

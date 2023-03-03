@@ -30,7 +30,7 @@ def delete_ontology(filename: str):
     return "Files removed..."
 
 
-@router.get("/names", response_model=List[str])
+@router.get("/names")
 def get_names_ontologies_already_uploaded():
     namesOfOnto = list()
 

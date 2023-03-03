@@ -13,7 +13,8 @@ import { createGlobalStyle } from 'styled-components';
 import { Result, Spin } from '@allenai/varnish';
 import { BrowserRouter, Route, Redirect } from 'react-router-dom';
 
-import { PDFPage } from './pages';
+import { LoginPage, PDFPage } from './pages';
+import { AuthProvider } from './context';
 import { CenterOnPage } from './components';
 import ModalPopupImportDocuments from './components/sidebar/ModalPopupImportDocuments';
 import { getAllocatedPaperStatus, PaperStatus } from './api';
@@ -54,13 +55,14 @@ const RedirectToFirstPaper = () => {
 
 const App = () => {
     return (
-        <>
+        <AuthProvider>
             <BrowserRouter>
                 <Route path="/" exact component={RedirectToFirstPaper} />
+                <Route path="/login" exact component={LoginPage} />
                 <Route path="/pdf/:sha" component={PDFPage} />
             </BrowserRouter>
             <GlobalStyles />
-        </>
+        </AuthProvider>
     );
 };
 

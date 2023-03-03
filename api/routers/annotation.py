@@ -20,7 +20,7 @@ router = APIRouter(
 )
 
 
-@router.post("/classes", response_model=List[OntoClass])
+@router.post("/classes")
 def get_classes(ontoNames: List[str]) -> List[OntoClass]:
     """
     Get the labels used for annotation for this app.
@@ -34,7 +34,7 @@ def get_classes(ontoNames: List[str]) -> List[OntoClass]:
     return resultClasses
 
 
-@router.post("/properties", response_model=List[OntoProperty])
+@router.post("/properties")
 def get_properties(ontoNames: List[str]) -> List[OntoProperty]:
     """
     Get the relations used for annotation for this app.
@@ -48,7 +48,7 @@ def get_properties(ontoNames: List[str]) -> List[OntoProperty]:
     return resultProperties
 
 
-@router.get("/allocation/info", response_model=Allocation)
+@router.get("/allocation/info")
 def get_allocation_info(x_auth_request_email: str = Header(None)) -> Allocation:
 
     # In development, the app isn't passed the x_auth_request_email header,

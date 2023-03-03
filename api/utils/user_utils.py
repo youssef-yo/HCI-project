@@ -96,7 +96,7 @@ def user_is_allowed(user_email: str) -> bool:
     Return True if the user_email is in the users file, False otherwise.
     """
     user = load_user(user_email)
-    True if user else False
+    return True if user else False
 
     # try:
     #     with open(configuration.users_file) as file:

@@ -35,7 +35,7 @@ def verify_access_token(token: str, credentials_exception: HTTPException) -> Tok
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
-        email: str = str(payload.get("email"))
+        email: str = str(payload.get("sub"))
 
         if not email:
             raise credentials_exception
