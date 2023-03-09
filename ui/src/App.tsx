@@ -11,10 +11,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { Result, Spin } from '@allenai/varnish';
-import { BrowserRouter, Route, Redirect } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import { LoginPage, PDFPage } from './pages';
-import { AuthProvider } from './context';
 import { CenterOnPage } from './components';
 import ModalPopupImportDocuments from './components/sidebar/ModalPopupImportDocuments';
 import { getAllocatedPaperStatus, PaperStatus } from './api';
@@ -47,7 +46,7 @@ const RedirectToFirstPaper = () => {
             );
         }
 
-        return <Redirect to={`/pdf/${sha}`} />;
+        return <Navigate to={`/pdf/${sha}`} />;
     }, [papers]);
 
     return content;
@@ -55,14 +54,14 @@ const RedirectToFirstPaper = () => {
 
 const App = () => {
     return (
-        <AuthProvider>
-            <BrowserRouter>
-                <Route path="/" exact component={RedirectToFirstPaper} />
-                <Route path="/login" exact component={LoginPage} />
-                <Route path="/pdf/:sha" component={PDFPage} />
-            </BrowserRouter>
+        <>
+            <Routes>
+                <Route path="/" element={<RedirectToFirstPaper />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/pdf/:sha" element={<PDFPage />} />
+            </Routes>
             <GlobalStyles />
-        </AuthProvider>
+        </>
     );
 };
 

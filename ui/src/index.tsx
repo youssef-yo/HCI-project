@@ -7,17 +7,22 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@allenai/varnish';
+import { AuthProvider } from './context';
 import '@allenai/varnish/dist/varnish.css';
 
 import App from './App';
 
 ReactDOM.render(
     <BrowserRouter>
-        <ThemeProvider>
-            <Route path="/" component={App} />
-        </ThemeProvider>
+        <AuthProvider>
+            <ThemeProvider>
+                <Routes>
+                    <Route path="/*" element={<App />} />
+                </Routes>
+            </ThemeProvider>
+        </AuthProvider>
     </BrowserRouter>,
     document.getElementById('root')
 );
