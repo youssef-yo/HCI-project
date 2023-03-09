@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Response, status
-from routers import annotation, auth, doc, ontology, upload, user
+from routers import annotation, auth, doc, logout, ontology, refresh, upload, user
 
 
 app = FastAPI()
@@ -7,7 +7,9 @@ app = FastAPI()
 app.include_router(annotation.router)
 app.include_router(auth.router)
 app.include_router(doc.router)
+app.include_router(logout.router)
 app.include_router(ontology.router)
+app.include_router(refresh.router)
 app.include_router(upload.router)
 app.include_router(user.router)
 

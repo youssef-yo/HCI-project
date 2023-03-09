@@ -1,10 +1,10 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
-from schemas.users import UserOut, UserDB, UserIn
+from schemas.users import UserOut, UserIn
 
-from utils import user_utils, utils
+from utils import oauth2, user_utils, utils
 
 
 router = APIRouter(
@@ -43,6 +43,14 @@ def create_user(user: UserIn) -> UserOut:
     user_utils.save_user(user)
 
     return UserOut(**user.dict())
+
+
+@router.get("/me", response_model=UserOut)
+def get_current_user(user: str = Depends(oauth2.get_current_user)) -> UserOut:
+    """
+    Returns the user that is currently logged in.
+    """
+    return user
 
 
 @router.get("/{email}", response_model=UserOut)

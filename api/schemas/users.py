@@ -10,6 +10,7 @@ class UserBase(BaseModel):
 
 class UserDB(UserBase):
     password: str
+    refresh_token: Union[str, None] = None
 
 
 class UserIn(UserBase):
@@ -18,13 +19,3 @@ class UserIn(UserBase):
 
 class UserOut(UserBase):
     pass
-
-
-class Token(BaseModel):
-    role: str
-    accessToken: str
-    tokenType: str
-
-
-class TokenData(BaseModel):
-    email: str

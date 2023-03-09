@@ -39,7 +39,7 @@ configuration = pre_serve.load_configuration(CONFIGURATION_FILE)
 create_folder(configuration.output_directory)
 
 create_folder(configuration.users_directory)
-create_json_file(configuration.users_directory, configuration.users_file, {"users": []})
+create_json_file(configuration.users_directory, configuration.users_file, [])
 
 create_folder(configuration.upload_ontology_directory)
 

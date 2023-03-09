@@ -37,7 +37,7 @@ export const LoginPage = () => {
             .catch((err) => {
                 if (!err?.response) {
                     setErrorMsg('Server Unavailable.');
-                } else if (err.response?.status === 403) {
+                } else if (err.response?.status === 401) {
                     setErrorMsg('Invalid username or password.');
                 } else {
                     setErrorMsg('Something went wrong...');
@@ -73,7 +73,7 @@ export const LoginPage = () => {
                         />
 
                         <Input
-                            type="text"
+                            type="password"
                             variant={InputType.STANDARD}
                             id="password"
                             placeHolder="Password"

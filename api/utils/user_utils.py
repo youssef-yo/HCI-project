@@ -20,8 +20,7 @@ def load_users() -> List[UserDB]:
         return []
 
     with open(users_path) as f:
-        json_users = json.load(f)
-        users = json_users["users"]
+        users = json.load(f)
         return [UserDB(**user) for user in users]
 
 
@@ -32,7 +31,7 @@ def save_users(users: List[UserDB]):
     users_path = os.path.join(configuration.users_directory, configuration.users_file)
 
     with open(users_path, "w+") as f:
-        json.dump({"users": [user.dict() for user in users]}, f)
+        json.dump([user.dict() for user in users], f)
 
 
 def load_user(email: str) -> Optional[UserDB]:

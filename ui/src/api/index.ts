@@ -76,7 +76,7 @@ export function pdfURL(sha: string): string {
 
 export async function login(formData: FormData): Promise<JWTToken> {
     return axios
-        .post('/api/login/', formData, {
+        .post('/api/auth/', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
