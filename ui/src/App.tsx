@@ -8,57 +8,34 @@
  * @see https://github.com/reactjs/react-router-tutorial/tree/master/lessons
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
 import { createGlobalStyle } from 'styled-components';
-import { Result, Spin } from '@allenai/varnish';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
-import { LoginPage, PDFPage } from './pages';
-import { CenterOnPage } from './components';
-import ModalPopupImportDocuments from './components/sidebar/ModalPopupImportDocuments';
-import { getAllocatedPaperStatus, PaperStatus } from './api';
-import { QuestionCircleOutlined } from '@ant-design/icons';
-
-const RedirectToFirstPaper = () => {
-    const [papers, setPapers] = useState<PaperStatus[] | null>(null);
-
-    useEffect(() => {
-        getAllocatedPaperStatus().then((allocation) => setPapers(allocation?.papers || []));
-    }, []);
-
-    const content = useMemo(() => {
-        if (!papers) {
-            return (
-                <CenterOnPage>
-                    <Spin size="large" />
-                </CenterOnPage>
-            );
-        }
-
-        /** First available sha */
-        const sha = papers.find((p) => !!p.sha)?.sha;
-        if (!papers.length || !sha) {
-            return (
-                <CenterOnPage>
-                    <Result icon={<QuestionCircleOutlined />} title="PDFs Not Found" />
-                    <ModalPopupImportDocuments></ModalPopupImportDocuments>
-                </CenterOnPage>
-            );
-        }
-
-        return <Navigate to={`/pdf/${sha}`} />;
-    }, [papers]);
-
-    return content;
-};
+import { DashPage, LoginPage, PDFPage } from './pages';
+import { RedirectToPage, RequireAuth } from './components';
+import { ROLES } from './config/roles';
+import { PersistLogin } from './components/PersistLogin';
 
 const App = () => {
     return (
         <>
             <Routes>
-                <Route path="/" element={<RedirectToFirstPaper />} />
+                {/* Public Routes */}
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/pdf/:sha" element={<PDFPage />} />
+
+                <Route element={<PersistLogin />}>
+                    <Route path="/" element={<RedirectToPage />} />
+
+                    {/* Administrator Routes */}
+                    <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
+                        <Route path="/dash" element={<DashPage />} />
+                    </Route>
+
+                    {/* Annotator Routes */}
+                    <Route element={<RequireAuth allowedRoles={[ROLES.Annotator]} />}>
+                        <Route path="/pdf/:sha" element={<PDFPage />} />
+                    </Route>
+                </Route>
             </Routes>
             <GlobalStyles />
         </>

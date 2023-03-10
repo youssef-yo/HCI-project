@@ -5,15 +5,20 @@ import pawlsLogo from '../assets/images/pawlsLogo.png';
 import { login } from '../api';
 import { useAuth } from '../hooks';
 import { Button, Input, InputType } from '../components/common';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export const LoginPage = () => {
+    const { setToken } = useAuth();
+
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || '/';
+
     const errorRef = useRef<HTMLParagraphElement>(null);
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
-
-    const authContext = useAuth();
 
     useEffect(() => {
         setErrorMsg('');
@@ -28,11 +33,10 @@ export const LoginPage = () => {
 
         login(formData)
             .then((res) => {
-                authContext.setAuth({
-                    role: res.role,
-                    username: username,
-                    accessToken: res.accessToken,
-                });
+                setToken(res.accessToken);
+                setUsername('');
+                setPassword('');
+                navigate(from, { replace: true });
             })
             .catch((err) => {
                 if (!err?.response) {
@@ -66,7 +70,7 @@ export const LoginPage = () => {
                             type="text"
                             variant={InputType.STANDARD}
                             id="username"
-                            placeHolder="Username"
+                            placeholder="Username"
                             onChange={(e) => setUsername(e.target.value)}
                             value={username}
                             required
@@ -76,7 +80,7 @@ export const LoginPage = () => {
                             type="password"
                             variant={InputType.STANDARD}
                             id="password"
-                            placeHolder="Password"
+                            placeholder="Password"
                             onChange={(e) => setPassword(e.target.value)}
                             value={password}
                             required

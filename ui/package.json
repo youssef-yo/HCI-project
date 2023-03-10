@@ -46,6 +46,7 @@
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-standard": "^5.0.0",
+    "jwt-decode": "^3.1.2",
     "pdfjs-dist": "^2.7.570",
     "prettier": "^2.2.1",
     "react": "^16.9.0",

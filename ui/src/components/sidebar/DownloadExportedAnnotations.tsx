@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDownloadFile } from '../../utils/useDownloadFile';
+import { useDownloadFile } from '../../hooks';
 import { Button, ButtonState } from './button';
 import { exportAnnotations } from '../../api';
 import { notification } from '@allenai/varnish';

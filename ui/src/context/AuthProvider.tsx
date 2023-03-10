@@ -1,9 +1,10 @@
-import { createContext, ReactNode, useState } from 'react';
+import React, { createContext, ReactNode, useEffect, useState } from 'react';
+import jwtdecode from 'jwt-decode';
+import { JWTTokenData } from '../api';
 
 export type AuthData = {
+    username: string;
     role: string;
-    username: string; // Email of the user currently logged in
-    accessToken: string; // JWT token received when logged in
 };
 
 type AuthProviderProps = {
@@ -11,18 +12,34 @@ type AuthProviderProps = {
 };
 
 type AuthContextProps = {
-    auth: AuthData;
-    setAuth: (authData: AuthData) => void;
+    token: string | null;
+    setToken: React.Dispatch<React.SetStateAction<string | null>>;
+    auth: AuthData | null;
+    setAuth: React.Dispatch<React.SetStateAction<AuthData | null>>;
 };
 
 export const AuthContext = createContext({} as AuthContextProps);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const [auth, setAuth] = useState<AuthData>({
-        role: '',
-        username: '',
-        accessToken: '',
-    });
+    const [token, setToken] = useState<string | null>(null);
+    const [auth, setAuth] = useState<AuthData | null>(null);
 
-    return <AuthContext.Provider value={{ auth, setAuth }}>{children}</AuthContext.Provider>;
+    useEffect(() => {
+        console.log(`Token: ${token}`);
+        if (!token) return;
+
+        const decoded: JWTTokenData = jwtdecode(token);
+        const { username, role } = decoded.userInfo;
+
+        console.log(`Username: ${username}`);
+        console.log(`Role: ${role}`);
+
+        setAuth({ username, role });
+    }, [token]);
+
+    return (
+        <AuthContext.Provider value={{ token, setToken, auth, setAuth }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };

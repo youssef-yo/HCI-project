@@ -2,15 +2,12 @@ import React from 'react';
 import StyledButton from './Button.styled';
 
 export type ButtonProps = {
-    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-    children?: React.ReactNode;
     variant?: 'primary';
-    disabled?: boolean;
-};
+} & Omit<React.ComponentProps<'button'>, 'ref'>;
 
-export const Button: React.FC<ButtonProps> = ({ onClick, children, variant, disabled }) => {
+export const Button: React.FC<ButtonProps> = ({ children, variant, ...rest }) => {
     return (
-        <StyledButton onClick={onClick} disabled={disabled} variant={variant}>
+        <StyledButton variant={variant} {...rest}>
             {children}
         </StyledButton>
     );

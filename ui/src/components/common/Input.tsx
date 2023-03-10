@@ -6,44 +6,26 @@ export enum InputType {
 }
 
 export type InputProps = {
-    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    value?: string;
-    placeHolder?: string;
     type?: 'text' | 'password';
-    id?: string;
     variant?: InputType;
-    disabled?: boolean;
-    required?: boolean;
-};
+} & Omit<React.ComponentProps<'input'>, 'ref' | 'type'>;
 
 export type InputBoxProps = {
     variant?: InputType;
 };
 
 export const Input: React.FC<InputProps> = ({
-    onChange,
-    value,
     type = 'text',
-    placeHolder,
+    placeholder,
     variant = InputType.STANDARD,
-    id,
-    disabled,
-    required,
+    ...rest
 }) => {
     switch (variant) {
         case InputType.STANDARD:
             return (
                 <InputBox variant={variant}>
-                    <StyledInput
-                        onChange={onChange}
-                        value={value}
-                        type={type}
-                        id={id}
-                        variant={variant}
-                        disabled={disabled}
-                        required={required}
-                    />
-                    <i>{placeHolder}</i>
+                    <StyledInput type={type} variant={variant} {...rest} />
+                    <i>{placeholder}</i>
                 </InputBox>
             );
     }
