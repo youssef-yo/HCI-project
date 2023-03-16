@@ -1,6 +1,6 @@
 import React from 'react';
 
-import pawlsLogo from './pawlsLogo.png';
+import pawlsLogo from '../../assets/images/pawlsLogo.png';
 import styled from 'styled-components';
 
 export const Header = () => {
@@ -12,7 +12,5 @@ export const Header = () => {
 };
 
 const Logo = styled.img`
-    margin: 20px 4px 10px 0px;
-    padding: 4px;
     max-width: 100%;
 `;

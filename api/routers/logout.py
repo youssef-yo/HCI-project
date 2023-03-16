@@ -24,7 +24,7 @@ def logout(response: Response, X_Auth_Token: Union[str, None] = Cookie(default=N
     token_data = oauth2.verify_refresh_token(X_Auth_Token)
 
     if not token_data:
-        response.delete_cookie("X-Auth-Token", httponly=True, samesite="none")
+        response.delete_cookie("X-Auth-Token", httponly=True, samesite="none", secure=True)
         return
 
     # Find user who has this token assigned
@@ -39,4 +39,4 @@ def logout(response: Response, X_Auth_Token: Union[str, None] = Cookie(default=N
     foundUser.refresh_token = None
     user_utils.save_user(foundUser)
 
-    response.delete_cookie("X-Auth-Token", httponly=True, samesite="none")
+    response.delete_cookie("X-Auth-Token", httponly=True, samesite="none", secure=True)

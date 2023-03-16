@@ -10,7 +10,6 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import { PDF, CenterOnPage, RelationModal } from '../components';
 import ModalPopupImportDocuments from '../components/sidebar/ModalPopupImportDocuments';
 import {
-    SidebarContainer,
     Labels,
     Annotations,
     Relations,
@@ -18,6 +17,7 @@ import {
     Header,
     Comment,
 } from '../components/sidebar';
+import { WithSidebar, Sidebar, Topbar, WithTopbar } from '../components/common';
 import {
     pdfURL,
     getTokens,
@@ -229,35 +229,43 @@ export const PDFPage = () => {
             });
     }, [sha]);
 
+    const topbarHeight = '68px';
     const sidebarWidth = '300px';
+
     switch (viewState) {
         case ViewState.LOADING:
             return (
                 <WithSidebar width={sidebarWidth}>
-                    <SidebarContainer width={sidebarWidth}>
+                    <Sidebar width={sidebarWidth}>
                         <Header />
                         <AssignedPaperList papers={assignedPaperStatuses} />
-                    </SidebarContainer>
-                    <CenterOnPage>
-                        <Progress
-                            type="circle"
-                            percent={progress}
-                            strokeColor={{ '0%': theme.color.T6, '100%': theme.color.G6 }}
-                        />
-                    </CenterOnPage>
+                    </Sidebar>
+                    <WithTopbar height={topbarHeight}>
+                        <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <CenterOnPage>
+                            <Progress
+                                type="circle"
+                                percent={progress}
+                                strokeColor={{ '0%': theme.color.T6, '100%': theme.color.G6 }}
+                            />
+                        </CenterOnPage>
+                    </WithTopbar>
                 </WithSidebar>
             );
         case ViewState.NOT_FOUND:
             return (
                 <WithSidebar width={sidebarWidth}>
-                    <SidebarContainer width={sidebarWidth}>
+                    <Sidebar width={sidebarWidth}>
                         <Header />
                         <ModalPopupImportDocuments></ModalPopupImportDocuments>
                         <AssignedPaperList papers={assignedPaperStatuses} />
-                    </SidebarContainer>
-                    <CenterOnPage>
-                        <Result icon={<QuestionCircleOutlined />} title="PDF Not Found" />
-                    </CenterOnPage>
+                    </Sidebar>
+                    <WithTopbar height={topbarHeight}>
+                        <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <CenterOnPage>
+                            <Result icon={<QuestionCircleOutlined />} title="PDF Not Found" />
+                        </CenterOnPage>
+                    </WithTopbar>
                 </WithSidebar>
             );
         case ViewState.LOADED:
@@ -297,7 +305,7 @@ export const PDFPage = () => {
                             <listeners.SaveBeforeUnload sha={sha} />
                             <listeners.HideAnnotationLabels />
                             <WithSidebar width={sidebarWidth}>
-                                <SidebarContainer width={sidebarWidth}>
+                                <Sidebar width={sidebarWidth}>
                                     <Header />
                                     <Labels
                                         sha={sha}
@@ -319,19 +327,22 @@ export const PDFPage = () => {
                                     {activePaperStatus ? (
                                         <Comment sha={sha} paperStatus={activePaperStatus} />
                                     ) : null}
-                                </SidebarContainer>
-                                <PDFContainer>
-                                    {activeOntoProperty ? (
-                                        <RelationModal
-                                            visible={relationModalVisible}
-                                            onClick={onRelationModalOk}
-                                            onCancel={onRelationModalCancel}
-                                            source={selectedAnnotations}
-                                            label={activeOntoProperty}
-                                        />
-                                    ) : null}
-                                    <PDF />
-                                </PDFContainer>
+                                </Sidebar>
+                                <WithTopbar height={topbarHeight}>
+                                    <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
+                                    <PDFContainer>
+                                        {activeOntoProperty ? (
+                                            <RelationModal
+                                                visible={relationModalVisible}
+                                                onClick={onRelationModalOk}
+                                                onCancel={onRelationModalCancel}
+                                                source={selectedAnnotations}
+                                                label={activeOntoProperty}
+                                            />
+                                        ) : null}
+                                        <PDF />
+                                    </PDFContainer>
+                                </WithTopbar>
                             </WithSidebar>
                         </AnnotationStore.Provider>
                     </PDFStore.Provider>
@@ -343,30 +354,20 @@ export const PDFPage = () => {
         case ViewState.ERROR:
             return (
                 <WithSidebar width={sidebarWidth}>
-                    <SidebarContainer width={sidebarWidth}>
+                    <Sidebar width={sidebarWidth}>
                         <Header />
                         <AssignedPaperList papers={assignedPaperStatuses} />
-                    </SidebarContainer>
-                    <CenterOnPage>
-                        <Result status="warning" title="Unable to Render Document" />
-                    </CenterOnPage>
+                    </Sidebar>
+                    <WithTopbar height={topbarHeight}>
+                        <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <CenterOnPage>
+                            <Result status="warning" title="Unable to Render Document" />
+                        </CenterOnPage>
+                    </WithTopbar>
                 </WithSidebar>
             );
     }
 };
-
-interface HasWidth {
-    width: string;
-}
-
-const WithSidebar = styled.div<HasWidth>(
-    ({ width }) => `
-    display: grid;
-    flex-grow: 1;
-    grid-template-columns: minmax(0, 1fr);
-    padding-left: ${width};
-`
-);
 
 const PDFContainer = styled.div(
     ({ theme }) => `

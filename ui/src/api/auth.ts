@@ -19,6 +19,18 @@ export async function login(formData: FormData): Promise<JWTToken> {
 }
 
 /**
+ * Logs out the user from the application.
+ */
+export async function logout(): Promise<any> {
+    axios
+        .get('/api/logout/', {
+            withCredentials: true,
+        })
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err));
+}
+
+/**
  * Refresh the JWT access token, using the httpOnly refresh token cookie.
  *
  * @returns Promise with the JWT access token, or error
