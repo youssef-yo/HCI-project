@@ -2,14 +2,15 @@ import json
 import os
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Body, HTTPException, Header, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 from fastapi.encoders import jsonable_encoder
 
 from schemas.annotations import Annotation, PdfAnnotation, RelationGroup
+from schemas.users import UserDB
 
 from utils.configuration import configuration
-from utils.user_utils import get_user_from_header
+from utils.oauth2 import get_current_user
 
 
 router = APIRouter(
@@ -60,10 +61,9 @@ async def get_pdf_title(sha: str) -> Optional[str]:
 
 @router.post("/{sha}/comments")
 def set_pdf_comments(
-    sha: str, comments: str = Body(...), x_auth_request_email: str = Header(None)
+    sha: str, comments: str = Body(...), user: UserDB = Depends(get_current_user)
 ):
-    user = get_user_from_header(x_auth_request_email)
-    status_path = os.path.join(configuration.output_directory, "status", f"{user}.json")
+    status_path = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
     exists = os.path.exists(status_path)
 
     if not exists:
@@ -76,10 +76,9 @@ def set_pdf_comments(
 
 @router.post("/{sha}/junk")
 def set_pdf_junk(
-    sha: str, junk: bool = Body(...), x_auth_request_email: str = Header(None)
+    sha: str, junk: bool = Body(...), user: UserDB = Depends(get_current_user)
 ):
-    user = get_user_from_header(x_auth_request_email)
-    status_path = os.path.join(configuration.output_directory, "status", f"{user}.json")
+    status_path = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
     exists = os.path.exists(status_path)
     if not exists:
         # Not an allocated user. Do nothing.
@@ -91,10 +90,9 @@ def set_pdf_junk(
 
 @router.post("/{sha}/finished")
 def set_pdf_finished(
-    sha: str, finished: bool = Body(...), x_auth_request_email: str = Header(None)
+    sha: str, finished: bool = Body(...), user: UserDB = Depends(get_current_user)
 ):
-    user = get_user_from_header(x_auth_request_email)
-    status_path = os.path.join(configuration.output_directory, "status", f"{user}.json")
+    status_path = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
     exists = os.path.exists(status_path)
     if not exists:
         # Not an allocated user. Do nothing.
@@ -106,11 +104,10 @@ def set_pdf_finished(
 
 @router.get("/{sha}/annotations")
 def get_annotations(
-    sha: str, x_auth_request_email: str = Header(None)
+    sha: str, user: UserDB = Depends(get_current_user)
 ) -> PdfAnnotation:
-    user = get_user_from_header(x_auth_request_email)
     annotations = os.path.join(
-        configuration.output_directory, sha, f"{user}_annotations.json"
+        configuration.output_directory, sha, f"{user.email}_annotations.json"
     )
     exists = os.path.exists(annotations)
 
@@ -129,7 +126,7 @@ def save_annotations(
     sha: str,
     annotations: List[Annotation],
     relations: List[RelationGroup],
-    x_auth_request_email: str = Header(None),
+    user: UserDB = Depends(get_current_user),
 ):
     """
     sha: str
@@ -144,15 +141,14 @@ def save_annotations(
         is controlled by the Skiff Kubernetes cluster.
     """
     # Update the annotations in the annotation json file.
-    user = get_user_from_header(x_auth_request_email)
     annotations_path = os.path.join(
-        configuration.output_directory, sha, f"{user}_annotations.json"
+        configuration.output_directory, sha, f"{user.email}_annotations.json"
     )
     json_annotations = [jsonable_encoder(a) for a in annotations]
     json_relations = [jsonable_encoder(r) for r in relations]
 
     # Update the annotation counts in the status file.
-    status_path = os.path.join(configuration.output_directory, "status", f"{user}.json")
+    status_path = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
     exists = os.path.exists(status_path)
     if not exists:
         # Not an allocated user. Do nothing.

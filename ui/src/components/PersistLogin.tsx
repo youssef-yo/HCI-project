@@ -2,8 +2,7 @@ import { Spin } from '@allenai/varnish';
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { CenterOnPage } from '.';
-import { useAuth } from '../hooks';
-import { useRefreshToken } from '../hooks/useRefreshToken';
+import { useAuth, useRefreshToken } from '../hooks';
 
 export const PersistLogin = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);

@@ -162,8 +162,17 @@ const Page = ({ pageInfo, onError }: PageProps) => {
                 if (containerRef.current === null) {
                     throw new Error('No Container');
                 }
+
+                // console.log(
+                //     `===Current===\n[Event] Page-X: ${event.pageX}\n[Event] Page-Y: ${
+                //         event.pageY
+                //     }\n[ContainerRef] Offset-Left: ${
+                //         containerRef.current.getBoundingClientRect().left
+                //     }\n[ContainerRef] Offset-Top: ${containerRef.current.offsetTop}`
+                // );
+
                 if (!selection) {
-                    const left = event.pageX - containerRef.current.offsetLeft;
+                    const left = event.pageX - containerRef.current.getBoundingClientRect().left;
                     const top = event.pageY - containerRef.current.offsetTop;
                     setSelection({
                         left,
@@ -179,9 +188,19 @@ const Page = ({ pageInfo, onError }: PageProps) => {
                           if (containerRef.current === null) {
                               throw new Error('No Container');
                           }
+
+                          //   console.log(
+                          //       `===Current===\n[Event] Page-X: ${event.pageX}\n[Event] Page-Y: ${
+                          //           event.pageY
+                          //       }\n[ContainerRef] Offset-Left: ${
+                          //           containerRef.current.getBoundingClientRect().left
+                          //       }\n[ContainerRef] Offset-Top: ${containerRef.current.offsetTop}`
+                          //   );
+
                           setSelection({
                               ...selection,
-                              right: event.pageX - containerRef.current.offsetLeft,
+                              right:
+                                  event.pageX - containerRef.current.getBoundingClientRect().left,
                               bottom: event.pageY - containerRef.current.offsetTop,
                           });
                       }

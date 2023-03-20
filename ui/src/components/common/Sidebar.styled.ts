@@ -20,9 +20,7 @@ export const StyledSidebar = styled.div<SidebarProps>(
 `
 );
 
-export const WithSidebar = styled.div<SidebarProps>(({ theme, width }) => {
-    console.log('Allen AI Theme:');
-    console.log(theme);
+export const WithSidebar = styled.div<SidebarProps>(({ width }) => {
     return `
     position: relative;
     display: grid;

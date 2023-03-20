@@ -3,15 +3,16 @@ import json
 import os
 from typing import List, Any
 
-from fastapi import APIRouter, HTTPException, Header, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 
 from app import export
 from schemas.metadata import Allocation, PaperStatus
 from schemas.annotations import OntoClass, OntoProperty, OntologyData
+from schemas.users import UserDB
 
 from utils.configuration import configuration
-from utils.user_utils import get_user_from_header
+from utils.oauth2 import get_current_user
 
 
 router = APIRouter(
@@ -49,16 +50,16 @@ def get_properties(ontoNames: List[str]) -> List[OntoProperty]:
 
 
 @router.get("/allocation/info")
-def get_allocation_info(x_auth_request_email: str = Header(None)) -> Allocation:
+def get_allocation_info(user: UserDB = Depends(get_current_user)) -> Allocation:
 
     # In development, the app isn't passed the x_auth_request_email header,
     # meaning this would always fail. Instead, to smooth local development,
     # we always return all pdfs, essentially short-circuiting the allocation
     # mechanism.
-    user = get_user_from_header(x_auth_request_email)
-
+    # user = get_user_from_header(x_auth_request_email)
+    
     status_dir = os.path.join(configuration.output_directory, "status")
-    status_path = os.path.join(status_dir, f"{user}.json")
+    status_path = os.path.join(status_dir, f"{user.email}.json")
     exists = os.path.exists(status_path)
 
     if not exists:
@@ -84,14 +85,13 @@ def get_allocation_info(x_auth_request_email: str = Header(None)) -> Allocation:
 
 
 @router.get("/{sha}/export")
-def export_annotations(sha: str, x_auth_request_email: str = Header(None)):
-    user = get_user_from_header(x_auth_request_email)
+def export_annotations(sha: str, user: UserDB = Depends(get_current_user)):
     annotations = os.path.join(
-        configuration.output_directory, sha, f"{user}_annotations.json"
+        configuration.output_directory, sha, f"{user.email}_annotations.json"
     )
     exists = os.path.exists(annotations)
 
-    path_pdfs_satus = os.path.join(configuration.output_directory, "status", f"{user}.json")
+    path_pdfs_satus = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
 
     with open(path_pdfs_satus, "r") as f:
         pdfs_satus = json.load(f)

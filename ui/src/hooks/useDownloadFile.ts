@@ -15,7 +15,7 @@ interface DownloadedFileInfo {
     readonly url: string | undefined;
 }
 
-export const useDownloadFile = ({
+const useDownloadFile = ({
     apiDefinition,
     preDownloading,
     postDownloading,
@@ -49,3 +49,5 @@ export const useDownloadFile = ({
 
     return { download, ref, url, name };
 };
+
+export default useDownloadFile;

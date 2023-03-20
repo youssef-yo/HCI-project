@@ -7,16 +7,17 @@ import uuid
 from owlready2 import *
 from rdflib import Graph
 
-from fastapi import APIRouter, File, Header, UploadFile, status
+from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.encoders import jsonable_encoder
 
 from schemas.annotations import OntoClass, OntoProperty, OntologyData
+from schemas.users import UserDB
 
 from app.assign import assign
 from app.preprocess import preprocess
 
 from utils.configuration import configuration
-from utils.user_utils import get_user_from_header
+from utils.oauth2 import get_current_user
 
 
 router = APIRouter(
@@ -26,7 +27,7 @@ router = APIRouter(
 
 
 @router.post("/ontology", response_model=OntologyData)
-def upload_ontology(file: UploadFile = File(...)) -> OntologyData:
+def upload_ontology(user: UserDB = Depends(get_current_user), file: UploadFile = File(...)) -> OntologyData:
     # l'argomento passato deve avere lo stesso nome che devinisco con
     # formData.append('nomeArgomento', fileObj, fileObj.name);
     # Altrimenti errore: '422 unprocessable entity fastapi'
@@ -43,12 +44,10 @@ def upload_ontology(file: UploadFile = File(...)) -> OntologyData:
 
 
 @router.post("/doc")
-def upload_document(x_auth_request_email: str = Header(None), file: UploadFile = File(...)):
+def upload_document(user: UserDB = Depends(get_current_user), file: UploadFile = File(...)):
     """
     Add a PDF to the pawls dataset (skiff_files/).
     """
-    user = get_user_from_header(x_auth_request_email)
-
     pdf = str(file.filename)
 
     pdf_name = Path(pdf).stem
@@ -65,7 +64,7 @@ def upload_document(x_auth_request_email: str = Header(None), file: UploadFile =
 
     npages = preprocess("pdfplumber", file_location)
 
-    assign(configuration.output_directory, user, pdf_name, npages, file_location)
+    assign(configuration.output_directory, user.email, pdf_name, npages, file_location)
     return "ok"
 
 

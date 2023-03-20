@@ -1,9 +1,11 @@
 import React from 'react';
 import FileItem from './FileItem';
-import { deleteFile } from '../../api/index';
+import { useOntologyApi } from '../../api/index';
 import '../style/FileList.scss';
 
 const FileList = ({ files, removeFile }: { files: any; removeFile: any }) => {
+    const { deleteFile } = useOntologyApi();
+
     const deleteFileHandler = (_name: any) => {
         deleteFile(_name);
         removeFile(_name);

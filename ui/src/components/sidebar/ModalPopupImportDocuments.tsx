@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import { notification } from '@allenai/varnish';
 import InputFile from './inputFile';
 import FileList from './FileList';
-import { getAllocatedPaperStatus, uploadDocument } from '../../api/index';
+import { useAnnotationApi, useUploadApi } from '../../api/index';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = () => {
@@ -13,6 +13,10 @@ const App = () => {
     const [files, setFiles]: [files: any, setFiles: any] = useState([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [anyFileUploaded, setAnyFileUploaded] = useState<boolean>(false);
+
+    const { getAllocatedPaperStatus } = useAnnotationApi();
+    const { uploadDocument } = useUploadApi();
+
     const supportedFiles = 'PDF';
     const api = (param: any) => {
         return uploadDocument(param);

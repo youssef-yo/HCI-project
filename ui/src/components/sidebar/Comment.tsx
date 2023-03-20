@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Input } from '@allenai/varnish';
 
 import { SidebarItem, SidebarItemTitle } from './common';
-import { PaperStatus, setPdfComment } from '../../api';
+import { PaperStatus, useDocumentApi } from '../../api';
 
 interface CommentProps {
     sha: string;
@@ -11,6 +11,7 @@ interface CommentProps {
 }
 
 export const Comment = ({ sha, paperStatus }: CommentProps) => {
+    const { setPdfComment } = useDocumentApi();
     const [comment, setComment] = useState<string>(paperStatus.comments);
 
     return (

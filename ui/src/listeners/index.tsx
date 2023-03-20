@@ -1,11 +1,12 @@
 import { useEffect, useContext } from 'react';
 import { AnnotationStore } from '../context';
-import { saveAnnotations } from '../api';
+import { useDocumentApi } from '../api';
 import { notification } from '@allenai/varnish';
 
 export const UndoAnnotation = () => {
     const annotationStore = useContext(AnnotationStore);
     const { pdfAnnotations, setPdfAnnotations } = annotationStore;
+
     useEffect(() => {
         const handleUndo = (e: KeyboardEvent) => {
             if (e.metaKey && e.keyCode === 90) {
@@ -50,6 +51,7 @@ interface WithSha {
 }
 
 export const SaveWithTimeout = ({ sha }: WithSha) => {
+    const { saveAnnotations } = useDocumentApi();
     const annotationStore = useContext(AnnotationStore);
     const { pdfAnnotations, setPdfAnnotations } = annotationStore;
 
@@ -83,8 +85,10 @@ export const SaveWithTimeout = ({ sha }: WithSha) => {
 // deduplicate if I need to save at another time as well.
 
 export const SaveBeforeUnload = ({ sha }: WithSha) => {
+    const { saveAnnotations } = useDocumentApi();
     const annotationStore = useContext(AnnotationStore);
     const { pdfAnnotations, setPdfAnnotations } = annotationStore;
+
     useEffect(() => {
         const beforeUnload = (e: BeforeUnloadEvent) => {
             e.preventDefault();

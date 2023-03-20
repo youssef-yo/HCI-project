@@ -2,7 +2,7 @@ import { Result, Spin } from '@allenai/varnish';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { getAllocatedPaperStatus } from '../api';
+import { useAnnotationApi } from '../api';
 import { ROLES } from '../config/roles';
 import { useAuth } from '../hooks';
 import { CenterOnPage } from './CenterOnPage';
@@ -18,6 +18,7 @@ export const RedirectToPage = () => {
     const [viewState, setViewState] = useState<ViewState>(ViewState.LOADING);
     const [redirectTarget, setRedirectTarget] = useState<string>('/');
     const { auth } = useAuth();
+    const { getAllocatedPaperStatus } = useAnnotationApi();
 
     useEffect(() => {
         setViewState(ViewState.LOADING);

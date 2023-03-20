@@ -2,12 +2,13 @@ import { useRef, useState, useEffect, FormEvent } from 'react';
 import styled from 'styled-components';
 import pawlsLogo from '../assets/images/pawlsLogo.png';
 
-import { login } from '../api';
+import { useAuthApi } from '../api';
 import { useAuth } from '../hooks';
 import { Button, Input, InputType } from '../components/common';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export const LoginPage = () => {
+    const { login } = useAuthApi();
     const { setToken } = useAuth();
 
     const navigate = useNavigate();

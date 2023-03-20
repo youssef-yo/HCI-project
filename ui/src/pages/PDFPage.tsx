@@ -20,16 +20,13 @@ import {
 import { WithSidebar, Sidebar, Topbar, WithTopbar } from '../components/common';
 import {
     pdfURL,
-    getTokens,
     PageTokens,
     PaperStatus,
-    getAllocatedPaperStatus,
     OntoClass,
     OntoProperty,
-    getAnnotations,
-    getClasses,
-    getProperties,
-    getNamesOfOntologiesAlreadyUploaded,
+    useAnnotationApi,
+    useDocumentApi,
+    useOntologyApi,
     OntologiesNames,
 } from '../api';
 import {
@@ -82,6 +79,10 @@ export const PDFPage = () => {
     const [ontoNames, setOntoNames] = useState<OntologiesNames>();
 
     const [relationMode, setRelationMode] = useState<boolean>(false);
+
+    const { getClasses, getProperties, getAllocatedPaperStatus } = useAnnotationApi();
+    const { getTokens, getAnnotations } = useDocumentApi();
+    const { getNamesOfOntologiesAlreadyUploaded } = useOntologyApi();
     // React's Error Boundaries don't work for us because a lot of work is done by pdfjs in
     // a background task (a web worker). We instead setup a top level error handler that's
     // passed around as needed so we can display a nice error to the user when something

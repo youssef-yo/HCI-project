@@ -6,7 +6,7 @@ import { Annotation } from '../../context';
 
 import { CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { AnnotationSummary } from '../AnnotationSummary';
-import { setPdfJunk, setPdfFinished } from '../../api';
+import { useDocumentApi } from '../../api';
 
 interface AnnotationsProps {
     sha: string;
@@ -14,6 +14,8 @@ interface AnnotationsProps {
 }
 
 export const Annotations = ({ sha, annotations }: AnnotationsProps) => {
+    const { setPdfFinished, setPdfJunk } = useDocumentApi();
+
     const onFinishToggle = (isFinished: boolean) => {
         setPdfFinished(sha, isFinished).then(() => {
             if (isFinished) {

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useDownloadFile } from '../../hooks';
 import { Button, ButtonState } from './button';
-import { exportAnnotations } from '../../api';
+import { useAnnotationApi } from '../../api';
 import { notification } from '@allenai/varnish';
 
 export const DownloadExportedAnnotations = ({ sha }: any) => {
     const [buttonState, setButtonState] = useState<ButtonState>(ButtonState.Primary);
+    const { exportAnnotations } = useAnnotationApi();
 
     const preDownloading = () => setButtonState(ButtonState.Loading);
     const postDownloading = () => setButtonState(ButtonState.Primary);

@@ -1,7 +1,6 @@
 import { MdOutlinePersonOutline } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../../api';
-import { useAuth } from '../../hooks';
+import { useAuth, useLogout } from '../../hooks';
 import { IconButton, StyledTopbar } from './Topbar.styled';
 
 export type TopbarProps = {
@@ -10,22 +9,13 @@ export type TopbarProps = {
 };
 
 export const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
-    const { auth, setAuth, setToken } = useAuth();
+    const { auth } = useAuth();
+    const logout = useLogout();
     const navigate = useNavigate();
 
     const onLogout = async () => {
-        const afterLogout = () => {
-            setAuth(null);
-            setToken(null);
-            navigate('/');
-        };
-
-        logout()
-            .then((_) => afterLogout())
-            .catch((err) => {
-                console.log(err);
-                afterLogout();
-            });
+        await logout();
+        navigate('/login');
     };
 
     return (

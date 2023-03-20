@@ -1,20 +1,21 @@
-import { refresh } from '../api';
-import { useAuth } from './useAuth';
+import { useAuthApi } from '../api';
+import useAuth from './useAuth';
 
-export const useRefreshToken = () => {
+const useRefreshToken = () => {
+    const { refresh } = useAuthApi();
     const { setToken } = useAuth();
 
     const refreshToken = async () => {
-        await refresh()
-            .then((res) => {
-                console.log(res);
-                setToken(res.accessToken);
-            })
-            .catch((err) => {
-                console.log(err.response);
-                Promise.reject(err);
-            });
+        try {
+            const res = await refresh();
+            setToken(res.accessToken);
+            return res.accessToken;
+        } catch (err) {
+            Promise.reject(err);
+        }
     };
 
     return refreshToken;
 };
+
+export default useRefreshToken;

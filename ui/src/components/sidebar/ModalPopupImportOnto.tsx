@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import InputFile from './inputFile';
 import FileList from './FileList';
-import { OntologiesNames, getClasses, getProperties, uploadOntology } from '../../api/index';
+import { useAnnotationApi, OntologiesNames, useUploadApi } from '../../api/index';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = ({ annotationStore }: { annotationStore: any }) => {
@@ -13,6 +13,10 @@ const App = ({ annotationStore }: { annotationStore: any }) => {
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [anyFileUploaded, setAnyFileUploaded] = useState<boolean>(false);
     const supportedFiles = 'N-Triples, RDF/XML, OWL/XML';
+
+    const { getClasses, getProperties } = useAnnotationApi();
+    const { uploadOntology } = useUploadApi();
+
     const api = (param: any) => {
         return uploadOntology(param);
     };
