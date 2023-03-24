@@ -6,6 +6,9 @@ python-json-logger==0.1.10
 fastapi
 uvicorn
 
+# MongoDB driver
+motor==3.1.1
+
 # used for testing/formatting
 pytest
 pytest-env
@@ -26,6 +29,9 @@ rdflib
 # Password hashing and JWT
 passlib[bcrypt]
 python-jose[cryptography]
+
+# Data validation
+pydantic[email]
 
 pandas
 pdfplumber

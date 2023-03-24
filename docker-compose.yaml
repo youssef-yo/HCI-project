@@ -18,6 +18,8 @@ services:
             - PYTHONUNBUFFERED=1
             - LOG_LEVEL=DEBUG
         command: ["main:app", "--host", "0.0.0.0", "--reload"]
+        depends_on:
+            - mongodb
     ui:
         build:
           context: ./ui
@@ -30,6 +32,15 @@ services:
             - ./ui/package.json:/usr/local/src/skiff/app/ui/package.json
             - ./ui/tsconfig.json:/usr/local/src/skiff/app/ui/tsconfig.json
             - ./ui/yarn.lock:/usr/local/src/skiff/app/ui/yarn.lock
+    mongodb:
+        image: mongo
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=devusername
+            - MONGO_INITDB_ROOT_PASSWORD=devpassword
+        volumes:
+            - ./database/data:/data/db
+        ports:
+            - 27017:27017
     proxy:
         build: ./proxy
         ports:

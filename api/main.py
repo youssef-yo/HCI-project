@@ -1,8 +1,37 @@
-from fastapi import FastAPI, Response, status
-from routers import annotation, auth, doc, logout, ontology, refresh, upload, user
+from fastapi import (
+    FastAPI,
+    Response,
+    status
+)
+
+from core.events import (
+    create_start_app_handler,
+    create_stop_app_handler
+)
+
+from routers import (
+    annotation,
+    auth,
+    doc,
+    logout,
+    ontology,
+    refresh,
+    upload,
+    user
+)
 
 
 app = FastAPI()
+
+app.add_event_handler(
+    "startup",
+    create_start_app_handler()
+)
+
+app.add_event_handler(
+    "shutdown",
+    create_stop_app_handler()
+)
 
 app.include_router(annotation.router)
 app.include_router(auth.router)

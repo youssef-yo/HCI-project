@@ -3,16 +3,23 @@ import json
 import os
 from typing import List, Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status
+)
 from fastapi.responses import FileResponse
 
 from app import export
-from schemas.metadata import Allocation, PaperStatus
-from schemas.annotations import OntoClass, OntoProperty, OntologyData
-from schemas.users import UserDB
 
-from utils.configuration import configuration
-from utils.oauth2 import get_current_user
+from models.schemas.metadata import Allocation, PaperStatus
+from models.schemas.annotations import OntoClass, OntoProperty, OntologyData
+from models.domain.users import UserInDB
+
+from core.config import configuration
+
+from services.oauth2 import get_current_user
 
 
 router = APIRouter(
@@ -50,7 +57,7 @@ def get_properties(ontoNames: List[str]) -> List[OntoProperty]:
 
 
 @router.get("/allocation/info")
-def get_allocation_info(user: UserDB = Depends(get_current_user)) -> Allocation:
+def get_allocation_info(user: UserInDB = Depends(get_current_user)) -> Allocation:
 
     # In development, the app isn't passed the x_auth_request_email header,
     # meaning this would always fail. Instead, to smooth local development,
@@ -85,7 +92,7 @@ def get_allocation_info(user: UserDB = Depends(get_current_user)) -> Allocation:
 
 
 @router.get("/{sha}/export")
-def export_annotations(sha: str, user: UserDB = Depends(get_current_user)):
+def export_annotations(sha: str, user: UserInDB = Depends(get_current_user)):
     annotations = os.path.join(
         configuration.output_directory, sha, f"{user.email}_annotations.json"
     )

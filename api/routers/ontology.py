@@ -1,8 +1,12 @@
 import os
 from typing import List
-from fastapi import APIRouter, status
 
-from utils.configuration import configuration
+from fastapi import (
+    APIRouter,
+    status
+)
+
+from core.config import configuration
 
 
 router = APIRouter(

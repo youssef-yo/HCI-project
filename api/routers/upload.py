@@ -7,17 +7,23 @@ import uuid
 from owlready2 import *
 from rdflib import Graph
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    UploadFile
+)
 from fastapi.encoders import jsonable_encoder
-
-from schemas.annotations import OntoClass, OntoProperty, OntologyData
-from schemas.users import UserDB
 
 from app.assign import assign
 from app.preprocess import preprocess
 
-from utils.configuration import configuration
-from utils.oauth2 import get_current_user
+from models.schemas.annotations import OntoClass, OntoProperty, OntologyData
+from models.domain.users import UserInDB
+
+from services.oauth2 import get_current_user
+
+from core.config import configuration
 
 
 router = APIRouter(
@@ -27,7 +33,7 @@ router = APIRouter(
 
 
 @router.post("/ontology", response_model=OntologyData)
-def upload_ontology(user: UserDB = Depends(get_current_user), file: UploadFile = File(...)) -> OntologyData:
+def upload_ontology(user: UserInDB = Depends(get_current_user), file: UploadFile = File(...)) -> OntologyData:
     # l'argomento passato deve avere lo stesso nome che devinisco con
     # formData.append('nomeArgomento', fileObj, fileObj.name);
     # Altrimenti errore: '422 unprocessable entity fastapi'
@@ -44,7 +50,7 @@ def upload_ontology(user: UserDB = Depends(get_current_user), file: UploadFile =
 
 
 @router.post("/doc")
-def upload_document(user: UserDB = Depends(get_current_user), file: UploadFile = File(...)):
+def upload_document(user: UserInDB = Depends(get_current_user), file: UploadFile = File(...)):
     """
     Add a PDF to the pawls dataset (skiff_files/).
     """

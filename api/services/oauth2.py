@@ -1,17 +1,26 @@
+import os
 from datetime import datetime, timedelta
 from typing import Union
-import os
-from fastapi import Depends, HTTPException, status
+
+from fastapi import (
+    Depends,
+    HTTPException,
+    status
+)
 from fastapi.security import OAuth2PasswordBearer
+
 from jose import JWTError, jwt
 
-from schemas.users import UserDB
-from schemas.jwt_tokens import AccessTokenData, RefreshTokenData
+from db.database import get_users_repo
+from db.repositories.users import UserRepository
 
-from utils.user_utils import load_user
+from models.domain.users import UserInDB
+from models.schemas.jwt_tokens import (
+    AccessTokenData,
+    RefreshTokenData
+)
 
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/", scheme_name="JWT")
 
 
 # This are default development values, the real values must be set in a .env file
@@ -68,7 +77,7 @@ def verify_access_token(token: str, credentials_exception: HTTPException) -> Acc
         token_data = AccessTokenData(**payload)
 
         # Check that username is set
-        if not token_data.userInfo.username:
+        if not token_data.user_info.username:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
@@ -96,7 +105,13 @@ def verify_refresh_token(token: str) -> Union[RefreshTokenData, None]:
     return token_data
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> UserDB:
+def get_current_user(
+        token: str = Depends(oauth2_scheme),
+        user_repo: UserRepository = Depends(get_users_repo)
+) -> UserInDB:
+    """
+    Gets the current user, related to the JWT access token.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail=f"Could not validate credentials",
@@ -105,7 +120,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> UserDB:
 
     token_data = verify_access_token(token, credentials_exception)
 
-    user = load_user(token_data.userInfo.username)
+    user = user_repo.find_by_email(token_data.user_info.username)
 
     if not user:
         raise HTTPException(

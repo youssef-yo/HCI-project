@@ -1,10 +1,22 @@
-from typing import Union
+from typing import Optional
 
-from fastapi import APIRouter, Cookie, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Cookie,
+    Depends,
+    HTTPException,
+    status
+)
 
-from schemas.jwt_tokens import AccessToken
+from db.database import get_users_repo
+from db.repositories.users import UserRepository
 
-from utils import oauth2, user_utils
+from models.schemas.jwt_tokens import AccessToken
+
+from services.oauth2 import (
+    create_access_token,
+    verify_refresh_token
+)
 
 
 router = APIRouter(
@@ -13,7 +25,10 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=AccessToken)
-def refresh(X_Auth_Token: Union[str, None] = Cookie(default=None, alias="X-Auth-Token")) -> AccessToken:
+def refresh(
+    X_Auth_Token: Optional[str] = Cookie(default=None, alias="X-Auth-Token"),
+    user_repo: UserRepository = Depends(get_users_repo)
+) -> AccessToken:
     """
     Returns a new JWT access token, if the refresh token is valid.
     """
@@ -24,31 +39,29 @@ def refresh(X_Auth_Token: Union[str, None] = Cookie(default=None, alias="X-Auth-
         )
     
     # Find user who has this token assigned
-    foundUser = [user for user in user_utils.load_users() if user.refresh_token == X_Auth_Token]
+    found_user = user_repo.find_by_refresh_token(X_Auth_Token)
 
-    if not foundUser:
+    if not found_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Forbidden"
         )
-    
-    foundUser = foundUser[0]
 
     # Verify JWT refresh token
-    token_data = oauth2.verify_refresh_token(X_Auth_Token)
+    token_data = verify_refresh_token(X_Auth_Token)
 
-    if not token_data or foundUser.email != token_data.username:
+    if not token_data or found_user.email != token_data.username:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Forbidden"
         )
 
     # Create JWT access token
-    access_token = oauth2.create_access_token(data={
+    access_token = create_access_token(data={
         "userInfo": {
-            "username": foundUser.email,
-            "role": foundUser.role
+            "username": found_user.email,
+            "role": found_user.role
         }
     })
 
-    return {"accessToken": access_token, "tokenType": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer"}

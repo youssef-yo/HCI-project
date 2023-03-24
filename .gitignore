@@ -22,6 +22,9 @@ api/onto/*
 api/users/*
 api/extracted_annotations/*
 
+# MongoDB Database Volumes
+database
+
 ### Python Build Related ### 
 
 # Byte-compiled / optimized / DLL files

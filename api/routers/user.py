@@ -1,10 +1,23 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status
+)
 
-from schemas.users import UserOut, UserIn
+from db.database import get_users_repo
+from db.repositories.users import UserRepository
 
-from utils import oauth2, user_utils, utils
+from models.domain.users import UserInDB
+from models.schemas.users import (
+    UserInCreate,
+    UserOutResponse
+)
+
+from services.security import hash_password
+from services.oauth2 import get_current_user as get_current_auth_user
 
 
 router = APIRouter(
@@ -13,52 +26,64 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[UserOut])
-def get_users() -> List[UserOut]:
+@router.get("/", response_model=List[UserOutResponse])
+def get_users(
+    user_repo: UserRepository = Depends(get_users_repo)
+) -> List[UserOutResponse]:
     """
     Returns all the users currently created.
     """
-    return user_utils.load_users()
+    return user_repo.find_all()
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserOut)
-def create_user(user: UserIn) -> UserOut:
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserOutResponse)
+def create_user(
+    user: UserInCreate,
+    user_repo: UserRepository = Depends(get_users_repo)
+) -> UserOutResponse:
     """
     Creates a new user, if another one with the same email does not already exist.
     """
-    stored_user = user_utils.load_user(user.email)
+    stored_user = user_repo.find_by_email(user.email)
 
     if stored_user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"User {user.email} already exists."
         )
-    
+
     if not user.role:
         user.role = "Annotator"
 
-    hashed_password = utils.hash_password(user.password)
-    user.password = hashed_password
+    hashed_password = hash_password(user.password)
 
-    user_utils.save_user(user)
+    new_user = UserInDB(
+        email=user.email,
+        full_name=user.full_name,
+        role=user.role,
+        hashed_password=hashed_password
+    )
 
-    return UserOut(**user.dict())
+    return user_repo.create(new_user)
 
 
-@router.get("/me", response_model=UserOut)
-def get_current_user(user: str = Depends(oauth2.get_current_user)) -> UserOut:
+@router.get("/me", response_model=UserOutResponse)
+def get_current_user(user: str = Depends(get_current_auth_user)) -> UserOutResponse:
     """
     Returns the user that is currently logged in.
     """
     return user
 
 
-@router.get("/{email}", response_model=UserOut)
-def get_user(email: str) -> UserOut:
+@router.get("/{email}", response_model=UserOutResponse)
+def get_user(
+    email: str,
+    user_repo: UserRepository = Depends(get_users_repo)
+) -> UserOutResponse:
     """
     Returns the user with the given email, if exists.
     """
-    user = user_utils.load_user(email)
+    user = user_repo.find_by_email(email)
 
     if not user:
         raise HTTPException(
@@ -66,4 +91,4 @@ def get_user(email: str) -> UserOut:
             detail=f"User {email} not found."
         )
     
-    return UserOut(**user.dict())
+    return user

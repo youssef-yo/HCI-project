@@ -2,15 +2,22 @@ import json
 import os
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    HTTPException,
+    status
+)
 from fastapi.responses import FileResponse
 from fastapi.encoders import jsonable_encoder
 
-from schemas.annotations import Annotation, PdfAnnotation, RelationGroup
-from schemas.users import UserDB
+from models.schemas.annotations import Annotation, PdfAnnotation, RelationGroup
+from models.domain.users import UserInDB
 
-from utils.configuration import configuration
-from utils.oauth2 import get_current_user
+from services.oauth2 import get_current_user
+
+from core.config import configuration
 
 
 router = APIRouter(
@@ -19,7 +26,7 @@ router = APIRouter(
 )
 
 
-@router.get("/{sha}/pdf")
+@router.get("/{sha}/pdf", response_class=FileResponse)
 async def get_pdf(sha: str):
     """
     Fetches a PDF.
@@ -61,7 +68,7 @@ async def get_pdf_title(sha: str) -> Optional[str]:
 
 @router.post("/{sha}/comments")
 def set_pdf_comments(
-    sha: str, comments: str = Body(...), user: UserDB = Depends(get_current_user)
+    sha: str, comments: str = Body(...), user: UserInDB = Depends(get_current_user)
 ):
     status_path = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
     exists = os.path.exists(status_path)
@@ -76,7 +83,7 @@ def set_pdf_comments(
 
 @router.post("/{sha}/junk")
 def set_pdf_junk(
-    sha: str, junk: bool = Body(...), user: UserDB = Depends(get_current_user)
+    sha: str, junk: bool = Body(...), user: UserInDB = Depends(get_current_user)
 ):
     status_path = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
     exists = os.path.exists(status_path)
@@ -90,7 +97,7 @@ def set_pdf_junk(
 
 @router.post("/{sha}/finished")
 def set_pdf_finished(
-    sha: str, finished: bool = Body(...), user: UserDB = Depends(get_current_user)
+    sha: str, finished: bool = Body(...), user: UserInDB = Depends(get_current_user)
 ):
     status_path = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
     exists = os.path.exists(status_path)
@@ -104,7 +111,7 @@ def set_pdf_finished(
 
 @router.get("/{sha}/annotations")
 def get_annotations(
-    sha: str, user: UserDB = Depends(get_current_user)
+    sha: str, user: UserInDB = Depends(get_current_user)
 ) -> PdfAnnotation:
     annotations = os.path.join(
         configuration.output_directory, sha, f"{user.email}_annotations.json"
@@ -126,7 +133,7 @@ def save_annotations(
     sha: str,
     annotations: List[Annotation],
     relations: List[RelationGroup],
-    user: UserDB = Depends(get_current_user),
+    user: UserInDB = Depends(get_current_user),
 ):
     """
     sha: str
