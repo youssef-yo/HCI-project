@@ -13,17 +13,14 @@ from fastapi.responses import FileResponse
 from fastapi.encoders import jsonable_encoder
 
 from models.schemas.annotations import Annotation, PdfAnnotation, RelationGroup
-from models.domain.users import UserInDB
+from models.domain.users import UserDocument
 
 from services.oauth2 import get_current_user
 
-from core.config import configuration
+from core.config import settings
 
 
-router = APIRouter(
-    prefix="/api/doc",
-    tags=['Documents']
-)
+router = APIRouter()
 
 
 @router.get("/{sha}/pdf", response_class=FileResponse)
@@ -34,7 +31,7 @@ async def get_pdf(sha: str):
     sha: str
         The sha of the pdf to return.
     """
-    pdf = os.path.join(configuration.output_directory, sha, f"{sha}.pdf")
+    pdf = os.path.join(settings.output_directory, sha, f"{sha}.pdf")
     pdf_exists = os.path.exists(pdf)
     if not pdf_exists:
         raise HTTPException(
@@ -53,7 +50,7 @@ async def get_pdf_title(sha: str) -> Optional[str]:
     sha: str
         The sha of the pdf title to return.
     """
-    pdf_info = os.path.join(configuration.output_directory, "pdf_metadata.json")
+    pdf_info = os.path.join(settings.output_directory, "pdf_metadata.json")
 
     with open(pdf_info, "r") as f:
         info = json.load(f)
@@ -68,9 +65,9 @@ async def get_pdf_title(sha: str) -> Optional[str]:
 
 @router.post("/{sha}/comments")
 def set_pdf_comments(
-    sha: str, comments: str = Body(...), user: UserInDB = Depends(get_current_user)
+    sha: str, comments: str = Body(...), user: UserDocument = Depends(get_current_user)
 ):
-    status_path = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
+    status_path = os.path.join(settings.output_directory, "status", f"{user.email}.json")
     exists = os.path.exists(status_path)
 
     if not exists:
@@ -83,9 +80,9 @@ def set_pdf_comments(
 
 @router.post("/{sha}/junk")
 def set_pdf_junk(
-    sha: str, junk: bool = Body(...), user: UserInDB = Depends(get_current_user)
+    sha: str, junk: bool = Body(...), user: UserDocument = Depends(get_current_user)
 ):
-    status_path = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
+    status_path = os.path.join(settings.output_directory, "status", f"{user.email}.json")
     exists = os.path.exists(status_path)
     if not exists:
         # Not an allocated user. Do nothing.
@@ -97,9 +94,9 @@ def set_pdf_junk(
 
 @router.post("/{sha}/finished")
 def set_pdf_finished(
-    sha: str, finished: bool = Body(...), user: UserInDB = Depends(get_current_user)
+    sha: str, finished: bool = Body(...), user: UserDocument = Depends(get_current_user)
 ):
-    status_path = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
+    status_path = os.path.join(settings.output_directory, "status", f"{user.email}.json")
     exists = os.path.exists(status_path)
     if not exists:
         # Not an allocated user. Do nothing.
@@ -111,10 +108,10 @@ def set_pdf_finished(
 
 @router.get("/{sha}/annotations")
 def get_annotations(
-    sha: str, user: UserInDB = Depends(get_current_user)
+    sha: str, user: UserDocument = Depends(get_current_user)
 ) -> PdfAnnotation:
     annotations = os.path.join(
-        configuration.output_directory, sha, f"{user.email}_annotations.json"
+        settings.output_directory, sha, f"{user.email}_annotations.json"
     )
     exists = os.path.exists(annotations)
 
@@ -133,7 +130,7 @@ def save_annotations(
     sha: str,
     annotations: List[Annotation],
     relations: List[RelationGroup],
-    user: UserInDB = Depends(get_current_user),
+    user: UserDocument = Depends(get_current_user),
 ):
     """
     sha: str
@@ -149,13 +146,13 @@ def save_annotations(
     """
     # Update the annotations in the annotation json file.
     annotations_path = os.path.join(
-        configuration.output_directory, sha, f"{user.email}_annotations.json"
+        settings.output_directory, sha, f"{user.email}_annotations.json"
     )
     json_annotations = [jsonable_encoder(a) for a in annotations]
     json_relations = [jsonable_encoder(r) for r in relations]
 
     # Update the annotation counts in the status file.
-    status_path = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
+    status_path = os.path.join(settings.output_directory, "status", f"{user.email}.json")
     exists = os.path.exists(status_path)
     if not exists:
         # Not an allocated user. Do nothing.
@@ -177,7 +174,7 @@ def get_tokens(sha: str):
     sha: str
         PDF sha to retrieve tokens for.
     """
-    pdf_tokens = os.path.join(configuration.output_directory, sha, "pdf_structure.json")
+    pdf_tokens = os.path.join(settings.output_directory, sha, "pdf_structure.json")
     if not os.path.exists(pdf_tokens):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -15,7 +15,7 @@ const useAuthApi = () => {
      */
     const login: (formData: FormData) => Promise<JWTToken> = async (formData: FormData) => {
         return axios
-            .post('/api/auth/', formData, {
+            .post('/api/auth', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -29,7 +29,7 @@ const useAuthApi = () => {
      */
     const logout: () => Promise<any> = async () => {
         return axios
-            .get('/api/logout/', {
+            .get('/api/logout', {
                 withCredentials: true,
             })
             .then((res) => res.data)
@@ -43,7 +43,7 @@ const useAuthApi = () => {
      */
     const refresh: () => Promise<JWTToken> = async () => {
         return axios
-            .get('/api/refresh/', {
+            .get('/api/refresh', {
                 withCredentials: true,
             })
             .then((res) => res.data)

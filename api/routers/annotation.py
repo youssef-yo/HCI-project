@@ -15,17 +15,14 @@ from app import export
 
 from models.schemas.metadata import Allocation, PaperStatus
 from models.schemas.annotations import OntoClass, OntoProperty, OntologyData
-from models.domain.users import UserInDB
+from models.domain.users import UserDocument
 
-from core.config import configuration
+from core.config import settings
 
 from services.oauth2 import get_current_user
 
 
-router = APIRouter(
-    prefix="/api/annotation",
-    tags=['Annotation']
-)
+router = APIRouter()
 
 
 @router.post("/classes")
@@ -57,7 +54,7 @@ def get_properties(ontoNames: List[str]) -> List[OntoProperty]:
 
 
 @router.get("/allocation/info")
-def get_allocation_info(user: UserInDB = Depends(get_current_user)) -> Allocation:
+def get_allocation_info(user: UserDocument = Depends(get_current_user)) -> Allocation:
 
     # In development, the app isn't passed the x_auth_request_email header,
     # meaning this would always fail. Instead, to smooth local development,
@@ -65,7 +62,7 @@ def get_allocation_info(user: UserInDB = Depends(get_current_user)) -> Allocatio
     # mechanism.
     # user = get_user_from_header(x_auth_request_email)
     
-    status_dir = os.path.join(configuration.output_directory, "status")
+    status_dir = os.path.join(settings.output_directory, "status")
     status_path = os.path.join(status_dir, f"{user.email}.json")
     exists = os.path.exists(status_path)
 
@@ -92,13 +89,13 @@ def get_allocation_info(user: UserInDB = Depends(get_current_user)) -> Allocatio
 
 
 @router.get("/{sha}/export")
-def export_annotations(sha: str, user: UserInDB = Depends(get_current_user)):
+def export_annotations(sha: str, user: UserDocument = Depends(get_current_user)):
     annotations = os.path.join(
-        configuration.output_directory, sha, f"{user.email}_annotations.json"
+        settings.output_directory, sha, f"{user.email}_annotations.json"
     )
     exists = os.path.exists(annotations)
 
-    path_pdfs_satus = os.path.join(configuration.output_directory, "status", f"{user.email}.json")
+    path_pdfs_satus = os.path.join(settings.output_directory, "status", f"{user.email}.json")
 
     with open(path_pdfs_satus, "r") as f:
         pdfs_satus = json.load(f)
@@ -115,7 +112,7 @@ def export_annotations(sha: str, user: UserInDB = Depends(get_current_user)):
 
     abspath_annotations = os.path.abspath(annotations)
     path_export = os.path.join(
-        configuration.directory_extracted_annotations, f"{sha}_extractedAnnotations"
+        settings.directory_extracted_annotations, f"{sha}_extractedAnnotations"
     )
     abspath_export = os.path.abspath(path_export)
 
@@ -136,12 +133,12 @@ def export_annotations(sha: str, user: UserInDB = Depends(get_current_user)):
 
 
 def all_pdf_shas() -> List[str]:
-    pdfs = glob.glob(f"{configuration.output_directory}/*/*.pdf")
+    pdfs = glob.glob(f"{settings.output_directory}/*/*.pdf")
     return [p.split("/")[-2] for p in pdfs]
 
 
 def getClassesAndPropertiesFromJsonOntology(filename: str) -> OntologyData:
-    file_location = os.path.join(configuration.extracted_data_from_ontology_directory, f"{filename}.json")
+    file_location = os.path.join(settings.extracted_data_from_ontology_directory, f"{filename}.json")
     classesResult: Any
     propertiesResult: Any
     exists = os.path.exists(file_location)

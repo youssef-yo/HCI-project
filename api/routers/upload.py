@@ -19,26 +19,23 @@ from app.assign import assign
 from app.preprocess import preprocess
 
 from models.schemas.annotations import OntoClass, OntoProperty, OntologyData
-from models.domain.users import UserInDB
+from models.domain.users import UserDocument
 
 from services.oauth2 import get_current_user
 
-from core.config import configuration
+from core.config import settings
 
 
-router = APIRouter(
-    prefix="/api/upload",
-    tags=['Upload']
-)
+router = APIRouter()
 
 
 @router.post("/ontology", response_model=OntologyData)
-def upload_ontology(user: UserInDB = Depends(get_current_user), file: UploadFile = File(...)) -> OntologyData:
+def upload_ontology(user: UserDocument = Depends(get_current_user), file: UploadFile = File(...)) -> OntologyData:
     # l'argomento passato deve avere lo stesso nome che devinisco con
     # formData.append('nomeArgomento', fileObj, fileObj.name);
     # Altrimenti errore: '422 unprocessable entity fastapi'
 
-    file_location = os.path.join(configuration.upload_ontology_directory, f"{file.filename}")
+    file_location = os.path.join(settings.upload_ontology_directory, f"{file.filename}")
 
     with open(file_location, "wb+") as buffer:
         shutil.copyfileobj(file.file, buffer)
@@ -50,7 +47,7 @@ def upload_ontology(user: UserInDB = Depends(get_current_user), file: UploadFile
 
 
 @router.post("/doc")
-def upload_document(user: UserInDB = Depends(get_current_user), file: UploadFile = File(...)):
+def upload_document(user: UserDocument = Depends(get_current_user), file: UploadFile = File(...)):
     """
     Add a PDF to the pawls dataset (skiff_files/).
     """
@@ -58,7 +55,7 @@ def upload_document(user: UserInDB = Depends(get_current_user), file: UploadFile
 
     pdf_name = Path(pdf).stem
 
-    output_dir = os.path.join(configuration.output_directory, pdf_name)
+    output_dir = os.path.join(settings.output_directory, pdf_name)
 
     os.umask(0)
     os.mkdir(output_dir, 0o777)
@@ -70,7 +67,7 @@ def upload_document(user: UserInDB = Depends(get_current_user), file: UploadFile
 
     npages = preprocess("pdfplumber", file_location)
 
-    assign(configuration.output_directory, user.email, pdf_name, npages, file_location)
+    assign(settings.output_directory, user.email, pdf_name, npages, file_location)
     return "ok"
 
 
@@ -196,6 +193,6 @@ def analyze_ontology(path: str) -> OntologyData:
 
 
 def saveOntologyDataToJson(ontology: Ontology, name: str):
-    path = os.path.join(configuration.extracted_data_from_ontology_directory, f"{name}.json")
+    path = os.path.join(settings.extracted_data_from_ontology_directory, f"{name}.json")
     with open(path, "w+") as f:
         json.dump(ontology, f)

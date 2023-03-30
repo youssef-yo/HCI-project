@@ -4,43 +4,23 @@ from fastapi import (
     status
 )
 
-from core.events import (
-    create_start_app_handler,
-    create_stop_app_handler
-)
+from core.events import lifespan
+from core.logging import configure_logging
 
-from routers import (
-    annotation,
-    auth,
-    doc,
-    logout,
-    ontology,
-    refresh,
-    upload,
-    user
-)
+from routers import api
 
 
-app = FastAPI()
+def get_application() -> FastAPI:
+    configure_logging()
 
-app.add_event_handler(
-    "startup",
-    create_start_app_handler()
-)
+    application = FastAPI(lifespan=lifespan)
 
-app.add_event_handler(
-    "shutdown",
-    create_stop_app_handler()
-)
+    application.include_router(api.router, prefix="/api")
 
-app.include_router(annotation.router)
-app.include_router(auth.router)
-app.include_router(doc.router)
-app.include_router(logout.router)
-app.include_router(ontology.router)
-app.include_router(refresh.router)
-app.include_router(upload.router)
-app.include_router(user.router)
+    return application
+
+
+app = get_application()
 
 
 @app.get("/", status_code=status.HTTP_204_NO_CONTENT)

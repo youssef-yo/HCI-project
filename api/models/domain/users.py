@@ -1,9 +1,11 @@
 from typing import Optional
 from pydantic import EmailStr
 
-from models.domain.rwmodel import RWModel
+from beanie import Document
 
-from services import security
+from core.config import settings
+
+from models.domain.rwmodel import RWModel
 
 
 class UserBase(RWModel):
@@ -12,9 +14,12 @@ class UserBase(RWModel):
     role: Optional[str] = None
 
 
-class UserInDB(UserBase):
+class UserDocument(Document):
+    email: EmailStr
+    full_name: str
+    role: Optional[str] = None
     hashed_password: str
     refresh_token: Optional[str] = None
 
-    def check_password(self, password: str) -> bool:
-        return security.verify_password(password, self.hashed_password)
+    class Settings:
+        name = settings.users_collection

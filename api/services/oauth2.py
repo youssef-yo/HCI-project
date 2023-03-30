@@ -11,10 +11,9 @@ from fastapi.security import OAuth2PasswordBearer
 
 from jose import JWTError, jwt
 
-from db.database import get_users_repo
-from db.repositories.users import UserRepository
+from core.config import settings
 
-from models.domain.users import UserInDB
+from models.domain.users import UserDocument
 from models.schemas.jwt_tokens import (
     AccessTokenData,
     RefreshTokenData
@@ -23,30 +22,16 @@ from models.schemas.jwt_tokens import (
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/", scheme_name="JWT")
 
 
-# This are default development values, the real values must be set in a .env file
-# to get a string like this run:
-# openssl rand -hex 32
-ACCESS_TOKEN_SECRET = os.getenv(
-    "ACCESS_TOKEN_SECRET", "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")
-REFRESH_TOKEN_SECRET = os.getenv(
-    "REFRESH_TOKEN_SECRET", "7eeef6cceaba350ddc132e676c2f60941fc89b4d60870dc5ca11f36722aca1c7")
-
-ALGORITHM = os.getenv("ALGORITHM", "HS256")
-
-ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 20)
-REFRESH_TOKEN_EXPIRE_DAYS = os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 30)
-
-
 def create_access_token(data: dict) -> str:
     """
     Creates a new JWT access token.
     """
     to_encode = data.copy()
 
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
     to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(to_encode, ACCESS_TOKEN_SECRET, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.access_token_secret, algorithm=settings.jwt_algorithm)
 
     return encoded_jwt
 
@@ -57,10 +42,10 @@ def create_refresh_token(data: dict) -> str:
     """
     to_encode = data.copy()
 
-    expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.utcnow() + timedelta(days=settings.refresh_token_expire_days)
     to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(to_encode, REFRESH_TOKEN_SECRET, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.refresh_token_secret, algorithm=settings.jwt_algorithm)
 
     return encoded_jwt
 
@@ -71,7 +56,7 @@ def verify_access_token(token: str, credentials_exception: HTTPException) -> Acc
     Returns the token data if valid, else raises the given exception.
     """
     try:
-        payload = jwt.decode(token, ACCESS_TOKEN_SECRET, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.access_token_secret, algorithms=[settings.jwt_algorithm])
 
         # Conversion successful, can safely convert payload to pydantic model
         token_data = AccessTokenData(**payload)
@@ -91,7 +76,7 @@ def verify_refresh_token(token: str) -> Union[RefreshTokenData, None]:
     Returns the token data if valid, else None.
     """
     try:
-        payload = jwt.decode(token, REFRESH_TOKEN_SECRET, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.refresh_token_secret, algorithms=[settings.jwt_algorithm])
 
         # Conversion successful, can safely convert payload to pydantic model
         token_data = RefreshTokenData(**payload)
@@ -105,10 +90,7 @@ def verify_refresh_token(token: str) -> Union[RefreshTokenData, None]:
     return token_data
 
 
-def get_current_user(
-        token: str = Depends(oauth2_scheme),
-        user_repo: UserRepository = Depends(get_users_repo)
-) -> UserInDB:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserDocument:
     """
     Gets the current user, related to the JWT access token.
     """
@@ -120,7 +102,7 @@ def get_current_user(
 
     token_data = verify_access_token(token, credentials_exception)
 
-    user = user_repo.find_by_email(token_data.user_info.username)
+    user = await UserDocument.find_one(UserDocument.email == token_data.user_info.username)
 
     if not user:
         raise HTTPException(

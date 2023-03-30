@@ -1,4 +1,6 @@
-from typing import Callable
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
 
 from db.events import (
     connect_to_db,
@@ -6,15 +8,12 @@ from db.events import (
 )
 
 
-def create_start_app_handler() -> Callable:
-    def start_app() -> None:
-        connect_to_db()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Create the connection with the database
+    await connect_to_db()
 
-    return start_app
+    yield
 
-
-def create_stop_app_handler() -> Callable:
-    def stop_app() -> None:
-        close_db_connection()
-
-    return stop_app
+    # Close the connection with the database
+    close_db_connection()
