@@ -17,7 +17,7 @@ from models.schemas.metadata import Allocation, PaperStatus
 from models.schemas.annotations import OntoClass, OntoProperty, OntologyData
 from models.domain.users import UserDocument
 
-from core.config import settings
+from core.config import Settings, get_settings
 
 from services.oauth2 import get_current_user
 
@@ -54,14 +54,17 @@ def get_properties(ontoNames: List[str]) -> List[OntoProperty]:
 
 
 @router.get("/allocation/info")
-def get_allocation_info(user: UserDocument = Depends(get_current_user)) -> Allocation:
+def get_allocation_info(
+    user: UserDocument = Depends(get_current_user),
+    settings: Settings = Depends(get_settings)
+) -> Allocation:
 
     # In development, the app isn't passed the x_auth_request_email header,
     # meaning this would always fail. Instead, to smooth local development,
     # we always return all pdfs, essentially short-circuiting the allocation
     # mechanism.
     # user = get_user_from_header(x_auth_request_email)
-    
+
     status_dir = os.path.join(settings.output_directory, "status")
     status_path = os.path.join(status_dir, f"{user.email}.json")
     exists = os.path.exists(status_path)
@@ -89,7 +92,11 @@ def get_allocation_info(user: UserDocument = Depends(get_current_user)) -> Alloc
 
 
 @router.get("/{sha}/export")
-def export_annotations(sha: str, user: UserDocument = Depends(get_current_user)):
+def export_annotations(
+    sha: str,
+    user: UserDocument = Depends(get_current_user),
+    settings: Settings = Depends(get_settings)
+):
     annotations = os.path.join(
         settings.output_directory, sha, f"{user.email}_annotations.json"
     )
@@ -133,12 +140,12 @@ def export_annotations(sha: str, user: UserDocument = Depends(get_current_user))
 
 
 def all_pdf_shas() -> List[str]:
-    pdfs = glob.glob(f"{settings.output_directory}/*/*.pdf")
+    pdfs = glob.glob(f"{get_settings().output_directory}/*/*.pdf")
     return [p.split("/")[-2] for p in pdfs]
 
 
 def getClassesAndPropertiesFromJsonOntology(filename: str) -> OntologyData:
-    file_location = os.path.join(settings.extracted_data_from_ontology_directory, f"{filename}.json")
+    file_location = os.path.join(get_settings().extracted_data_from_ontology_directory, f"{filename}.json")
     classesResult: Any
     propertiesResult: Any
     exists = os.path.exists(file_location)

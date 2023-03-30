@@ -1,6 +1,6 @@
 import logging
 
-from core.config import settings
+from core.config import get_settings
 
 from models.domain.users import UserDocument
 
@@ -29,4 +29,4 @@ async def create_base_admin(email: str, password: str) -> None:
 
 
 async def setup_application() -> None:
-    await create_base_admin(settings.base_admin_email, settings.base_admin_pwd)
+    await create_base_admin(get_settings().base_admin_email, get_settings().base_admin_pwd)

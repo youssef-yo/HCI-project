@@ -1,7 +1,7 @@
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from core.config import settings
+from core.config import get_settings
 
 from models.domain.users import UserDocument
 
@@ -23,7 +23,7 @@ class MongoClient:
         self._client.close()
 
 
-db = MongoClient(settings.mongodb_uri, settings.db_name)
+db = MongoClient(get_settings().mongodb_uri, get_settings().db_name)
 
 
 async def initialize_db():

@@ -23,14 +23,18 @@ from models.domain.users import UserDocument
 
 from services.oauth2 import get_current_user
 
-from core.config import settings
+from core.config import Settings, get_settings
 
 
 router = APIRouter()
 
 
 @router.post("/ontology", response_model=OntologyData)
-def upload_ontology(user: UserDocument = Depends(get_current_user), file: UploadFile = File(...)) -> OntologyData:
+def upload_ontology(
+    user: UserDocument = Depends(get_current_user),
+    file: UploadFile = File(...),
+    settings: Settings = Depends(get_settings)
+) -> OntologyData:
     # l'argomento passato deve avere lo stesso nome che devinisco con
     # formData.append('nomeArgomento', fileObj, fileObj.name);
     # Altrimenti errore: '422 unprocessable entity fastapi'
@@ -47,7 +51,11 @@ def upload_ontology(user: UserDocument = Depends(get_current_user), file: Upload
 
 
 @router.post("/doc")
-def upload_document(user: UserDocument = Depends(get_current_user), file: UploadFile = File(...)):
+def upload_document(
+    user: UserDocument = Depends(get_current_user),
+    file: UploadFile = File(...),
+    settings: Settings = Depends(get_settings)
+):
     """
     Add a PDF to the pawls dataset (skiff_files/).
     """
@@ -193,6 +201,6 @@ def analyze_ontology(path: str) -> OntologyData:
 
 
 def saveOntologyDataToJson(ontology: Ontology, name: str):
-    path = os.path.join(settings.extracted_data_from_ontology_directory, f"{name}.json")
+    path = os.path.join(get_settings().extracted_data_from_ontology_directory, f"{name}.json")
     with open(path, "w+") as f:
         json.dump(ontology, f)

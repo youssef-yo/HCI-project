@@ -11,7 +11,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from jose import JWTError, jwt
 
-from core.config import settings
+from core.config import get_settings
 
 from models.domain.users import UserDocument
 from models.schemas.jwt_tokens import (
@@ -28,10 +28,10 @@ def create_access_token(data: dict) -> str:
     """
     to_encode = data.copy()
 
-    expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
+    expire = datetime.utcnow() + timedelta(minutes=get_settings().access_token_expire_minutes)
     to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(to_encode, settings.access_token_secret, algorithm=settings.jwt_algorithm)
+    encoded_jwt = jwt.encode(to_encode, get_settings().access_token_secret, algorithm=get_settings().jwt_algorithm)
 
     return encoded_jwt
 
@@ -42,10 +42,11 @@ def create_refresh_token(data: dict) -> str:
     """
     to_encode = data.copy()
 
-    expire = datetime.utcnow() + timedelta(days=settings.refresh_token_expire_days)
+    expire = datetime.utcnow() + timedelta(days=get_settings().refresh_token_expire_days)
     to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(to_encode, settings.refresh_token_secret, algorithm=settings.jwt_algorithm)
+    encoded_jwt = jwt.encode(to_encode, get_settings().refresh_token_secret,
+                             algorithm=get_settings().jwt_algorithm)
 
     return encoded_jwt
 
@@ -56,7 +57,7 @@ def verify_access_token(token: str, credentials_exception: HTTPException) -> Acc
     Returns the token data if valid, else raises the given exception.
     """
     try:
-        payload = jwt.decode(token, settings.access_token_secret, algorithms=[settings.jwt_algorithm])
+        payload = jwt.decode(token, get_settings().access_token_secret, algorithms=[get_settings().jwt_algorithm])
 
         # Conversion successful, can safely convert payload to pydantic model
         token_data = AccessTokenData(**payload)
@@ -76,7 +77,7 @@ def verify_refresh_token(token: str) -> Union[RefreshTokenData, None]:
     Returns the token data if valid, else None.
     """
     try:
-        payload = jwt.decode(token, settings.refresh_token_secret, algorithms=[settings.jwt_algorithm])
+        payload = jwt.decode(token, get_settings().refresh_token_secret, algorithms=[get_settings().jwt_algorithm])
 
         # Conversion successful, can safely convert payload to pydantic model
         token_data = RefreshTokenData(**payload)

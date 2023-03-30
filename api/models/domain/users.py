@@ -3,7 +3,7 @@ from pydantic import EmailStr
 
 from beanie import Document
 
-from core.config import settings
+from core.config import get_settings
 
 from models.domain.rwmodel import RWModel
 
@@ -22,4 +22,4 @@ class UserDocument(Document):
     refresh_token: Optional[str] = None
 
     class Settings:
-        name = settings.users_collection
+        name = get_settings().users_collection

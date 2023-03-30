@@ -13,7 +13,10 @@ from routers import api
 def get_application() -> FastAPI:
     configure_logging()
 
-    application = FastAPI(lifespan=lifespan)
+    application = FastAPI(
+        title="ONTO-PAWLS",
+        lifespan=lifespan
+    )
 
     application.include_router(api.router, prefix="/api")
 
