@@ -21,8 +21,12 @@ class Settings:
     access_token_expire_minutes: int = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 20)
     refresh_token_expire_days: int = os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 30)
 
-    mongodb_uri: str = os.getenv('MONGODB_URI', 'mongodb://devusername:devpassword@mongodb:27017/')
+    # Base admin credentials
+    base_admin_email: str = os.getenv("BASE_ADMIN_EMAIL", "devadmin@example.com")
+    base_admin_pwd: str = os.getenv("BASE_ADMIN_PWD", "12345")
 
+    # Database properties
+    mongodb_uri: str = os.getenv('MONGODB_URI', 'mongodb://devusername:devpassword@mongodb:27017/')
     db_name: str = os.getenv("DB_NAME", "ontopawls")
     users_collection: str = os.getenv("DB_USERS_COLLECTION", "users")
 
