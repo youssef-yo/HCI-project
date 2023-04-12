@@ -3,12 +3,22 @@ import {
     MdOutlineDashboard,
     MdOutlineDescription,
     MdOutlineGroup,
+    MdOutlineHub,
+    MdOutlinePersonAddAlt,
 } from 'react-icons/md';
 import { NavLink, Outlet, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 import { Sidebar, Topbar, WithSidebar, WithTopbar } from '../components/common';
 import { Header } from '../components/sidebar';
-import { DashSummary, Papers, Tasks, Users } from './dashboard';
+import {
+    DashSummary,
+    Papers,
+    Tasks,
+    Users,
+    UserDetails,
+    UserCreate,
+    Ontologies,
+} from './dashboard';
 
 export const DashPage = () => {
     const topbarHeight = '68px';
@@ -29,23 +39,34 @@ export const DashPage = () => {
                     </div>
                     <div>
                         <p className="navGroup__title">Users</p>
-                        <NavLink className="navGroup__link" to={'users'}>
+                        <NavLink className="navGroup__link" to={'users'} end>
                             <MdOutlineGroup />
                             <span>Users</span>
+                        </NavLink>
+                        <NavLink className="navGroup__link" to={'users/new'} end>
+                            <MdOutlinePersonAddAlt />
+                            <span>Create User</span>
                         </NavLink>
                     </div>
                     <div>
                         <p className="navGroup__title">Papers</p>
-                        <NavLink className="navGroup__link" to={'papers'}>
+                        <NavLink className="navGroup__link" to={'papers'} end>
                             <MdOutlineDescription />
                             <span>Papers</span>
                         </NavLink>
                     </div>
                     <div>
                         <p className="navGroup__title">Tasks</p>
-                        <NavLink className="navGroup__link" to={'tasks'}>
+                        <NavLink className="navGroup__link" to={'tasks'} end>
                             <MdOutlineAssignment />
                             <span>Tasks</span>
+                        </NavLink>
+                    </div>
+                    <div>
+                        <p className="navGroup__title">Ontologies</p>
+                        <NavLink className="navGroup__link" to={'ontos'} end>
+                            <MdOutlineHub />
+                            <span>Ontologies</span>
                         </NavLink>
                     </div>
                 </NavLinks>
@@ -58,8 +79,11 @@ export const DashPage = () => {
                         <Route path="/" element={<Outlet />}>
                             <Route path="/" element={<DashSummary />} />
                             <Route path="users" element={<Users />} />
+                            <Route path="users/info/:id" element={<UserDetails />} />
+                            <Route path="users/new" element={<UserCreate />} />
                             <Route path="papers" element={<Papers />} />
                             <Route path="tasks" element={<Tasks />} />
+                            <Route path="ontos" element={<Ontologies />} />
                         </Route>
                     </Routes>
                 </DashContainer>

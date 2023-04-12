@@ -5,3 +5,6 @@ export * from './Labels';
 export * from './Header';
 export * from './Relations';
 export * from './Comment';
+export { default as FileItem } from './FileItem';
+export { default as FileList } from './FileList';
+export { default as InputFile } from './inputFile';

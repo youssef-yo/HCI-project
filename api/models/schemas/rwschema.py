@@ -1,6 +1,14 @@
-from models.domain.rwmodel import RWModel
+from pydantic import BaseConfig, BaseModel
 
 
-class RWSchema(RWModel):
-    class Config(RWModel.Config):
-        pass
+def convert_field_to_camel_case(string: str) -> str:
+    return "".join(
+        word if index == 0 else word.capitalize()
+        for index, word in enumerate(string.split("_"))
+    )
+
+
+class RWSchema(BaseModel):
+    class Config(BaseConfig):
+        allow_population_by_field_name = True
+        alias_generator = convert_field_to_camel_case

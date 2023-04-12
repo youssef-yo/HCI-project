@@ -5,14 +5,6 @@ from beanie import Document
 
 from core.config import get_settings
 
-from models.domain.rwmodel import RWModel
-
-
-class UserBase(RWModel):
-    email: EmailStr
-    full_name: str
-    role: Optional[str] = None
-
 
 class UserDocument(Document):
     email: EmailStr

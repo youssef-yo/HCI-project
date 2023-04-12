@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import '../style/InputFile.scss';
+import '../../assets/styles/InputFile.scss';
 
 const InputFile = ({
     files,

@@ -1,16 +1,12 @@
-import React from 'react';
 import FileItem from './FileItem';
-import { useOntologyApi } from '../../api/index';
-import '../style/FileList.scss';
+import '../../assets/styles/FileList.scss';
 
 const FileList = ({ files, removeFile }: { files: any; removeFile: any }) => {
-    const { deleteFile } = useOntologyApi();
-
     const deleteFileHandler = (_name: any) => {
-        deleteFile(_name);
         removeFile(_name);
         // TODO: cehcke di deleteFIle: solo se deleteFile è dato a buon fine => usa try catch
     };
+
     return (
         <ul className="file-list">
             {files &&

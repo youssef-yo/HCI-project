@@ -9,7 +9,7 @@ import { SidebarItem, SidebarItemTitle } from './common';
 
 import DropdownOntoClasses from './DropdownOntoClasses';
 import { DownloadExportedAnnotations } from './DownloadExportedAnnotations';
-import ModalPopupImportOnto from './ModalPopupImportOnto';
+// import ModalPopupImportOnto from './ModalPopupImportOnto';
 import ModalPopupImportDocuments from './ModalPopupImportDocuments';
 import CreationRelation from './CreationRelation';
 
@@ -26,7 +26,7 @@ export const Labels = ({ sha, _setRelationModalVisible }: Props) => {
     return (
         <SidebarItem>
             <ModalPopupImportDocuments></ModalPopupImportDocuments>
-            <ModalPopupImportOnto annotationStore={annotationStore}></ModalPopupImportOnto>
+            {/* <ModalPopupImportOnto annotationStore={annotationStore}></ModalPopupImportOnto> */}
             <DownloadExportedAnnotations sha={sha}></DownloadExportedAnnotations>
             <div>
                 <SidebarItemTitle>Relation Mode</SidebarItemTitle>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
-import '../style/FileItem.scss';
+import '../../assets/styles/FileItem.scss';
 
 const FileItem = ({ file, deleteFile }: { file: any; deleteFile: any }) => {
     return (

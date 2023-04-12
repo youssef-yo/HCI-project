@@ -1,7 +1,11 @@
 import React from 'react';
 
 const Papers = () => {
-    return <div>Papers</div>;
+    return (
+        <section>
+            <h1>Papers</h1>
+        </section>
+    );
 };
 
 export default Papers;

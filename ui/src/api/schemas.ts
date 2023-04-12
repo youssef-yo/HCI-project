@@ -70,3 +70,17 @@ export interface OntoProperty {
     range: string[]; // come domain. Ricorda che potrebbero essere vuote! (in questo caso la relazione
     // è 'libera')
 }
+
+export interface User {
+    _id: string;
+    email: string;
+    fullName: string;
+    role: string;
+}
+
+export interface UserCreate {
+    email: string;
+    fullName: string;
+    role: string;
+    password: string;
+}

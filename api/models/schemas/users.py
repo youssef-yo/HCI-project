@@ -1,4 +1,14 @@
-from models.domain.users import UserBase
+from typing import Optional
+from pydantic import EmailStr
+
+from models.schemas.mongo import MongoBase
+from models.schemas.rwschema import RWSchema
+
+
+class UserBase(RWSchema):
+    email: EmailStr
+    full_name: str
+    role: Optional[str] = None
 
 
 class UserInCreate(UserBase):
@@ -15,9 +25,20 @@ class UserInCreate(UserBase):
         }
 
 
-class UserOutResponse(UserBase):
-    pass
+class UserInUpdate(RWSchema):
+    full_name: Optional[str]
+    role: Optional[str]
 
+    class Config:
+        schema_extra = {
+            "example": {
+                "fullName": "Jason Bourne",
+                "role": "Annotator",
+            }
+        }
+
+
+class UserOutResponse(UserBase, MongoBase):
     class Config:
         schema_extra = {
             "example": {

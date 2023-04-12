@@ -1,7 +1,7 @@
 import glob
 import json
 import os
-from typing import List, Any
+from typing import List
 
 from fastapi import (
     APIRouter,
@@ -14,7 +14,6 @@ from fastapi.responses import FileResponse
 from app import export
 
 from models.schemas.metadata import Allocation, PaperStatus
-from models.schemas.annotations import OntoClass, OntoProperty, OntologyData
 from models.domain.users import UserDocument
 
 from core.config import Settings, get_settings
@@ -23,34 +22,6 @@ from services.oauth2 import get_current_user
 
 
 router = APIRouter()
-
-
-@router.post("/classes")
-def get_classes(ontoNames: List[str]) -> List[OntoClass]:
-    """
-    Get the labels used for annotation for this app.
-    """
-    resultClasses = list()
-    for filename in ontoNames:
-        classes_properties = getClassesAndPropertiesFromJsonOntology(filename)
-
-        resultClasses.extend(classes_properties['classes'])
-
-    return resultClasses
-
-
-@router.post("/properties")
-def get_properties(ontoNames: List[str]) -> List[OntoProperty]:
-    """
-    Get the relations used for annotation for this app.
-    """
-    resultProperties = list()
-    for filename in ontoNames:
-        classes_properties = getClassesAndPropertiesFromJsonOntology(filename)
-
-        resultProperties.extend(classes_properties['properties'])
-
-    return resultProperties
 
 
 @router.get("/allocation/info")
@@ -142,20 +113,3 @@ def export_annotations(
 def all_pdf_shas() -> List[str]:
     pdfs = glob.glob(f"{get_settings().output_directory}/*/*.pdf")
     return [p.split("/")[-2] for p in pdfs]
-
-
-def getClassesAndPropertiesFromJsonOntology(filename: str) -> OntologyData:
-    file_location = os.path.join(get_settings().extracted_data_from_ontology_directory, f"{filename}.json")
-    classesResult: Any
-    propertiesResult: Any
-    exists = os.path.exists(file_location)
-    if not exists:
-        return {"classes": [], "properties": []}
-    else:
-        with open(file_location) as f:
-            onto = json.load(f)
-
-        classesResult = onto['data']['classes']
-        propertiesResult = onto['data']['properties']
-
-    return {"classes": classesResult, "properties": propertiesResult}

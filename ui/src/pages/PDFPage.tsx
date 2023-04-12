@@ -80,9 +80,9 @@ export const PDFPage = () => {
 
     const [relationMode, setRelationMode] = useState<boolean>(false);
 
-    const { getClasses, getProperties, getAllocatedPaperStatus } = useAnnotationApi();
+    const { getAllocatedPaperStatus } = useAnnotationApi();
     const { getTokens, getAnnotations } = useDocumentApi();
-    const { getNamesOfOntologiesAlreadyUploaded } = useOntologyApi();
+    const { getClasses, getProperties, getOntologiesNames } = useOntologyApi();
     // React's Error Boundaries don't work for us because a lot of work is done by pdfjs in
     // a background task (a web worker). We instead setup a top level error handler that's
     // passed around as needed so we can display a nice error to the user when something
@@ -112,8 +112,8 @@ export const PDFPage = () => {
     };
 
     useEffect(() => {
-        getNamesOfOntologiesAlreadyUploaded().then((ontologiesName) => {
-            setOntoNames(ontologiesName);
+        getOntologiesNames().then((ontologiesNames) => {
+            setOntoNames(ontologiesNames);
         });
     }, []);
 

@@ -1,6 +1,5 @@
-import axios from 'axios';
 import useAxiosPrivate from './useAxiosPrivate';
-import { Allocation, OntologiesNames } from './schemas';
+import { Allocation } from './schemas';
 
 /**
  * Annotation API entry points.
@@ -9,48 +8,6 @@ import { Allocation, OntologiesNames } from './schemas';
  */
 const useAnnotationApi = () => {
     const axiosPrivate = useAxiosPrivate();
-
-    /**
-     * Gets the ontologies classes.
-     *
-     * @param _ontologiesNames Ontologies names
-     * @returns Ontologies classes
-     */
-    const getClasses = async (_ontologiesNames: OntologiesNames) => {
-        const ontoNames: string[] = _ontologiesNames.ontologiesNames;
-        try {
-            const response = await axios({
-                method: 'post',
-                url: '/api/annotation/classes',
-                data: ontoNames,
-            });
-            // console.log('response data: ', response.data);
-            return response.data;
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    /**
-     * Gets the ontologies properties.
-     *
-     * @param _ontologiesNames Ontologies names
-     * @returns Ontologies properties
-     */
-    const getProperties = async (_ontologiesNames: OntologiesNames) => {
-        const ontoNames: string[] = _ontologiesNames.ontologiesNames;
-        try {
-            const response = await axios({
-                method: 'post',
-                url: '/api/annotation/properties',
-                data: ontoNames,
-            });
-            // console.log('response data: ', response.data);
-            return response.data;
-        } catch (error) {
-            console.log(error);
-        }
-    };
 
     /**
      * Gets the user assigned papers.
@@ -73,7 +30,7 @@ const useAnnotationApi = () => {
         });
     };
 
-    return { getClasses, getProperties, getAllocatedPaperStatus, exportAnnotations };
+    return { getAllocatedPaperStatus, exportAnnotations };
 };
 
 export default useAnnotationApi;
