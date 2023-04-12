@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import { notification } from '@allenai/varnish';
 import InputFile from './inputFile';
 import FileList from './FileList';
-import { useAnnotationApi, useUploadApi } from '../../api/index';
+import { useAnnotationApi, useUploadApi } from '../../api';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = () => {

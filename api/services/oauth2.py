@@ -13,8 +13,8 @@ from jose import JWTError, jwt
 
 from core.config import get_settings
 
-from models.domain.users import UserDocument
-from models.schemas.jwt_tokens import (
+from models.domain import UserDocument
+from models.schemas import (
     AccessTokenData,
     RefreshTokenData
 )

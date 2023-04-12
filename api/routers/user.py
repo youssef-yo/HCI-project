@@ -7,8 +7,8 @@ from fastapi import (
     status
 )
 
-from models.domain.users import UserDocument
-from models.schemas.users import (
+from models.domain import UserDocument
+from models.schemas import (
     UserInCreate,
     UserInUpdate,
     UserOutResponse

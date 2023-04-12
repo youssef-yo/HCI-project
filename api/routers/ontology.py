@@ -10,8 +10,8 @@ from fastapi import (
 
 from db.database import MongoClient, get_db
 
-from models.domain.ontologies import OntologyDocument
-from models.schemas.ontologies import (
+from models.domain import OntologyDocument
+from models.schemas import (
     OntoClass,
     OntoProperty
 )

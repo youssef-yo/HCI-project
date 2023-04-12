@@ -13,8 +13,8 @@ from fastapi.responses import FileResponse
 
 from app import export
 
-from models.schemas.metadata import Allocation, PaperStatus
-from models.domain.users import UserDocument
+from models.schemas import Allocation, PaperStatus
+from models.domain import UserDocument
 
 from core.config import Settings, get_settings
 

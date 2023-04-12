@@ -3,8 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
 
 from core.config import get_settings
 
-from models.domain.ontologies import OntologyDocument
-from models.domain.users import UserDocument
+from models.domain import OntologyDocument, UserDocument
 
 
 class MongoClient:

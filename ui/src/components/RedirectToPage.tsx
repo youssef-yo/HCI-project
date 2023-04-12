@@ -6,7 +6,7 @@ import { useAnnotationApi } from '../api';
 import { ROLES } from '../config/roles';
 import { useAuth } from '../hooks';
 import { CenterOnPage } from './CenterOnPage';
-import ModalPopupImportDocuments from './sidebar/ModalPopupImportDocuments';
+import { ModalPopupImportDocuments } from './sidebar';
 
 enum ViewState {
     LOADING,

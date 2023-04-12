@@ -2,7 +2,7 @@ import logging
 
 from core.config import get_settings
 
-from models.domain.users import UserDocument
+from models.domain import UserDocument
 
 from services.security import hash_password
 

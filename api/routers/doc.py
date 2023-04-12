@@ -12,8 +12,8 @@ from fastapi import (
 from fastapi.responses import FileResponse
 from fastapi.encoders import jsonable_encoder
 
-from models.schemas.annotations import Annotation, PdfAnnotation, RelationGroup
-from models.domain.users import UserDocument
+from models.schemas import Annotation, PdfAnnotation, RelationGroup
+from models.domain import UserDocument
 
 from services.oauth2 import get_current_user
 

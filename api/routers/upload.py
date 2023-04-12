@@ -25,9 +25,8 @@ from app.preprocess import preprocess
 
 from db.database import MongoClient, get_db
 
-from models.schemas.ontologies import OntoClass, OntoProperty, OntologyData
-from models.domain.ontologies import OntologyDocument
-from models.domain.users import UserDocument
+from models.schemas import OntoClass, OntoProperty, OntologyData
+from models.domain import OntologyDocument, UserDocument
 
 from services.oauth2 import get_current_user
 

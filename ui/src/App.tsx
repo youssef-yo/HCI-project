@@ -12,9 +12,8 @@ import { createGlobalStyle } from 'styled-components';
 import { Routes, Route, Outlet } from 'react-router-dom';
 
 import { DashPage, LoginPage, PDFPage } from './pages';
-import { RedirectToPage, RequireAuth } from './components';
+import { PersistLogin, RedirectToPage, RequireAuth } from './components';
 import { ROLES } from './config/roles';
-import { PersistLogin } from './components/PersistLogin';
 
 const App = () => {
     return (

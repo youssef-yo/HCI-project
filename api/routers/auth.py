@@ -10,8 +10,8 @@ from fastapi import (
 )
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
-from models.domain.users import UserDocument
-from models.schemas.jwt_tokens import AccessToken
+from models.domain import UserDocument
+from models.schemas import AccessToken
 
 from services.security import verify_password
 from services.oauth2 import (

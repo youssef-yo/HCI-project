@@ -4,7 +4,7 @@ from beanie import Document, PydanticObjectId
 
 from core.config import get_settings
 
-from models.schemas.ontologies import OntologyData
+from models.schemas import OntologyData
 
 
 class OntologyDocument(Document):

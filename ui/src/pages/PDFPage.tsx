@@ -8,7 +8,6 @@ import { Result, Progress, notification } from '@allenai/varnish';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
 import { PDF, CenterOnPage, RelationModal } from '../components';
-import ModalPopupImportDocuments from '../components/sidebar/ModalPopupImportDocuments';
 import {
     Labels,
     Annotations,
@@ -16,6 +15,7 @@ import {
     AssignedPaperList,
     Header,
     Comment,
+    ModalPopupImportDocuments,
 } from '../components/sidebar';
 import { WithSidebar, Sidebar, Topbar, WithTopbar } from '../components/common';
 import {
