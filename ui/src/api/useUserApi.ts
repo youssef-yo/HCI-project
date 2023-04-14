@@ -1,4 +1,4 @@
-import { User, UserCreate } from './schemas';
+import { User, UserCreate, UserUpdate } from './schemas';
 import useAxiosPrivate from './useAxiosPrivate';
 
 /**
@@ -47,7 +47,37 @@ const useUserApi = () => {
             .catch((err) => Promise.reject(err));
     };
 
-    return { getUsers, getUserByID, createUser };
+    /**
+     * Updates a specific user, based on the given identifier, with the given data.
+     *
+     * @param id User identifier
+     * @param userUpdate Updated data
+     * @returns Promise with user
+     */
+    const updateUser: (id: string, userUpdate: UserUpdate) => Promise<User> = (
+        id: string,
+        userUpdate: UserUpdate
+    ) => {
+        return axiosPrivate
+            .put(`/api/users/${id}`, userUpdate)
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err));
+    };
+
+    /**
+     * Deletes a specific user, based on the given identifier.
+     *
+     * @param id User identifier
+     * @returns Promise
+     */
+    const deleteUser: (id: string) => Promise<any> = (id: string) => {
+        return axiosPrivate
+            .delete(`/api/users/${id}`)
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err));
+    };
+
+    return { getUsers, getUserByID, createUser, updateUser, deleteUser };
 };
 
 export default useUserApi;

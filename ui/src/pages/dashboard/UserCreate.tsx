@@ -35,7 +35,7 @@ const UserCreate = () => {
         createUser(newUser)
             .then((user) => {
                 console.log(`User ${user.email} successfully created!`);
-                navigate(`/dash/users/info/${user.email}`);
+                navigate(`/dash/users/info/${user._id}`);
             })
             .catch((err) => {
                 if (!err?.response) {

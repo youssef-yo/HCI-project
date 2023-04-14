@@ -1,13 +1,13 @@
 from typing import Optional
 from pydantic import EmailStr
 
-from beanie import Document
+from beanie import Document, Indexed
 
 from core.config import get_settings
 
 
 class UserDocument(Document):
-    email: EmailStr
+    email: Indexed(EmailStr, unique=True)
     full_name: str
     role: Optional[str] = None
     hashed_password: str

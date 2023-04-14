@@ -16,13 +16,15 @@ from .metadata import (
     PaperStatus
 )
 from .mongo import (
-    MongoBase
+    MongoBase,
+    PydanticObjectId
 )
 from .ontologies import (
     OntoClass,
     Ontology,
     OntologyData,
-    OntoProperty
+    OntoProperty,
+    OntologyOutResponse
 )
 from .users import (
     UserInCreate,

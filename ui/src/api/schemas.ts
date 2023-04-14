@@ -35,6 +35,11 @@ export interface OntologiesNames {
     ontologiesNames: string[];
 }
 
+export interface Ontology {
+    _id: string;
+    name: string;
+}
+
 export interface PaperStatus {
     sha: string;
     name: string;
@@ -83,4 +88,9 @@ export interface UserCreate {
     fullName: string;
     role: string;
     password: string;
+}
+
+export interface UserUpdate {
+    fullName: string;
+    role: string;
 }

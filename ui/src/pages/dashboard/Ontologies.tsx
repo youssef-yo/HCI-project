@@ -1,22 +1,22 @@
 import { MdDeleteOutline } from 'react-icons/md';
 import { useEffect, useState } from 'react';
-import { useOntologyApi, useUploadApi } from '../../api';
+import { Ontology, useOntologyApi, useUploadApi } from '../../api';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { InputFile, FileList } from '../../components/sidebar';
 
 const Ontologies = () => {
-    const [ontos, setOntos] = useState<string[]>([]);
+    const [ontos, setOntos] = useState<Ontology[]>([]);
     const [ontoModal, setOntoModal] = useState<boolean>(false);
 
-    const { deleteOntology, getOntologiesNames } = useOntologyApi();
+    const { deleteOntology, getOntologiesList } = useOntologyApi();
 
     useEffect(() => {
         loadOntologies();
     }, []);
 
     const loadOntologies = () => {
-        getOntologiesNames()
-            .then((ontos) => setOntos(ontos.ontologiesNames))
+        getOntologiesList()
+            .then((ontos) => setOntos(ontos))
             .catch((err) => console.error(err));
     };
 
@@ -28,7 +28,7 @@ const Ontologies = () => {
 
     const removeOntology = async (onto: string) => {
         await deleteOntology(onto);
-        setOntos(ontos.filter((o) => o !== onto));
+        setOntos(ontos.filter((o) => o._id !== onto));
     };
 
     return (
@@ -49,8 +49,8 @@ const Ontologies = () => {
                 </thead>
                 <tbody>
                     {ontos.map((onto) => (
-                        <tr key={onto}>
-                            <td>{onto}</td>
+                        <tr key={onto._id}>
+                            <td>{onto.name}</td>
                             <td
                                 style={{
                                     display: 'flex',
@@ -58,7 +58,9 @@ const Ontologies = () => {
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                 }}>
-                                <div className="iconButton" onClick={() => removeOntology(onto)}>
+                                <div
+                                    className="iconButton"
+                                    onClick={() => removeOntology(onto._id)}>
                                     <MdDeleteOutline />
                                 </div>
                             </td>
@@ -81,7 +83,7 @@ const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ show, onHide }) => {
     const [anyFileUploaded, setAnyFileUploaded] = useState<boolean>(false);
     const supportedFiles = 'N-Triples, RDF/XML, OWL/XML';
 
-    const { deleteOntology } = useOntologyApi();
+    // const { deleteOntology } = useOntologyApi();
     const { uploadOntology } = useUploadApi();
 
     const changeStateFileIsUploading = (value: boolean) => {
@@ -100,8 +102,10 @@ const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ show, onHide }) => {
     };
 
     const removeFile = (_file: string) => {
-        deleteOntology(_file);
-        setFiles(files.filter((file: any) => file.name !== _file));
+        // For now it does nothing, when we'll load documents in MongoDB, we'll take care of this...
+        // deleteOntology(_file);
+        // setFiles(files.filter((file: any) => file.name !== _file));
+        console.log('Tried deleting file...');
     };
 
     const handleClose = () => {

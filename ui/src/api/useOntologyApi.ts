@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { OntologiesNames } from './schemas';
+import { Ontology } from './schemas';
 import useAxiosPrivate from './useAxiosPrivate';
 
 /**
@@ -10,9 +10,9 @@ import useAxiosPrivate from './useAxiosPrivate';
 const useOntologyApi = () => {
     const axiosPrivate = useAxiosPrivate();
 
-    const deleteOntology = async (filename: string) => {
+    const deleteOntology = async (id: string) => {
         axiosPrivate
-            .delete(`/api/ontology/${filename}`)
+            .delete(`/api/ontology/${id}`)
             .then((res) => {
                 console.log(res);
             })
@@ -20,11 +20,11 @@ const useOntologyApi = () => {
     };
 
     /**
-     * Gets the names of the ontologies that have been uploaded.
+     * Gets the ontologies that have been uploaded.
      *
-     * @returns Promise with ontologies names
+     * @returns Promise with ontologies
      */
-    const getOntologiesNames: () => Promise<OntologiesNames> = async () => {
+    const getOntologiesList: () => Promise<Ontology[]> = async () => {
         return await axios
             .get('/api/ontology/names')
             .then((r) => r.data)
@@ -34,16 +34,15 @@ const useOntologyApi = () => {
     /**
      * Gets the ontologies classes.
      *
-     * @param _ontologiesNames Ontologies names
+     * @param _ontologiesIds Ontologies IDs
      * @returns Ontologies classes
      */
-    const getClasses = async (_ontologiesNames: OntologiesNames) => {
-        const ontoNames: string[] = _ontologiesNames.ontologiesNames;
+    const getClasses = async (_ontologiesIds: string[]) => {
         try {
             const response = await axios({
                 method: 'post',
                 url: '/api/ontology/classes',
-                data: ontoNames,
+                data: _ontologiesIds,
             });
             // console.log('response data: ', response.data);
             return response.data;
@@ -55,16 +54,15 @@ const useOntologyApi = () => {
     /**
      * Gets the ontologies properties.
      *
-     * @param _ontologiesNames Ontologies names
+     * @param _ontologiesIds Ontologies IDs
      * @returns Ontologies properties
      */
-    const getProperties = async (_ontologiesNames: OntologiesNames) => {
-        const ontoNames: string[] = _ontologiesNames.ontologiesNames;
+    const getProperties = async (_ontologiesIds: string[]) => {
         try {
             const response = await axios({
                 method: 'post',
                 url: '/api/ontology/properties',
-                data: ontoNames,
+                data: _ontologiesIds,
             });
             // console.log('response data: ', response.data);
             return response.data;
@@ -73,7 +71,7 @@ const useOntologyApi = () => {
         }
     };
 
-    return { deleteOntology, getOntologiesNames, getClasses, getProperties };
+    return { deleteOntology, getOntologiesList, getClasses, getProperties };
 };
 
 export default useOntologyApi;

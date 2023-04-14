@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Users = () => {
     const [users, setUsers] = useState<User[]>([]);
-    const { getUsers } = useUserApi();
+    const { getUsers, deleteUser } = useUserApi();
 
     const navigate = useNavigate();
 
@@ -14,6 +14,14 @@ const Users = () => {
             .then((res) => setUsers(res))
             .catch((err) => console.error(err));
     }, []);
+
+    const onDeleteUser = async (id: string) => {
+        await deleteUser(id)
+            .then((_) => setUsers(users.filter((user) => user._id !== id)))
+            .catch((err) => {
+                console.error(err);
+            });
+    };
 
     return (
         <section>
@@ -29,7 +37,7 @@ const Users = () => {
                 </thead>
                 <tbody>
                     {users.map((user) => (
-                        <tr key={user.email}>
+                        <tr key={user._id}>
                             <td>{user.email}</td>
                             <td>{user.fullName}</td>
                             <td>{user.role}</td>
@@ -42,10 +50,10 @@ const Users = () => {
                                 }}>
                                 <div
                                     className="iconButton"
-                                    onClick={() => navigate(`info/${user.email}`)}>
+                                    onClick={() => navigate(`info/${user._id}`)}>
                                     <MdOpenInNew />
                                 </div>
-                                <div className="iconButton">
+                                <div className="iconButton" onClick={() => onDeleteUser(user._id)}>
                                     <MdDeleteOutline />
                                 </div>
                             </td>

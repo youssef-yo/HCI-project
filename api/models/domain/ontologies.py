@@ -1,6 +1,6 @@
 from typing import Optional
 
-from beanie import Document, PydanticObjectId
+from beanie import Document, Indexed, PydanticObjectId
 
 from core.config import get_settings
 
@@ -8,7 +8,7 @@ from models.schemas import OntologyData
 
 
 class OntologyDocument(Document):
-    name: str
+    name: Indexed(str)
     file_id: Optional[PydanticObjectId]
     data: OntologyData
 

@@ -2,6 +2,8 @@ from typing import List
 
 from pydantic import BaseModel
 
+from models.schemas.mongo import MongoBase
+from models.schemas.rwschema import RWSchema
 
 class OntoClass(BaseModel):
     id: str  # serve per il rendering nei menù, lo assegnerò dal backend
@@ -31,3 +33,7 @@ class OntologyData(BaseModel):
 class Ontology(BaseModel):
     name: str
     data: OntologyData
+
+
+class OntologyOutResponse(RWSchema, MongoBase):
+    name: str

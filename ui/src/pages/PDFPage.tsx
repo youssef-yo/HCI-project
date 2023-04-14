@@ -27,7 +27,6 @@ import {
     useAnnotationApi,
     useDocumentApi,
     useOntologyApi,
-    OntologiesNames,
 } from '../api';
 import {
     PDFPageInfo,
@@ -76,13 +75,13 @@ export const PDFPage = () => {
     const [hideLabels, setHideLabels] = useState<boolean>(false);
 
     const [relationModalVisible, setRelationModalVisible] = useState<boolean>(false);
-    const [ontoNames, setOntoNames] = useState<OntologiesNames>();
+    const [ontoNames, setOntoNames] = useState<string[]>();
 
     const [relationMode, setRelationMode] = useState<boolean>(false);
 
     const { getAllocatedPaperStatus } = useAnnotationApi();
     const { getTokens, getAnnotations } = useDocumentApi();
-    const { getClasses, getProperties, getOntologiesNames } = useOntologyApi();
+    const { getClasses, getProperties, getOntologiesList } = useOntologyApi();
     // React's Error Boundaries don't work for us because a lot of work is done by pdfjs in
     // a background task (a web worker). We instead setup a top level error handler that's
     // passed around as needed so we can display a nice error to the user when something
@@ -112,13 +111,14 @@ export const PDFPage = () => {
     };
 
     useEffect(() => {
-        getOntologiesNames().then((ontologiesNames) => {
+        getOntologiesList().then((ontologies) => {
+            const ontologiesNames = ontologies.map((onto) => onto._id);
             setOntoNames(ontologiesNames);
         });
     }, []);
 
     useEffect(() => {
-        if (ontoNames !== undefined && ontoNames.ontologiesNames.length > 0) {
+        if (ontoNames !== undefined && ontoNames.length > 0) {
             getClasses(ontoNames).then((ontoClasses) => {
                 if (ontoClasses !== undefined) {
                     setOntoClasses(ontoClasses);
@@ -129,7 +129,7 @@ export const PDFPage = () => {
     }, [ontoNames]);
 
     useEffect(() => {
-        if (ontoNames !== undefined && ontoNames.ontologiesNames.length > 0) {
+        if (ontoNames !== undefined && ontoNames.length > 0) {
             getProperties(ontoNames).then((ontoProperty) => {
                 if (ontoProperty !== undefined) {
                     setOntoProperties(ontoProperty);
