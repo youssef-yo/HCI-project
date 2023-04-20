@@ -8,25 +8,30 @@ export enum InputType {
 export type InputProps = {
     type?: 'text' | 'password';
     variant?: InputType;
-} & Omit<React.ComponentProps<'input'>, 'ref' | 'type'>;
+    color?: 'primary' | 'secondary';
+} & Omit<React.ComponentProps<'input'>, 'ref' | 'type' | 'color'>;
 
 export type InputBoxProps = {
     variant?: InputType;
+    color?: 'primary' | 'secondary';
 };
 
-export const Input: React.FC<InputProps> = ({
+const Input: React.FC<InputProps> = ({
     type = 'text',
     placeholder,
     variant = InputType.STANDARD,
+    color = 'primary',
     ...rest
 }) => {
     switch (variant) {
         case InputType.STANDARD:
             return (
-                <InputBox variant={variant}>
-                    <StyledInput type={type} variant={variant} {...rest} />
+                <InputBox variant={variant} color={color}>
+                    <StyledInput type={type} variant={variant} color={color} {...rest} />
                     <i>{placeholder}</i>
                 </InputBox>
             );
     }
 };
+
+export default Input;

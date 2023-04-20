@@ -1,12 +1,17 @@
-import { MdDeleteOutline, MdOpenInNew } from 'react-icons/md';
+import { MdDeleteOutline, MdOpenInNew, MdOutlineEdit, MdOutlinePersonAddAlt } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { User, useUserApi } from '../../api';
+import { Button, Header, IconButton, Table } from '../../components/common';
+import { EditUserModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
 
 const Users = () => {
     const [users, setUsers] = useState<User[]>([]);
-    const { getUsers, deleteUser } = useUserApi();
 
+    const [userModal, setUserModal] = useState<boolean>(false);
+    const [editedUser, setEditedUser] = useState<string>('');
+
+    const { getUsers, deleteUser } = useUserApi();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -14,6 +19,21 @@ const Users = () => {
             .then((res) => setUsers(res))
             .catch((err) => console.error(err));
     }, []);
+
+    const handleCloseModal = () => {
+        console.log('Closing modal...');
+        setUserModal(false);
+    };
+
+    const onEditUser = (id: string) => {
+        setEditedUser(id);
+        setUserModal(true);
+    };
+
+    const onUserUpdated = (updatedUser: User) => {
+        const updatedUsers = users.map((u) => (u._id === updatedUser._id ? updatedUser : u));
+        setUsers(updatedUsers);
+    };
 
     const onDeleteUser = async (id: string) => {
         await deleteUser(id)
@@ -25,14 +45,22 @@ const Users = () => {
 
     return (
         <section>
-            <h1>Users</h1>
-            <table>
+            <Header>
+                <h1>Users</h1>
+                <Button
+                    color="secondary"
+                    icon={<MdOutlinePersonAddAlt />}
+                    onClick={() => navigate('new')}>
+                    Create User
+                </Button>
+            </Header>
+            <Table>
                 <thead>
                     <tr>
                         <th>Email</th>
                         <th>Full Name</th>
                         <th>Role</th>
-                        <th>Actions</th>
+                        <th style={{ textAlign: 'center' }}>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -47,20 +75,33 @@ const Users = () => {
                                     flexDirection: 'row',
                                     justifyContent: 'center',
                                     alignItems: 'center',
+                                    gap: '8px',
                                 }}>
-                                <div
-                                    className="iconButton"
+                                <IconButton
+                                    title="View User"
                                     onClick={() => navigate(`info/${user._id}`)}>
                                     <MdOpenInNew />
-                                </div>
-                                <div className="iconButton" onClick={() => onDeleteUser(user._id)}>
+                                </IconButton>
+                                <IconButton title="Edit User" onClick={() => onEditUser(user._id)}>
+                                    <MdOutlineEdit />
+                                </IconButton>
+                                <IconButton
+                                    title="Delete User"
+                                    onClick={() => onDeleteUser(user._id)}>
                                     <MdDeleteOutline />
-                                </div>
+                                </IconButton>
                             </td>
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </Table>
+
+            <EditUserModal
+                show={userModal}
+                onHide={handleCloseModal}
+                userID={editedUser}
+                onUpdate={onUserUpdated}
+            />
         </section>
     );
 };

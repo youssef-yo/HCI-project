@@ -6,8 +6,10 @@ export type SidebarProps = {
     children: React.ReactNode;
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ width, children }) => {
+const Sidebar: React.FC<SidebarProps> = ({ width, children }) => {
     return <StyledSidebar width={width}>{children}</StyledSidebar>;
 };
+
+export default Sidebar;
 
 export { WithSidebar } from './Sidebar.styled';

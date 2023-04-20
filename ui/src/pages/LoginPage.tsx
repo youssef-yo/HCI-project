@@ -87,7 +87,7 @@ export const LoginPage = () => {
                             required
                         />
 
-                        <Button onClick={handleSubmit} variant="primary">
+                        <Button color="primary" size="large" onClick={handleSubmit}>
                             Login
                         </Button>
                     </Form>

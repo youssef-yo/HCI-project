@@ -1,8 +1,8 @@
-import { MdDeleteOutline } from 'react-icons/md';
+import { MdDeleteOutline, MdOutlineEdit, MdOutlineNoteAdd } from 'react-icons/md';
 import { useEffect, useState } from 'react';
-import { Ontology, useOntologyApi, useUploadApi } from '../../api';
-import { Button, Form, Modal } from 'react-bootstrap';
-import { InputFile, FileList } from '../../components/sidebar';
+import { Ontology, useOntologyApi } from '../../api';
+import { Button, Header, IconButton, Table } from '../../components/common';
+import { UploadOntoModal } from '../../components/dashboard';
 
 const Ontologies = () => {
     const [ontos, setOntos] = useState<Ontology[]>([]);
@@ -33,18 +33,21 @@ const Ontologies = () => {
 
     return (
         <section>
-            <h1>Ontologies</h1>
+            <Header>
+                <h1>Ontologies</h1>
+                <Button
+                    color="secondary"
+                    icon={<MdOutlineNoteAdd />}
+                    onClick={() => setOntoModal(true)}>
+                    Upload Ontology
+                </Button>
+            </Header>
 
-            <Button variant="primary" onClick={() => setOntoModal(true)}>
-                Upload Ontology
-            </Button>
-            <UploadOntoModal show={ontoModal} onHide={handleModalClose} />
-
-            <table>
+            <Table>
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Actions</th>
+                        <th style={{ textAlign: 'center' }}>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,95 +60,24 @@ const Ontologies = () => {
                                     flexDirection: 'row',
                                     justifyContent: 'center',
                                     alignItems: 'center',
+                                    gap: '8px',
                                 }}>
-                                <div
-                                    className="iconButton"
+                                <IconButton title="Edit Ontology">
+                                    <MdOutlineEdit />
+                                </IconButton>
+                                <IconButton
+                                    title="Delete Ontology"
                                     onClick={() => removeOntology(onto._id)}>
                                     <MdDeleteOutline />
-                                </div>
+                                </IconButton>
                             </td>
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </Table>
+
+            <UploadOntoModal show={ontoModal} onHide={handleModalClose} />
         </section>
-    );
-};
-
-type UploadOntoModalProps = {
-    show: boolean;
-    onHide: () => void;
-};
-
-const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ show, onHide }) => {
-    const [files, setFiles] = useState<string[]>([]);
-    const [isUploading, setIsUploading] = useState<boolean>(false);
-    const [anyFileUploaded, setAnyFileUploaded] = useState<boolean>(false);
-    const supportedFiles = 'N-Triples, RDF/XML, OWL/XML';
-
-    // const { deleteOntology } = useOntologyApi();
-    const { uploadOntology } = useUploadApi();
-
-    const changeStateFileIsUploading = (value: boolean) => {
-        setIsUploading(value);
-        console.log('File is uploding? ', isUploading);
-    };
-
-    const changeStateAnyFileUploaded = (value: boolean) => {
-        setAnyFileUploaded(value);
-        console.log('Any file was uploaded? ', isUploading);
-        // if no file was uploaded then there is no need to refreshh the page after the modal is closed.
-    };
-
-    const updateFiles = (_file: string) => {
-        setFiles([...files, _file]);
-    };
-
-    const removeFile = (_file: string) => {
-        // For now it does nothing, when we'll load documents in MongoDB, we'll take care of this...
-        // deleteOntology(_file);
-        // setFiles(files.filter((file: any) => file.name !== _file));
-        console.log('Tried deleting file...');
-    };
-
-    const handleClose = () => {
-        if (anyFileUploaded && !isUploading) {
-            onHide();
-            window.location.reload();
-        }
-        if (!anyFileUploaded && !isUploading) {
-            onHide();
-        }
-    };
-
-    return (
-        <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>Upload Ontology</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <InputFile
-                    files={files}
-                    updateFiles={updateFiles}
-                    changeStateFileIsUploading={changeStateFileIsUploading}
-                    changeStateAnyFileUploaded={changeStateAnyFileUploaded}
-                    api={(onto: any) => uploadOntology(onto)}
-                    supportedFiles={supportedFiles}></InputFile>
-                <Form>
-                    <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                        <FileList files={files} removeFile={removeFile} />
-                    </Form.Group>
-                </Form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="primary" onClick={handleClose}>
-                    Close
-                </Button>
-                <Button variant="primary" onClick={handleClose}>
-                    Save Changes
-                </Button>
-            </Modal.Footer>
-        </Modal>
     );
 };
 

@@ -2,7 +2,7 @@ import { FormEvent, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUserApi } from '../../api';
-import { Button, Input, InputType } from '../../components/common';
+import { Button, Header, Input, InputType } from '../../components/common';
 
 const UserCreate = () => {
     const [email, setEmail] = useState<string>('');
@@ -50,7 +50,9 @@ const UserCreate = () => {
 
     return (
         <section>
-            <h1>Create User</h1>
+            <Header>
+                <h1>User Form</h1>
+            </Header>
 
             <Form onSubmit={(e) => onCreateUser(e)}>
                 {errorMsg && (
@@ -109,7 +111,7 @@ const UserCreate = () => {
                     required
                 />
 
-                <Button type="submit" onClick={onCreateUser} variant="primary">
+                <Button type="submit" color="secondary" size="large" onClick={onCreateUser}>
                     Create User
                 </Button>
             </Form>

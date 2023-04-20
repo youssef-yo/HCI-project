@@ -12,8 +12,25 @@ export const StyledTopbar = styled.div<TopbarProps>(
         height: ${height};
         background: ${theme.color.N9};
         color: #eee;
-        padding: ${theme.spacing.sm};
+        padding: ${theme.spacing.md};
         z-index: 1000;
+
+        & div > button {
+            &:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+    
+            svg {
+                fill: #ddd;
+                stroke: #ddd;
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+            &:hover > svg {
+                fill: #fff;
+                stroke: #fff;
+            }
+        }
     `
 );
 
@@ -25,31 +42,4 @@ export const WithTopbar = styled.div<TopbarProps>(
     grid-template-columns: minmax(0, 1fr);
     padding-top: ${height};
 `
-);
-
-export const IconButton = styled.div(
-    ({ theme }) => `
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: ${theme.spacing.sm};
-        border-radius: 50%;
-        cursor: pointer;
-        transition: 150ms ease-in;
-
-        &:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        svg {
-            fill: #ddd;
-            stroke: #ddd;
-            width: 1.25rem;
-            height: 1.25rem;
-        }
-        &:hover > svg {
-            fill: #fff;
-            stroke: #fff;
-        }
-    `
 );

@@ -1,14 +1,15 @@
 import { MdOutlinePersonOutline } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, useLogout } from '../../hooks';
-import { IconButton, StyledTopbar } from './Topbar.styled';
+import { StyledTopbar } from './Topbar.styled';
+import IconButton from './IconButton';
 
 export type TopbarProps = {
     height: string;
     leftOffset?: string;
 };
 
-export const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
+const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
     const { auth } = useAuth();
     const logout = useLogout();
     const navigate = useNavigate();
@@ -24,7 +25,13 @@ export const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
                 Welcome, {auth?.username}
             </div>
 
-            <div style={{ display: 'flex' }}>
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
                 <IconButton onClick={onLogout}>
                     <MdOutlinePersonOutline />
                 </IconButton>
@@ -32,5 +39,7 @@ export const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
         </StyledTopbar>
     );
 };
+
+export default Topbar;
 
 export { WithTopbar } from './Topbar.styled';

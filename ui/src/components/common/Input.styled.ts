@@ -1,18 +1,42 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { InputBoxProps, InputProps } from './Input';
+
+const INPUT_COLOR = {
+    primary: css`
+        background: #333;
+        color: #fff;
+    `,
+    secondary: css`
+        background: #dfdfdf;
+        color: #333;
+    `,
+};
 
 export const StyledInput = styled.input<InputProps>`
     position: relative;
     width: 100%;
-    background: #333;
     border: none;
     outline: none;
     padding: 25px 10px 7.5px;
     border-radius: 4px;
-    color: #fff;
     font-weight: 500;
     font-size: 1em;
+
+    ${(props) => props.color && INPUT_COLOR[props.color]}
 `;
+
+const BOX_COLOR = {
+    primary: css`
+        i {
+            color: #aaa;
+        }
+    `,
+    secondary: css`
+        i {
+            color: #555;
+        }
+    `,
+};
 
 export const InputBox = styled.div<InputBoxProps>`
     position: relative;
@@ -29,8 +53,9 @@ export const InputBox = styled.div<InputBoxProps>`
         left: 0;
         padding: 15px 10px;
         font-style: normal;
-        color: #aaa;
         transition: 0.5s;
         pointer-events: none;
     }
+
+    ${(props) => props.color && BOX_COLOR[props.color]}
 `;

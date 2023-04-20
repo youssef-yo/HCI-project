@@ -137,7 +137,7 @@ const DashContainer = styled.div(
     ({ theme }) => `
     height: 100%;
     overflow-y: auto;
-    padding: ${theme.spacing.sm};
+    padding: ${theme.spacing.md};
     background: ${theme.color.N4};
 `
 );

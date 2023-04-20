@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { User, useUserApi } from '../../api';
+import { Header } from '../../components/common';
 
 const UserDetails = () => {
     const { id } = useParams<{ id: string }>();
@@ -21,7 +22,10 @@ const UserDetails = () => {
 
     return (
         <section>
-            <h1>User Information</h1>
+            <Header>
+                <h1>User Information</h1>
+            </Header>
+
             <div className="userInfo">
                 {user?.email}
                 <br />

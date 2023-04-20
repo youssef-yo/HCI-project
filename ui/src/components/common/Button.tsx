@@ -2,13 +2,24 @@ import React from 'react';
 import StyledButton from './Button.styled';
 
 export type ButtonProps = {
-    variant?: 'primary';
-} & Omit<React.ComponentProps<'button'>, 'ref'>;
+    color?: 'primary' | 'secondary';
+    size?: 'small' | 'medium' | 'large';
+    icon?: JSX.Element;
+} & Omit<React.ComponentProps<'button'>, 'ref' | 'color'>;
 
-export const Button: React.FC<ButtonProps> = ({ children, variant, ...rest }) => {
+const Button: React.FC<ButtonProps> = ({
+    children,
+    color = 'primary',
+    size = 'medium',
+    icon,
+    ...rest
+}) => {
     return (
-        <StyledButton variant={variant} {...rest}>
+        <StyledButton color={color} size={size} {...rest}>
+            {icon && <span className="button__icon">{icon}</span>}
             {children}
         </StyledButton>
     );
 };
+
+export default Button;
