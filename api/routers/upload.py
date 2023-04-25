@@ -64,12 +64,14 @@ async def upload_ontology(
     db: MongoClient = Depends(get_db)
 ) -> OntologyData:
     # TODO: Use transactions to ensure atomicity
-    stored_onto = await OntologyDocument.find_one(OntologyDocument.name == file.filename)
+    onto = str(file.filename)
+    onto_name = Path(onto).stem
+    stored_onto = await OntologyDocument.find_one(OntologyDocument.name == onto_name)
 
     if stored_onto:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Ontology {file.filename} already exists."
+            detail=f"Ontology {onto_name} already exists."
         )
     
     print(f"File: {file.filename}")
@@ -90,7 +92,7 @@ async def upload_ontology(
 
     # Store the ontology document in the database
     ontology = OntologyDocument(
-        name=file.filename,
+        name=onto_name,
         file_id=ObjectId(file_id),
         data=result
     )

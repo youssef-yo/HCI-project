@@ -2,11 +2,13 @@ import { MdDeleteOutline, MdOutlineEdit, MdOutlineNoteAdd } from 'react-icons/md
 import { useEffect, useState } from 'react';
 import { Ontology, useOntologyApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
-import { UploadOntoModal } from '../../components/dashboard';
+import { EditOntoModal, UploadOntoModal } from '../../components/dashboard';
 
 const Ontologies = () => {
     const [ontos, setOntos] = useState<Ontology[]>([]);
-    const [ontoModal, setOntoModal] = useState<boolean>(false);
+    const [editedOnto, setEditedOnto] = useState<string>('');
+    const [editOntoModal, setEditOntoModal] = useState<boolean>(false);
+    const [uploadOntoModal, setUploadOntoModal] = useState<boolean>(false);
 
     const { deleteOntology, getOntologiesList } = useOntologyApi();
 
@@ -20,13 +22,28 @@ const Ontologies = () => {
             .catch((err) => console.error(err));
     };
 
-    const handleModalClose = () => {
-        console.log('Closing modal');
-        setOntoModal(false);
+    const handleEditModalClose = () => {
+        console.log('Closing edit modal');
+        setEditOntoModal(false);
+    };
+
+    const handleUploadModalClose = () => {
+        console.log('Closing upload modal');
+        setUploadOntoModal(false);
         loadOntologies();
     };
 
-    const removeOntology = async (onto: string) => {
+    const onEditOntology = (id: string) => {
+        setEditedOnto(id);
+        setEditOntoModal(true);
+    };
+
+    const onOntoUpdated = (updatedOnto: Ontology) => {
+        const updatedOntos = ontos.map((o) => (o._id === updatedOnto._id ? updatedOnto : o));
+        setOntos(updatedOntos);
+    };
+
+    const onDeleteOntology = async (onto: string) => {
         await deleteOntology(onto);
         setOntos(ontos.filter((o) => o._id !== onto));
     };
@@ -38,7 +55,7 @@ const Ontologies = () => {
                 <Button
                     color="secondary"
                     icon={<MdOutlineNoteAdd />}
-                    onClick={() => setOntoModal(true)}>
+                    onClick={() => setUploadOntoModal(true)}>
                     Upload Ontology
                 </Button>
             </Header>
@@ -62,12 +79,14 @@ const Ontologies = () => {
                                     alignItems: 'center',
                                     gap: '8px',
                                 }}>
-                                <IconButton title="Edit Ontology">
+                                <IconButton
+                                    title="Edit Ontology"
+                                    onClick={() => onEditOntology(onto._id)}>
                                     <MdOutlineEdit />
                                 </IconButton>
                                 <IconButton
                                     title="Delete Ontology"
-                                    onClick={() => removeOntology(onto._id)}>
+                                    onClick={() => onDeleteOntology(onto._id)}>
                                     <MdDeleteOutline />
                                 </IconButton>
                             </td>
@@ -76,7 +95,13 @@ const Ontologies = () => {
                 </tbody>
             </Table>
 
-            <UploadOntoModal show={ontoModal} onHide={handleModalClose} />
+            <EditOntoModal
+                show={editOntoModal}
+                onHide={handleEditModalClose}
+                ontoID={editedOnto}
+                onUpdate={onOntoUpdated}
+            />
+            <UploadOntoModal show={uploadOntoModal} onHide={handleUploadModalClose} />
         </section>
     );
 };

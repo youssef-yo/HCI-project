@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -33,6 +33,10 @@ class OntologyData(BaseModel):
 class Ontology(BaseModel):
     name: str
     data: OntologyData
+
+
+class OntologyInUpdate(RWSchema):
+    name: Optional[str]
 
 
 class OntologyOutResponse(RWSchema, MongoBase):

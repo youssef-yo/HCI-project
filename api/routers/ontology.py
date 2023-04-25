@@ -15,6 +15,7 @@ from models.domain import OntologyDocument
 from models.schemas import (
     OntoClass,
     OntoProperty,
+    OntologyInUpdate,
     OntologyOutResponse,
     PydanticObjectId
 )
@@ -35,7 +36,7 @@ async def delete_ontology(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Ontology with ID {id} not found."
         )
-    
+
     # Delete the ontology file from GridFS
     await db.gridFS.delete(stored_onto.file_id)
 
@@ -45,10 +46,54 @@ async def delete_ontology(
     return "Files removed..."
 
 
+@router.put("/{id}", response_model=OntologyOutResponse)
+async def update_ontology(
+    id: str,
+    req: OntologyInUpdate
+):
+    """Updates the ontology with the specified ID, with the given update properties"""
+    if req.name:
+        onto = await OntologyDocument.find_one(OntologyDocument.name == req.name)
+        if onto:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"An ontology with name {req.name} already exists."
+            )
+
+    req = {k: v for k, v in req.dict().items() if v is not None}
+    update_query = {"$set": {
+        field: value for field, value in req.items()
+    }}
+
+    onto = await OntologyDocument.get(id)
+    if not onto:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ontology with ID {id} not found."
+        )
+
+    await onto.update(update_query)
+    return onto
+
+
 @router.get("/names", response_model=List[OntologyOutResponse])
 async def get_ontologies_list():
     ontos = await OntologyDocument.find({}).to_list()
     return ontos
+
+
+@router.get("/{id}", response_model=OntologyOutResponse)
+async def get_ontology(
+    id: str,
+):
+    onto = await OntologyDocument.get(id)
+    if not onto:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ontology with ID {id} not found."
+        )
+
+    return onto
 
 
 @router.post("/classes")

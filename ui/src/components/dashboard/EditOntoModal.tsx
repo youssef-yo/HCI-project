@@ -2,34 +2,28 @@ import styled from 'styled-components';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { Input, InputType } from '../common';
-import { User, useUserApi } from '../../api';
+import { Ontology, useOntologyApi } from '../../api';
 
-type EditUserModalProps = {
+type EditOntoModalProps = {
     show: boolean;
     onHide: () => void;
-    userID: string;
-    onUpdate: (user: User) => void;
+    ontoID: string;
+    onUpdate: (onto: Ontology) => void;
 };
 
-const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onUpdate }) => {
-    const [email, setEmail] = useState<string>('');
-    const [fullName, setFullName] = useState<string>('');
-    const [role, setRole] = useState<string>('');
+const EditOntoModal: React.FC<EditOntoModalProps> = ({ show, onHide, ontoID, onUpdate }) => {
+    const [name, setName] = useState<string>('');
 
     const [errorMsg, setErrorMsg] = useState<string>('');
     const errorRef = useRef<HTMLParagraphElement>(null);
 
-    const { getUserByID, updateUser } = useUserApi();
+    const { getOntologyByID, updateOntology } = useOntologyApi();
 
     useEffect(() => {
-        if (!show || !userID) return;
+        if (!show || !ontoID) return;
 
-        getUserByID(userID)
-            .then((user) => {
-                setEmail(user.email);
-                setFullName(user.fullName);
-                setRole(user.role);
-            })
+        getOntologyByID(ontoID)
+            .then((onto) => setName(onto.name))
             .catch((err) => {
                 if (!err?.response) {
                     setErrorMsg('Server Unavailable.');
@@ -38,24 +32,22 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
                     console.error(err);
                 }
             });
-    }, [show, userID]);
+    }, [show, ontoID]);
 
     const handleClose = () => {
         setErrorMsg('');
-        setFullName('');
-        setRole('');
+        setName('');
         onHide();
     };
 
-    const onEditUser = async () => {
-        const userUpdate = {
-            fullName: fullName,
-            role: role,
+    const onEditOntology = async () => {
+        const ontoUpdate = {
+            name: name,
         };
 
-        updateUser(userID, userUpdate)
-            .then((user) => {
-                onUpdate(user);
+        updateOntology(ontoID, ontoUpdate)
+            .then((onto) => {
+                onUpdate(onto);
                 handleClose();
             })
             .catch((err) => {
@@ -71,7 +63,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>Edit User [{email}]</Modal.Title>
+                <Modal.Title>Edit Ontology</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form>
@@ -85,21 +77,10 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
                         type="text"
                         variant={InputType.STANDARD}
                         color="secondary"
-                        id="fullName"
-                        placeholder="Full Name"
-                        onChange={(e) => setFullName(e.target.value)}
-                        value={fullName}
-                        required
-                    />
-
-                    <Input
-                        type="text"
-                        variant={InputType.STANDARD}
-                        color="secondary"
-                        id="role"
-                        placeholder="Role"
-                        onChange={(e) => setRole(e.target.value)}
-                        value={role}
+                        id="name"
+                        placeholder="Ontology Name"
+                        onChange={(e) => setName(e.target.value)}
+                        value={name}
                         required
                     />
                 </Form>
@@ -108,7 +89,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
                 <Button variant="secondary" onClick={handleClose}>
                     Discard Changes
                 </Button>
-                <Button variant="primary" onClick={onEditUser}>
+                <Button variant="primary" onClick={onEditOntology}>
                     Save Changes
                 </Button>
             </Modal.Footer>
@@ -116,7 +97,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
     );
 };
 
-export default EditUserModal;
+export default EditOntoModal;
 
 const Form = styled.form`
     width: 100%;

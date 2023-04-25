@@ -50,6 +50,7 @@ const InputFile = ({
         api(formData)
             .then((result: any) => {
                 console.log('Response after the document was uploaded', result);
+                // TODO: Make the API return the ontology ID, and append it to the fileObj
                 updateFiles(fileObj);
                 fileObj.isUploading = false;
                 changeStateFileIsUploading(false);

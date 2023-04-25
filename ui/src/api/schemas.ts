@@ -40,6 +40,10 @@ export interface Ontology {
     name: string;
 }
 
+export interface OntologyUpdate {
+    name: string;
+}
+
 export interface PaperStatus {
     sha: string;
     name: string;

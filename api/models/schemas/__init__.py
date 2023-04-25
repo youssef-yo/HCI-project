@@ -24,6 +24,7 @@ from .ontologies import (
     Ontology,
     OntologyData,
     OntoProperty,
+    OntologyInUpdate,
     OntologyOutResponse
 )
 from .users import (
