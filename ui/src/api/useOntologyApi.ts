@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Ontology, OntologyUpdate } from './schemas';
+import { OntoClass, Ontology, OntologyUpdate, OntoProperty } from './schemas';
 import useAxiosPrivate from './useAxiosPrivate';
 
 /**
@@ -61,7 +61,7 @@ const useOntologyApi = () => {
      */
     const getOntologiesList: () => Promise<Ontology[]> = async () => {
         return await axios
-            .get('/api/ontology/names')
+            .get('/api/ontology')
             .then((r) => r.data)
             .catch((err) => console.log(err));
     };
@@ -87,6 +87,19 @@ const useOntologyApi = () => {
     };
 
     /**
+     * Gets the classes of the ontology with the given identifier.
+     *
+     * @param id Ontology ID
+     * @returns Promise with ontology classes
+     */
+    const getOntologyClasses: (id: string) => Promise<OntoClass[]> = (id: string) => {
+        return axios
+            .get(`/api/ontology/${id}/classes`)
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err));
+    };
+
+    /**
      * Gets the ontologies properties.
      *
      * @param _ontologiesIds Ontologies IDs
@@ -106,13 +119,28 @@ const useOntologyApi = () => {
         }
     };
 
+    /**
+     * Gets the properties of the ontology with the given identifier.
+     *
+     * @param id Ontology ID
+     * @returns Promise with ontology properties
+     */
+    const getOntologyProperties: (id: string) => Promise<OntoProperty[]> = (id: string) => {
+        return axios
+            .get(`/api/ontology/${id}/properties`)
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err));
+    };
+
     return {
         deleteOntology,
         updateOntology,
         getOntologyByID,
         getOntologiesList,
         getClasses,
+        getOntologyClasses,
         getProperties,
+        getOntologyProperties,
     };
 };
 

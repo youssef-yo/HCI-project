@@ -11,7 +11,7 @@ from fastapi import (
 
 from db.database import MongoClient, get_db
 
-from models.domain import OntologyDocument
+from models.domain import OntologyDocument, UserDocument
 from models.schemas import (
     OntoClass,
     OntoProperty,
@@ -20,80 +20,16 @@ from models.schemas import (
     PydanticObjectId
 )
 
+from services.oauth2 import get_current_user
+
 
 router = APIRouter()
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_ontology(
-    id: str,
-    db: MongoClient = Depends(get_db)
-):
-    # TODO: Use transactions to ensure atomicity
-    stored_onto = await OntologyDocument.get(id)
-    if not stored_onto:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Ontology with ID {id} not found."
-        )
-
-    # Delete the ontology file from GridFS
-    await db.gridFS.delete(stored_onto.file_id)
-
-    # Delete the ontology document
-    await stored_onto.delete()
-
-    return "Files removed..."
-
-
-@router.put("/{id}", response_model=OntologyOutResponse)
-async def update_ontology(
-    id: str,
-    req: OntologyInUpdate
-):
-    """Updates the ontology with the specified ID, with the given update properties"""
-    if req.name:
-        onto = await OntologyDocument.find_one(OntologyDocument.name == req.name)
-        if onto:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"An ontology with name {req.name} already exists."
-            )
-
-    req = {k: v for k, v in req.dict().items() if v is not None}
-    update_query = {"$set": {
-        field: value for field, value in req.items()
-    }}
-
-    onto = await OntologyDocument.get(id)
-    if not onto:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Ontology with ID {id} not found."
-        )
-
-    await onto.update(update_query)
-    return onto
-
-
-@router.get("/names", response_model=List[OntologyOutResponse])
+@router.get("", response_model=List[OntologyOutResponse])
 async def get_ontologies_list():
     ontos = await OntologyDocument.find({}).to_list()
     return ontos
-
-
-@router.get("/{id}", response_model=OntologyOutResponse)
-async def get_ontology(
-    id: str,
-):
-    onto = await OntologyDocument.get(id)
-    if not onto:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Ontology with ID {id} not found."
-        )
-
-    return onto
 
 
 @router.post("/classes")
@@ -134,3 +70,99 @@ async def get_properties(onto_ids: List[str]) -> List[OntoProperty]:
         result_properties.extend(onto.data.properties)
 
     return result_properties
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_ontology(
+    id: str,
+    user: UserDocument = Depends(get_current_user),
+    db: MongoClient = Depends(get_db)
+):
+    # TODO: Use transactions to ensure atomicity
+    stored_onto = await OntologyDocument.get(id)
+    if not stored_onto:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ontology with ID {id} not found."
+        )
+
+    # Delete the ontology file from GridFS
+    await db.gridFS.delete(stored_onto.file_id)
+
+    # Delete the ontology document
+    await stored_onto.delete()
+
+    return "Files removed..."
+
+
+@router.put("/{id}", response_model=OntologyOutResponse)
+async def update_ontology(
+    id: str,
+    req: OntologyInUpdate,
+    user: UserDocument = Depends(get_current_user)
+):
+    """Updates the ontology with the specified ID, with the given update properties"""
+    if req.name:
+        onto = await OntologyDocument.find_one(OntologyDocument.name == req.name)
+        if onto:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"An ontology with name {req.name} already exists."
+            )
+
+    req = {k: v for k, v in req.dict().items() if v is not None}
+    update_query = {"$set": {
+        field: value for field, value in req.items()
+    }}
+
+    onto = await OntologyDocument.get(id)
+    if not onto:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ontology with ID {id} not found."
+        )
+
+    await onto.update(update_query)
+    return onto
+
+
+@router.get("/{id}", response_model=OntologyOutResponse)
+async def get_ontology(
+    id: str,
+):
+    onto = await OntologyDocument.get(id)
+    if not onto:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ontology with ID {id} not found."
+        )
+
+    return onto
+
+
+@router.get("/{id}/classes")
+async def get_ontology_classes(
+    id: str,
+):
+    onto = await OntologyDocument.get(id)
+    if not onto:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ontology with ID {id} not found."
+        )
+
+    return onto.data.classes
+
+
+@router.get("/{id}/properties")
+async def get_ontology_classes(
+    id: str,
+):
+    onto = await OntologyDocument.get(id)
+    if not onto:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ontology with ID {id} not found."
+        )
+
+    return onto.data.properties
