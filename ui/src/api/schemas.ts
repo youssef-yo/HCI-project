@@ -44,6 +44,12 @@ export interface OntologyUpdate {
     name: string;
 }
 
+export interface Doc {
+    _id: string;
+    name: string;
+    totalPages: number;
+}
+
 export interface PaperStatus {
     sha: string;
     name: string;

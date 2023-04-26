@@ -33,13 +33,12 @@ async def get_ontologies_list():
 
 
 @router.post("/classes")
-async def get_classes(onto_ids: List[str]) -> List[OntoClass]:
+async def get_classes(
+    onto_ids: List[PydanticObjectId]
+) -> List[OntoClass]:
     """
     Get the labels used for annotation for this app.
     """
-
-    # Convert IDs to MongoDB ObjectID
-    onto_ids = [PydanticObjectId(id) for id in onto_ids]
 
     ontologies = await OntologyDocument.find(
         In(OntologyDocument.id, onto_ids)
@@ -53,13 +52,12 @@ async def get_classes(onto_ids: List[str]) -> List[OntoClass]:
 
 
 @router.post("/properties")
-async def get_properties(onto_ids: List[str]) -> List[OntoProperty]:
+async def get_properties(
+    onto_ids: List[PydanticObjectId]
+) -> List[OntoProperty]:
     """
     Get the relations used for annotation for this app.
     """
-
-    # Convert IDs to MongoDB ObjectID
-    onto_ids = [PydanticObjectId(id) for id in onto_ids]
 
     ontologies = await OntologyDocument.find(
         In(OntologyDocument.id, onto_ids)

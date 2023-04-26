@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { Annotation, PdfAnnotations, RelationGroup } from '../context';
 import useAxiosPrivate from './useAxiosPrivate';
-import { PageTokens } from './schemas';
+import { Doc, PageTokens } from './schemas';
 
 function docURL(sha: string): string {
-    return `/api/doc/${sha}`;
+    return `/api/docs/${sha}`;
 }
 
 export function pdfURL(sha: string): string {
@@ -18,6 +18,31 @@ export function pdfURL(sha: string): string {
  */
 const useDocumentApi = () => {
     const axiosPrivate = useAxiosPrivate();
+
+    /**
+     * Get all documents that have been uploaded.
+     *
+     * @returns Promise with document list
+     */
+    const getAllDocs: () => Promise<Doc[]> = () => {
+        return axios
+            .get('/api/docs')
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err));
+    };
+
+    /**
+     * Get the document with the given identifier.
+     *
+     * @param id Document ID
+     * @returns Promise with document
+     */
+    const getDocumentByID: (id: string) => Promise<Doc> = (id: string) => {
+        return axios
+            .get(`/api/docs/${id}`)
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err));
+    };
 
     /**
      * Gets the selected document page structure tokens.
@@ -37,7 +62,7 @@ const useDocumentApi = () => {
      * @returns Promise
      */
     const setPdfComment = async (sha: string, comments: string) => {
-        return axiosPrivate.post(`/api/doc/${sha}/comments`, comments);
+        return axiosPrivate.post(`/api/docs/${sha}/comments`, comments);
     };
 
     /**
@@ -48,7 +73,7 @@ const useDocumentApi = () => {
      * @returns Promise
      */
     const setPdfFinished = async (sha: string, finished: boolean) => {
-        return axiosPrivate.post(`/api/doc/${sha}/finished`, finished);
+        return axiosPrivate.post(`/api/docs/${sha}/finished`, finished);
     };
 
     /**
@@ -59,7 +84,7 @@ const useDocumentApi = () => {
      * @returns Promise
      */
     const setPdfJunk = async (sha: string, junk: boolean) => {
-        return axiosPrivate.post(`/api/doc/${sha}/junk`, junk);
+        return axiosPrivate.post(`/api/docs/${sha}/junk`, junk);
     };
 
     /**
@@ -75,7 +100,7 @@ const useDocumentApi = () => {
     ) => {
         // console.log('pdfAnnotations.annotations: ', pdfAnnotations.annotations);
         // console.log('pdfAnnotations.relations: ', pdfAnnotations.relations);
-        return axiosPrivate.post(`/api/doc/${sha}/annotations`, {
+        return axiosPrivate.post(`/api/docs/${sha}/annotations`, {
             annotations: pdfAnnotations.annotations,
             relations: pdfAnnotations.relations,
         });
@@ -88,7 +113,7 @@ const useDocumentApi = () => {
      * @returns Promise with document annotations
      */
     const getAnnotations: (sha: string) => Promise<PdfAnnotations> = async (sha: string) => {
-        return axiosPrivate.get(`/api/doc/${sha}/annotations`).then((response) => {
+        return axiosPrivate.get(`/api/docs/${sha}/annotations`).then((response) => {
             const ann: PdfAnnotations = response.data;
             const annotations = ann.annotations.map((a) => Annotation.fromObject(a));
             const relations = ann.relations.map((r) => RelationGroup.fromObject(r));
@@ -98,6 +123,8 @@ const useDocumentApi = () => {
     };
 
     return {
+        getAllDocs,
+        getDocumentByID,
         getTokens,
         setPdfComment,
         setPdfFinished,

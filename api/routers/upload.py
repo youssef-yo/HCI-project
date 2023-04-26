@@ -1,5 +1,3 @@
-import json
-import os
 import shutil
 import tempfile
 from pathlib import Path
@@ -20,20 +18,67 @@ from fastapi import (
 )
 from fastapi.encoders import jsonable_encoder
 
-from app.assign import assign
 from app.preprocess import preprocess
 
 from db.database import MongoClient, get_db
 
-from models.schemas import OntoClass, OntoProperty, OntologyData
-from models.domain import OntologyDocument, UserDocument
+from models.schemas import (
+    DocumentOutResponse,
+    OntoClass,
+    OntoProperty,
+    OntologyData
+)
+from models.domain import (
+    DocumentDocument,
+    OntologyDocument,
+    UserDocument
+)
 
 from services.oauth2 import get_current_user
 
-from core.config import Settings, get_settings
-
 
 router = APIRouter()
+
+
+@router.post("/doc", response_model=DocumentOutResponse)
+async def upload_document(
+    user: UserDocument = Depends(get_current_user),
+    file: UploadFile = File(...),
+    db: MongoClient = Depends(get_db)
+) -> DocumentOutResponse:
+    """
+    Uploads a PDF file.
+    It also extracts the PDF structure (pages and tokens) for later use.
+    """
+    # TODO: Use transactions to ensure atomicity
+    pdf = str(file.filename)
+    pdf_name = Path(pdf).stem
+
+    print(f"File: {file.filename}")
+    print(f"Content Type: {file.content_type}")
+    print(f"Size: {file.size}")
+    print(f"Headers: {file.headers}")
+
+    doc_structure = preprocess("pdfplumber", file.file)
+    npages = len(doc_structure)
+
+    # Upload the document file with GridFS
+    file.file.seek(0)
+    file_id = await db.gridFS.upload_from_stream(
+        file.filename,
+        file.file,
+        metadata={"contentType": file.content_type}
+    )
+
+    document = DocumentDocument(
+        name=pdf_name,
+        file_id=file_id,
+        total_pages=npages,
+        structure=doc_structure
+    )
+    await document.create()
+
+    return document
 
 
 @router.post("/ontology", response_model=OntologyData)
@@ -42,6 +87,10 @@ async def upload_ontology(
     file: UploadFile = File(...),
     db: MongoClient = Depends(get_db)
 ) -> OntologyData:
+    """
+    Uploads an ontology file.
+    It also extracts the ontology data (classes and properties) for later use.
+    """
     # TODO: Use transactions to ensure atomicity
     onto = str(file.filename)
     onto_name = Path(onto).stem
@@ -78,35 +127,6 @@ async def upload_ontology(
     await ontology.create()
 
     return result
-
-
-@router.post("/doc")
-def upload_document(
-    user: UserDocument = Depends(get_current_user),
-    file: UploadFile = File(...),
-    settings: Settings = Depends(get_settings)
-):
-    """
-    Add a PDF to the pawls dataset (skiff_files/).
-    """
-    pdf = str(file.filename)
-
-    pdf_name = Path(pdf).stem
-
-    output_dir = os.path.join(settings.output_directory, pdf_name)
-
-    os.umask(0)
-    os.mkdir(output_dir, 0o777)
-    abspath_output_dir = os.path.abspath(output_dir)
-    file_location = os.path.join(abspath_output_dir, f"{file.filename}")
-
-    with open(file_location, "wb+") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    npages = preprocess("pdfplumber", file_location)
-
-    assign(settings.output_directory, user.email, pdf_name, npages, file_location)
-    return "ok"
 
 
 def analyze_ontology(file: BinaryIO) -> OntologyData:

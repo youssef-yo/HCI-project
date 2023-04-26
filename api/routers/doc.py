@@ -9,11 +9,19 @@ from fastapi import (
     HTTPException,
     status
 )
-from fastapi.responses import FileResponse
+from fastapi.responses import Response
 from fastapi.encoders import jsonable_encoder
 
-from models.schemas import Annotation, PdfAnnotation, RelationGroup
-from models.domain import UserDocument
+from db.database import MongoClient, get_db
+
+from models.schemas import (
+    Annotation,
+    DocumentOutResponse,
+    Page,
+    PdfAnnotation,
+    RelationGroup
+)
+from models.domain import DocumentDocument, UserDocument
 
 from services.oauth2 import get_current_user
 
@@ -23,50 +31,46 @@ from core.config import Settings, get_settings
 router = APIRouter()
 
 
-@router.get("/{sha}/pdf", response_class=FileResponse)
-async def get_pdf(
-    sha: str,
-    settings: Settings = Depends(get_settings)
-):
-    """
-    Fetches a PDF.
+@router.get("", response_model=List[DocumentOutResponse])
+async def get_all_documents():
+    docs = await DocumentDocument.find({}).to_list()
+    return docs
 
+
+@router.get("/{sha}", response_model=DocumentOutResponse)
+async def get_document(
     sha: str
-        The sha of the pdf to return.
-    """
-    pdf = os.path.join(settings.output_directory, sha, f"{sha}.pdf")
-    pdf_exists = os.path.exists(pdf)
-    if not pdf_exists:
+):
+    doc = await DocumentDocument.get(sha)
+    if not doc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"pdf {sha} not found."
+            detail=f"Document with ID {sha} not found."
         )
+    
+    return doc
 
-    return FileResponse(pdf, media_type="application/pdf")
 
-
-@router.get("/{sha}/title")
-async def get_pdf_title(
+@router.get("/{sha}/pdf", response_class=Response)
+async def get_pdf(
     sha: str,
-    settings: Settings = Depends(get_settings)
-) -> Optional[str]:
+    db: MongoClient = Depends(get_db)
+):
     """
-    Fetches a PDF's title.
-
-    sha: str
-        The sha of the pdf title to return.
+    Fetches the PDF file that belongs to a document.
     """
-    pdf_info = os.path.join(settings.output_directory, "pdf_metadata.json")
+    pdf = await DocumentDocument.get(sha)
+    if not pdf:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"PDF document with ID {sha} not found."
+        )
+    
+    # Retrieve the document file from GridFS
+    grid_out = await db.gridFS.open_download_stream(pdf.file_id)
+    file = await grid_out.read()
 
-    with open(pdf_info, "r") as f:
-        info = json.load(f)
-
-    data = info.get("sha", None)
-
-    if data is None:
-        return None
-
-    return data.get("title", None)
+    return Response(file, media_type="application/pdf")
 
 
 @router.post("/{sha}/comments")
@@ -186,25 +190,43 @@ def save_annotations(
     return {}
 
 
-@router.get("/{sha}/tokens")
-def get_tokens(
+@router.get("/{sha}/tokens", response_model=List[Page])
+async def get_tokens(
     sha: str,
-    settings: Settings = Depends(get_settings)
+    db: MongoClient = Depends(get_db)
 ):
     """
-    sha: str
-        PDF sha to retrieve tokens for.
+    Gets the PDF structure (pages and tokens) of the file belonging to a document.
     """
-    pdf_tokens = os.path.join(settings.output_directory, sha, "pdf_structure.json")
-    if not os.path.exists(pdf_tokens):
+    pdf = await DocumentDocument.get(sha)
+    if not pdf:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="No tokens for pdf."
+            detail=f"PDF document with ID {sha} not found."
         )
-    with open(pdf_tokens, "r") as f:
-        response = json.load(f)
 
-    return response
+    return pdf.structure
+
+
+# @router.get("/{sha}/tokens")
+# def get_tokens(
+#     sha: str,
+#     settings: Settings = Depends(get_settings)
+# ):
+#     """
+#     sha: str
+#         PDF sha to retrieve tokens for.
+#     """
+#     pdf_tokens = os.path.join(settings.output_directory, sha, "pdf_structure.json")
+#     if not os.path.exists(pdf_tokens):
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="No tokens for pdf."
+#         )
+#     with open(pdf_tokens, "r") as f:
+#         response = json.load(f)
+
+#     return response
 
 
 def update_status_json(status_path: str, sha: str, data: Dict[str, Any]):

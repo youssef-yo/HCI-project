@@ -25,7 +25,9 @@ class Settings(BaseSettings):
     # Database properties
     mongodb_uri: str = "mongodb://devusername:devpassword@mongodb:27017/"
     db_name: str = "ontopawls"
+    docs_collection: str = "documents"
     ontos_collection: str = "ontologies"
+    tasks_collection: str = "tasks"
     users_collection: str = "users"
 
 

@@ -12,7 +12,7 @@ import { Sidebar, Topbar, WithSidebar, WithTopbar } from '../components/common';
 import { Header } from '../components/sidebar';
 import {
     DashSummary,
-    Papers,
+    Documents,
     Tasks,
     Users,
     UserDetails,
@@ -50,9 +50,9 @@ export const DashPage = () => {
                     </div>
                     <div>
                         <p className="navGroup__title">Papers</p>
-                        <NavLink className="navGroup__link" to={'papers'} end>
+                        <NavLink className="navGroup__link" to={'docs'} end>
                             <MdOutlineDescription />
-                            <span>Papers</span>
+                            <span>Documents</span>
                         </NavLink>
                     </div>
                     <div>
@@ -81,7 +81,7 @@ export const DashPage = () => {
                             <Route path="users" element={<Users />} />
                             <Route path="users/info/:id" element={<UserDetails />} />
                             <Route path="users/new" element={<UserCreate />} />
-                            <Route path="papers" element={<Papers />} />
+                            <Route path="docs" element={<Documents />} />
                             <Route path="tasks" element={<Tasks />} />
                             <Route path="ontos" element={<Ontologies />} />
                         </Route>

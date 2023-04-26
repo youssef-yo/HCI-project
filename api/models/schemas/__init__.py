@@ -5,6 +5,10 @@ from .annotations import (
     RelationGroup,
     TokenId
 )
+from .documents import (
+    DocumentOutResponse,
+    Page
+)
 from .jwt_tokens import (
     AccessToken,
     AccessTokenData,

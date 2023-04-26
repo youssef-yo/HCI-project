@@ -1,4 +1,6 @@
-from typing import List
+import shutil
+import tempfile
+from typing import BinaryIO, List
 
 import pandas as pd
 import pdfplumber
@@ -19,33 +21,37 @@ class PDFPlumberTokenExtractor:
             height=row["height"],
         )
 
-    def extract(self, pdf_path: str) -> List[Page]:
+    def extract(self, file: BinaryIO) -> List[Page]:
         """Extracts token text, positions, and style information from a PDF file.
 
         Args:
-            pdf_path (str): the path to the pdf file.
+            file (BinaryIO): the file.
             include_lines (bool, optional): Whether to include line tokens. Defaults to False.
 
         Returns:
             PdfAnnotations: A `PdfAnnotations` containing all the paper token information.
         """
-        plumber_pdf_object = pdfplumber.open(pdf_path)
+        with tempfile.NamedTemporaryFile() as tf:
+            file.seek(0)
+            shutil.copyfileobj(file, tf)
 
-        pages = []
-        for page_id in range(len(plumber_pdf_object.pages)):
-            cur_page = plumber_pdf_object.pages[page_id]
+            plumber_pdf_object = pdfplumber.open(tf)
 
-            tokens = self.obtain_word_tokens(cur_page)
+            pages = []
+            for page_id in range(len(plumber_pdf_object.pages)):
+                cur_page = plumber_pdf_object.pages[page_id]
 
-            page = dict(
-                page=dict(
-                    width=float(cur_page.width),
-                    height=float(cur_page.height),
-                    index=page_id
-                ),
-                tokens=tokens
-            )
-            pages.append(page)
+                tokens = self.obtain_word_tokens(cur_page)
+
+                page = dict(
+                    page=dict(
+                        width=float(cur_page.width),
+                        height=float(cur_page.height),
+                        index=page_id
+                    ),
+                    tokens=tokens
+                )
+                pages.append(page)
 
         return pages
 
@@ -88,10 +94,10 @@ class PDFPlumberTokenExtractor:
         return word_tokens
 
 
-def process_pdfplumber(pdf_file: str):
+def process_pdfplumber(pdf_file: BinaryIO):
     """
     Integration for importing annotations from pdfplumber.
-    pdf_file: str
+    pdf_file: BinaryIO
         The path to the pdf file to process.
     """
     pdf_extractors = PDFPlumberTokenExtractor()
