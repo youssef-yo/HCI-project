@@ -18,6 +18,7 @@ export const AnnotationSummary = ({ annotation }: AnnotationSummaryProps) => {
         );
     };
     const handleScrolling = () => {
+        if (!pageInfo) return;
         const divPage = document.getElementById(pageInfo.page.pageNumber.toString());
         divPage?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -26,7 +27,11 @@ export const AnnotationSummary = ({ annotation }: AnnotationSummaryProps) => {
         return null;
     }
 
-    const pageInfo = pdfStore.pages[annotation.page];
+    // Since the starting page might differ from the very first of the PDF,
+    // we must filter the page info based on the page index,
+    // not based on the array position.
+    const pageInfo = pdfStore.pages.find((pInfo) => annotation.page === pInfo.page.pageNumber - 1);
+    if (!pageInfo) return null;
 
     const text =
         annotation.tokens === null

@@ -21,17 +21,19 @@ export const Relations = ({ annotations, relations }: RelationProps) => {
     return (
         <SidebarItem>
             <SidebarItemTitle>Relations</SidebarItemTitle>
-            {relations.length === 0 ? (
-                <>None</>
-            ) : (
-                <>
-                    {relations.map((relation) => (
-                        <>
-                            <ModalPopupRelationInfo relation={relation}></ModalPopupRelationInfo>
-                        </>
-                    ))}
-                </>
-            )}
+            <div>
+                {relations.length === 0 ? (
+                    <>None</>
+                ) : (
+                    <div>
+                        {relations.map((relation) => (
+                            <ModalPopupRelationInfo
+                                key={relation.id}
+                                relation={relation}></ModalPopupRelationInfo>
+                        ))}
+                    </div>
+                )}
+            </div>
         </SidebarItem>
     );
 };
