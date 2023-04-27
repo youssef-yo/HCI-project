@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional
 
 from beanie import Document, Indexed, PydanticObjectId
 
@@ -11,7 +11,6 @@ class DocumentDocument(Document):
     name: Indexed(str)
     file_id: Optional[PydanticObjectId]
     total_pages: int
-    structure: List[Page]
 
     class Settings:
         name = get_settings().docs_collection

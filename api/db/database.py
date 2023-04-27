@@ -3,7 +3,13 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
 
 from core.config import get_settings
 
-from models.domain import DocumentDocument, OntologyDocument, UserDocument, TaskDocument
+from models.domain import (
+    DocStructureDocument,
+    DocumentDocument,
+    OntologyDocument,
+    UserDocument,
+    TaskDocument
+)
 
 
 class MongoClient:
@@ -19,7 +25,10 @@ class MongoClient:
         self._gridfs = AsyncIOMotorGridFSBucket(self._client[self._database])
 
     async def initialize(self) -> None:
-        await init_beanie(database=self._client[self._database], document_models=[DocumentDocument, OntologyDocument, UserDocument, TaskDocument])
+        await init_beanie(
+            database=self._client[self._database],
+            document_models=[DocStructureDocument, DocumentDocument, OntologyDocument, UserDocument, TaskDocument]
+        )
 
     def close(self) -> None:
         self._client.close()

@@ -42,7 +42,7 @@ const Documents = () => {
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Pages</th>
+                        <th style={{ textAlign: 'center' }}>Pages</th>
                         <th style={{ textAlign: 'center' }}>Actions</th>
                     </tr>
                 </thead>
@@ -50,7 +50,7 @@ const Documents = () => {
                     {docs.map((doc) => (
                         <tr key={doc._id}>
                             <td>{doc.name}</td>
-                            <td>{doc.totalPages}</td>
+                            <td style={{ textAlign: 'center' }}>{doc.totalPages}</td>
                             <td
                                 style={{
                                     display: 'flex',

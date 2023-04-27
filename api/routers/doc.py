@@ -19,9 +19,14 @@ from models.schemas import (
     DocumentOutResponse,
     Page,
     PdfAnnotation,
+    PydanticObjectId,
     RelationGroup
 )
-from models.domain import DocumentDocument, UserDocument
+from models.domain import (
+    DocStructureDocument,
+    DocumentDocument,
+    UserDocument
+)
 
 from services.oauth2 import get_current_user
 
@@ -39,7 +44,7 @@ async def get_all_documents():
 
 @router.get("/{sha}", response_model=DocumentOutResponse)
 async def get_document(
-    sha: str
+    sha: PydanticObjectId
 ):
     doc = await DocumentDocument.get(sha)
     if not doc:
@@ -47,13 +52,13 @@ async def get_document(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Document with ID {sha} not found."
         )
-    
+
     return doc
 
 
 @router.get("/{sha}/pdf", response_class=Response)
 async def get_pdf(
-    sha: str,
+    sha: PydanticObjectId,
     db: MongoClient = Depends(get_db)
 ):
     """
@@ -65,7 +70,7 @@ async def get_pdf(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"PDF document with ID {sha} not found."
         )
-    
+
     # Retrieve the document file from GridFS
     grid_out = await db.gridFS.open_download_stream(pdf.file_id)
     file = await grid_out.read()
@@ -192,13 +197,13 @@ def save_annotations(
 
 @router.get("/{sha}/tokens", response_model=List[Page])
 async def get_tokens(
-    sha: str,
+    sha: PydanticObjectId,
     db: MongoClient = Depends(get_db)
 ):
     """
     Gets the PDF structure (pages and tokens) of the file belonging to a document.
     """
-    pdf = await DocumentDocument.get(sha)
+    pdf = await DocStructureDocument.find_one(DocStructureDocument.doc_id == sha)
     if not pdf:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

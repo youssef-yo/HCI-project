@@ -29,6 +29,7 @@ from models.schemas import (
     OntologyData
 )
 from models.domain import (
+    DocStructureDocument,
     DocumentDocument,
     OntologyDocument,
     UserDocument
@@ -51,6 +52,7 @@ async def upload_document(
     It also extracts the PDF structure (pages and tokens) for later use.
     """
     # TODO: Use transactions to ensure atomicity
+    # TODO: Maybe implement a progress tracker... this operation can take long
     pdf = str(file.filename)
     pdf_name = Path(pdf).stem
 
@@ -59,8 +61,8 @@ async def upload_document(
     print(f"Size: {file.size}")
     print(f"Headers: {file.headers}")
 
-    doc_structure = preprocess("pdfplumber", file.file)
-    npages = len(doc_structure)
+    structure = preprocess("pdfplumber", file.file)
+    npages = len(structure)
 
     # Upload the document file with GridFS
     file.file.seek(0)
@@ -70,13 +72,22 @@ async def upload_document(
         metadata={"contentType": file.content_type}
     )
 
+    # Upload the document data
     document = DocumentDocument(
         name=pdf_name,
         file_id=file_id,
         total_pages=npages,
-        structure=doc_structure
     )
     await document.create()
+
+    # Upload the PDF structure in a separate collection (maybe in future in GridFS).
+    # This is because the structure can be quite large, and could hinder the
+    # performance for simpler document queries that do not involve the structure itself.
+    doc_structure = DocStructureDocument(
+        doc_id=document.id,
+        structure=structure
+    )
+    await doc_structure.create()
 
     return document
 
@@ -101,12 +112,12 @@ async def upload_ontology(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Ontology {onto_name} already exists."
         )
-    
+
     print(f"File: {file.filename}")
     print(f"Content Type: {file.content_type}")
     print(f"Size: {file.size}")
     print(f"Headers: {file.headers}")
-    
+
     # Analyzing the contents of the uploaded ontology file
     result = analyze_ontology(file.file)
 
