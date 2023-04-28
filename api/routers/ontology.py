@@ -21,6 +21,7 @@ from models.schemas import (
 )
 
 from services.oauth2 import get_current_user
+from services.ontology import get_onto_by_id
 
 
 router = APIRouter()
@@ -72,17 +73,12 @@ async def get_properties(
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_ontology(
-    id: str,
+    id: PydanticObjectId,
     user: UserDocument = Depends(get_current_user),
     db: MongoClient = Depends(get_db)
 ):
     # TODO: Use transactions to ensure atomicity
-    stored_onto = await OntologyDocument.get(id)
-    if not stored_onto:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Ontology with ID {id} not found."
-        )
+    stored_onto = await get_onto_by_id(id, assert_exists=True)
 
     # Delete the ontology file from GridFS
     await db.gridFS.delete(stored_onto.file_id)
@@ -95,7 +91,7 @@ async def delete_ontology(
 
 @router.put("/{id}", response_model=OntologyOutResponse)
 async def update_ontology(
-    id: str,
+    id: PydanticObjectId,
     req: OntologyInUpdate,
     user: UserDocument = Depends(get_current_user)
 ):
@@ -113,14 +109,9 @@ async def update_ontology(
         field: value for field, value in req.items()
     }}
 
-    onto = await OntologyDocument.get(id)
-    if not onto:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Ontology with ID {id} not found."
-        )
-
+    onto = await get_onto_by_id(id, assert_exists=True)
     await onto.update(update_query)
+
     return onto
 
 
@@ -128,13 +119,7 @@ async def update_ontology(
 async def get_ontology(
     id: str,
 ):
-    onto = await OntologyDocument.get(id)
-    if not onto:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Ontology with ID {id} not found."
-        )
-
+    onto = await get_onto_by_id(id, assert_exists=True)
     return onto
 
 
@@ -142,13 +127,7 @@ async def get_ontology(
 async def get_ontology_classes(
     id: str,
 ):
-    onto = await OntologyDocument.get(id)
-    if not onto:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Ontology with ID {id} not found."
-        )
-
+    onto = await get_onto_by_id(id, assert_exists=True)
     return onto.data.classes
 
 
@@ -156,11 +135,5 @@ async def get_ontology_classes(
 async def get_ontology_classes(
     id: str,
 ):
-    onto = await OntologyDocument.get(id)
-    if not onto:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Ontology with ID {id} not found."
-        )
-
+    onto = await get_onto_by_id(id, assert_exists=True)
     return onto.data.properties

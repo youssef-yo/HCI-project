@@ -104,3 +104,25 @@ export interface UserUpdate {
     fullName: string;
     role: string;
 }
+
+export interface PageRange {
+    start: number;
+    end: number;
+}
+
+export interface Task {
+    _id: string;
+    userId: string;
+    docId: string;
+    pageRange: PageRange;
+    finished: boolean;
+    junk: boolean;
+    comments: string;
+    completedAt?: Date;
+}
+
+export interface TaskCreate {
+    userId: string;
+    docId: string;
+    pageRange: PageRange;
+}

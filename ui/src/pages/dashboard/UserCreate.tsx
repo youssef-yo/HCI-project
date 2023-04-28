@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useUserApi } from '../../api';
 import { Button, Header, Input, InputType } from '../../components/common';
 
-const UserCreate = () => {
+const UserCreatePage = () => {
     const [email, setEmail] = useState<string>('');
     const [fullName, setFullName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -119,7 +119,7 @@ const UserCreate = () => {
     );
 };
 
-export default UserCreate;
+export default UserCreatePage;
 
 const Form = styled.form`
     width: 100%;

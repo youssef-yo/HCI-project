@@ -1,7 +1,9 @@
-export { default as DashSummary } from './DashSummary';
-export { default as Ontologies } from './Ontologies';
-export { default as Documents } from './Documents';
-export { default as Tasks } from './Tasks';
-export { default as Users } from './Users';
-export { default as UserCreate } from './UserCreate';
-export { default as UserDetails } from './UserDetails';
+export { default as DashSummaryPage } from './DashSummary';
+export { default as OntologiesPage } from './Ontologies';
+export { default as DocumentPage } from './Document';
+export { default as DocumentsPage } from './Documents';
+export { default as TaskPage } from './Task';
+export { default as TasksPage } from './Tasks';
+export { default as UsersPage } from './Users';
+export { default as UserCreatePage } from './UserCreate';
+export { default as UserPage } from './User';

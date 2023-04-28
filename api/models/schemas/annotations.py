@@ -10,11 +10,6 @@ class Bounds(BaseModel):
     right: float
     bottom: float
 
-# non servirà più
-class Label(BaseModel):
-    text: str
-    # color: str
-
 
 class TokenId(BaseModel):
     pageIndex: int
@@ -42,3 +37,10 @@ class RelationGroup(BaseModel):
 class PdfAnnotation(BaseModel):
     annotations: List[Annotation]
     relations: List[RelationGroup]
+
+    @staticmethod
+    def empty():
+        return PdfAnnotation(
+            annotations=[],
+            relations=[]
+        )

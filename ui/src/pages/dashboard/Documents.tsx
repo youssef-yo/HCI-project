@@ -3,12 +3,14 @@ import { useEffect, useState } from 'react';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { Doc, useDocumentApi } from '../../api';
 import { UploadDocModal } from '../../components/dashboard';
+import { useNavigate } from 'react-router-dom';
 
-const Documents = () => {
+const DocumentsPage = () => {
     const [docs, setDocs] = useState<Doc[]>([]);
     const [uploadDocModal, setUploadDocModal] = useState<boolean>(false);
 
     const { getAllDocs } = useDocumentApi();
+    const navigate = useNavigate();
 
     const loadDocs = () => {
         getAllDocs()
@@ -59,7 +61,9 @@ const Documents = () => {
                                     alignItems: 'center',
                                     gap: '8px',
                                 }}>
-                                <IconButton title="View Document">
+                                <IconButton
+                                    title="View Document"
+                                    onClick={() => navigate(`${doc._id}`)}>
                                     <MdOpenInNew />
                                 </IconButton>
                                 <IconButton title="Edit Document">
@@ -76,4 +80,4 @@ const Documents = () => {
     );
 };
 
-export default Documents;
+export default DocumentsPage;

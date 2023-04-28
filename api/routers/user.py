@@ -9,6 +9,7 @@ from fastapi import (
 
 from models.domain import UserDocument
 from models.schemas import (
+    PydanticObjectId,
     UserInCreate,
     UserInUpdate,
     UserOutResponse
@@ -16,6 +17,7 @@ from models.schemas import (
 
 from services.security import hash_password
 from services.oauth2 import get_current_user as get_current_auth_user
+from services.user import get_user_by_id
 
 
 router = APIRouter()
@@ -73,25 +75,19 @@ def get_current_user(
 
 @router.get("/{id}", response_model=UserOutResponse)
 async def get_user(
-    id: str,
+    id: PydanticObjectId,
     auth_user: str = Depends(get_current_auth_user)
 ) -> UserOutResponse:
     """
     Returns the user with the given ID, if exists.
     """
-    user = await UserDocument.get(id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with ID {id} not found."
-        )
-
+    user = await get_user_by_id(id, assert_exists=True)
     return user
 
 
 @router.put("/{id}", response_model=UserOutResponse)
 async def update_user(
-    id: str,
+    id: PydanticObjectId,
     req: UserInUpdate,
     auth_user: str = Depends(get_current_auth_user)
 ) -> UserOutResponse:
@@ -103,30 +99,19 @@ async def update_user(
         field: value for field, value in req.items()
     }}
 
-    user = await UserDocument.get(id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with ID {id} not found."
-        )
-
+    user = await get_user_by_id(id, assert_exists=True)
     await user.update(update_query)
+
     return user
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
-    id: str,
+    id: PydanticObjectId,
     auth_user: str = Depends(get_current_auth_user)
 ):
     """
     Deletes the user with the given ID, if exists.
     """
-    user = await UserDocument.get(id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with ID {id} not found."
-        )
-
+    user = await get_user_by_id(id, assert_exists=True)
     await user.delete()

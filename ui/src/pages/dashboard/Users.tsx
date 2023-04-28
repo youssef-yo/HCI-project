@@ -5,7 +5,7 @@ import { Button, Header, IconButton, Table } from '../../components/common';
 import { EditUserModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
 
-const Users = () => {
+const UsersPage = () => {
     const [users, setUsers] = useState<User[]>([]);
 
     const [userModal, setUserModal] = useState<boolean>(false);
@@ -79,7 +79,7 @@ const Users = () => {
                                 }}>
                                 <IconButton
                                     title="View User"
-                                    onClick={() => navigate(`info/${user._id}`)}>
+                                    onClick={() => navigate(`${user._id}`)}>
                                     <MdOpenInNew />
                                 </IconButton>
                                 <IconButton title="Edit User" onClick={() => onEditUser(user._id)}>
@@ -106,4 +106,4 @@ const Users = () => {
     );
 };
 
-export default Users;
+export default UsersPage;

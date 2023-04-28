@@ -31,6 +31,11 @@ from .ontologies import (
     OntologyInUpdate,
     OntologyOutResponse
 )
+from .tasks import (
+    PageRange,
+    TaskInCreate,
+    TaskOutResponse
+)
 from .users import (
     UserInCreate,
     UserInUpdate,

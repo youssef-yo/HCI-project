@@ -20,14 +20,20 @@ from models.schemas import (
     Page,
     PdfAnnotation,
     PydanticObjectId,
-    RelationGroup
+    RelationGroup,
+    TaskOutResponse
 )
 from models.domain import (
     DocStructureDocument,
     DocumentDocument,
+    TaskDocument,
     UserDocument
 )
 
+from services.doc import (
+    get_document_by_id,
+    get_document_structure
+)
 from services.oauth2 import get_current_user
 
 from core.config import Settings, get_settings
@@ -46,13 +52,7 @@ async def get_all_documents():
 async def get_document(
     sha: PydanticObjectId
 ):
-    doc = await DocumentDocument.get(sha)
-    if not doc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Document with ID {sha} not found."
-        )
-
+    doc = await get_document_by_id(sha, assert_exists=True)
     return doc
 
 
@@ -64,12 +64,7 @@ async def get_pdf(
     """
     Fetches the PDF file that belongs to a document.
     """
-    pdf = await DocumentDocument.get(sha)
-    if not pdf:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"PDF document with ID {sha} not found."
-        )
+    pdf = await get_document_by_id(sha, assert_exists=True)
 
     # Retrieve the document file from GridFS
     grid_out = await db.gridFS.open_download_stream(pdf.file_id)
@@ -195,6 +190,17 @@ def save_annotations(
     return {}
 
 
+@router.get("/{sha}/tasks", response_model=List[TaskOutResponse])
+async def get_document_tasks(
+    sha: PydanticObjectId,
+    user: UserDocument = Depends(get_current_user)
+):
+    doc = await get_document_by_id(sha, assert_exists=True)
+    
+    tasks = await TaskDocument.find_many(TaskDocument.doc_id == sha).to_list()
+    return tasks
+
+
 @router.get("/{sha}/tokens", response_model=List[Page])
 async def get_tokens(
     sha: PydanticObjectId,
@@ -203,35 +209,8 @@ async def get_tokens(
     """
     Gets the PDF structure (pages and tokens) of the file belonging to a document.
     """
-    pdf = await DocStructureDocument.find_one(DocStructureDocument.doc_id == sha)
-    if not pdf:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"PDF document with ID {sha} not found."
-        )
-
-    return pdf.structure
-
-
-# @router.get("/{sha}/tokens")
-# def get_tokens(
-#     sha: str,
-#     settings: Settings = Depends(get_settings)
-# ):
-#     """
-#     sha: str
-#         PDF sha to retrieve tokens for.
-#     """
-#     pdf_tokens = os.path.join(settings.output_directory, sha, "pdf_structure.json")
-#     if not os.path.exists(pdf_tokens):
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail="No tokens for pdf."
-#         )
-#     with open(pdf_tokens, "r") as f:
-#         response = json.load(f)
-
-#     return response
+    doc_structure = await get_document_structure(sha)
+    return doc_structure.structure
 
 
 def update_status_json(status_path: str, sha: str, data: Dict[str, Any]):

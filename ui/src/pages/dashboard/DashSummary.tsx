@@ -1,7 +1,7 @@
 import React from 'react';
 import { Header } from '../../components/common';
 
-const DashSummary = () => {
+const DashSummaryPage = () => {
     return (
         <Header>
             <h1>Dash Summary</h1>
@@ -9,4 +9,4 @@ const DashSummary = () => {
     );
 };
 
-export default DashSummary;
+export default DashSummaryPage;

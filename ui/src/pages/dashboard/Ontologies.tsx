@@ -4,7 +4,7 @@ import { Ontology, useOntologyApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { EditOntoModal, UploadOntoModal } from '../../components/dashboard';
 
-const Ontologies = () => {
+const OntologiesPage = () => {
     const [ontos, setOntos] = useState<Ontology[]>([]);
     const [editedOnto, setEditedOnto] = useState<string>('');
     const [editOntoModal, setEditOntoModal] = useState<boolean>(false);
@@ -106,4 +106,4 @@ const Ontologies = () => {
     );
 };
 
-export default Ontologies;
+export default OntologiesPage;

@@ -11,13 +11,15 @@ import styled from 'styled-components';
 import { Sidebar, Topbar, WithSidebar, WithTopbar } from '../components/common';
 import { Header } from '../components/sidebar';
 import {
-    DashSummary,
-    Documents,
-    Tasks,
-    Users,
-    UserDetails,
-    UserCreate,
-    Ontologies,
+    DashSummaryPage,
+    DocumentsPage,
+    TasksPage,
+    UsersPage,
+    UserPage,
+    UserCreatePage,
+    OntologiesPage,
+    TaskPage,
+    DocumentPage,
 } from './dashboard';
 
 export const DashPage = () => {
@@ -77,13 +79,15 @@ export const DashPage = () => {
                 <DashContainer>
                     <Routes>
                         <Route path="/" element={<Outlet />}>
-                            <Route path="/" element={<DashSummary />} />
-                            <Route path="users" element={<Users />} />
-                            <Route path="users/info/:id" element={<UserDetails />} />
-                            <Route path="users/new" element={<UserCreate />} />
-                            <Route path="docs" element={<Documents />} />
-                            <Route path="tasks" element={<Tasks />} />
-                            <Route path="ontos" element={<Ontologies />} />
+                            <Route path="/" element={<DashSummaryPage />} />
+                            <Route path="users" element={<UsersPage />} />
+                            <Route path="users/:userId" element={<UserPage />} />
+                            <Route path="users/new" element={<UserCreatePage />} />
+                            <Route path="docs" element={<DocumentsPage />} />
+                            <Route path="docs/:docId" element={<DocumentPage />} />
+                            <Route path="tasks" element={<TasksPage />} />
+                            <Route path="tasks/:taskId" element={<TaskPage />} />
+                            <Route path="ontos" element={<OntologiesPage />} />
                         </Route>
                     </Routes>
                 </DashContainer>
