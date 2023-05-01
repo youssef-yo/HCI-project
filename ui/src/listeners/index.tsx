@@ -1,6 +1,6 @@
 import { useEffect, useContext } from 'react';
 import { AnnotationStore } from '../context';
-import { useDocumentApi } from '../api';
+import { useTaskApi } from '../api';
 import { notification } from '@allenai/varnish';
 
 export const UndoAnnotation = () => {
@@ -46,12 +46,12 @@ export const HideAnnotationLabels = () => {
     return null;
 };
 
-interface WithSha {
-    sha: string;
+interface WithTaskID {
+    taskId: string;
 }
 
-export const SaveWithTimeout = ({ sha }: WithSha) => {
-    const { saveAnnotations } = useDocumentApi();
+export const SaveWithTimeout = ({ taskId }: WithTaskID) => {
+    const { saveTaskAnnotations } = useTaskApi();
     const annotationStore = useContext(AnnotationStore);
     const { pdfAnnotations, setPdfAnnotations } = annotationStore;
 
@@ -61,7 +61,7 @@ export const SaveWithTimeout = ({ sha }: WithSha) => {
         // annotations and relations are empty.
         if (pdfAnnotations.unsavedChanges) {
             const currentTimeout = setTimeout(() => {
-                saveAnnotations(sha, pdfAnnotations)
+                saveTaskAnnotations(taskId, pdfAnnotations)
                     .then(() => {
                         setPdfAnnotations(pdfAnnotations.saved());
                     })
@@ -76,7 +76,7 @@ export const SaveWithTimeout = ({ sha }: WithSha) => {
             }, 2000);
             return () => clearTimeout(currentTimeout);
         }
-    }, [sha, pdfAnnotations]);
+    }, [taskId, pdfAnnotations]);
 
     return null;
 };
@@ -84,15 +84,15 @@ export const SaveWithTimeout = ({ sha }: WithSha) => {
 // TODO(Mark): There is a lot of duplication between these two listeners,
 // deduplicate if I need to save at another time as well.
 
-export const SaveBeforeUnload = ({ sha }: WithSha) => {
-    const { saveAnnotations } = useDocumentApi();
+export const SaveBeforeUnload = ({ taskId }: WithTaskID) => {
+    const { saveTaskAnnotations } = useTaskApi();
     const annotationStore = useContext(AnnotationStore);
     const { pdfAnnotations, setPdfAnnotations } = annotationStore;
 
     useEffect(() => {
         const beforeUnload = (e: BeforeUnloadEvent) => {
             e.preventDefault();
-            saveAnnotations(sha, pdfAnnotations)
+            saveTaskAnnotations(taskId, pdfAnnotations)
                 .then(() => {
                     setPdfAnnotations(pdfAnnotations.saved());
                 })
@@ -111,7 +111,7 @@ export const SaveBeforeUnload = ({ sha }: WithSha) => {
         return () => {
             window.removeEventListener('beforeunload', beforeUnload);
         };
-    }, [sha, pdfAnnotations]);
+    }, [taskId, pdfAnnotations]);
 
     return null;
 };

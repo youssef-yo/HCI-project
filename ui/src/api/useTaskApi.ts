@@ -1,6 +1,6 @@
 import useAxiosPrivate from './useAxiosPrivate';
 import { Task, TaskCreate } from './schemas';
-import { PdfAnnotations } from '../context';
+import { Annotation, PdfAnnotations, RelationGroup } from '../context';
 
 /**
  * Task API entry points.
@@ -97,7 +97,13 @@ const useTaskApi = () => {
     const getTaskAnnotations: (id: string) => Promise<PdfAnnotations> = (id: string) => {
         return axiosPrivate
             .get(`/api/tasks/${id}/annotations`)
-            .then((res) => res.data)
+            .then((res) => {
+                const ann: PdfAnnotations = res.data;
+                const annotations = ann.annotations.map((a) => Annotation.fromObject(a));
+                const relations = ann.relations.map((r) => RelationGroup.fromObject(r));
+
+                return new PdfAnnotations(annotations, relations);
+            })
             .catch((err) => Promise.reject(err));
     };
 
@@ -118,6 +124,40 @@ const useTaskApi = () => {
             .catch((err) => Promise.reject(err));
     };
 
+    /**
+     * Marks the given task as complete or uncomplete (by annotator).
+     *
+     * @param id Task ID
+     * @param complete Boolean
+     * @returns Empty promise
+     */
+    const markTaskComplete: (id: string, complete: boolean) => Promise<any> = (
+        id: string,
+        complete: boolean
+    ) => {
+        return axiosPrivate
+            .post(`/api/tasks/${id}/complete`, complete)
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err));
+    };
+
+    /**
+     * Sets the given comments to the selected task.
+     *
+     * @param id Task ID
+     * @param comments Comments
+     * @returns Empty promise
+     */
+    const setTaskComment: (id: string, comments: string) => Promise<any> = (
+        id: string,
+        comments: string
+    ) => {
+        return axiosPrivate
+            .post(`/api/tasks/${id}/comments`, comments)
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err));
+    };
+
     return {
         getTasks,
         getTaskByID,
@@ -126,6 +166,8 @@ const useTaskApi = () => {
         deleteTask,
         getTaskAnnotations,
         saveTaskAnnotations,
+        markTaskComplete,
+        setTaskComment,
     };
 };
 

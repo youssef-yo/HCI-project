@@ -3,29 +3,32 @@ import styled from 'styled-components';
 import { Input } from '@allenai/varnish';
 
 import { SidebarItem, SidebarItemTitle } from './common';
-import { PaperStatus, useDocumentApi } from '../../api';
+import { Task, useTaskApi } from '../../api';
 
 interface CommentProps {
-    sha: string;
-    paperStatus: PaperStatus;
+    taskId: string;
+    activeTask: Task;
 }
 
-export const Comment = ({ sha, paperStatus }: CommentProps) => {
-    const { setPdfComment } = useDocumentApi();
-    const [comment, setComment] = useState<string>(paperStatus.comments);
+const Comment: React.FC<CommentProps> = ({ taskId, activeTask }) => {
+    const [comment, setComment] = useState<string>(activeTask.comments);
+
+    const { setTaskComment } = useTaskApi();
 
     return (
         <SidebarItem>
             <SidebarItemTitle>Comments</SidebarItemTitle>
             <DarkTextArea
-                defaultValue={paperStatus.comments}
+                defaultValue={activeTask.comments}
                 onChange={(e) => setComment(e.target.value)}
-                onBlur={() => setPdfComment(sha, comment)}
+                onBlur={() => setTaskComment(taskId, comment)}
                 autoSize={{ minRows: 6 }}
             />
         </SidebarItem>
     );
 };
+
+export default Comment;
 
 const DarkTextArea = styled(Input.TextArea)`
     color: black;

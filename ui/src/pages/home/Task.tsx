@@ -1,27 +1,21 @@
+import { MdOpenInNew } from 'react-icons/md';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Header } from '../../components/common';
-import { Doc, Task, User, useDocumentApi, useTaskApi, useUserApi } from '../../api';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Header } from '../../components/common';
+import { Doc, Task, useDocumentApi, useTaskApi } from '../../api';
 
 const TaskPage = () => {
     const { taskId } = useParams<{ taskId: string }>();
     const [task, setTask] = useState<Task>();
     const [doc, setDoc] = useState<Doc>();
-    const [user, setUser] = useState<User>();
 
     const { getTaskByID } = useTaskApi();
     const { getDocumentByID } = useDocumentApi();
-    const { getUserByID } = useUserApi();
+    const navigate = useNavigate();
 
     const loadDocument = (docId: string) => {
         getDocumentByID(docId)
             .then((doc) => setDoc(doc))
-            .catch((err) => console.error(err));
-    };
-
-    const loadUser = (userId: string) => {
-        getUserByID(userId)
-            .then((user) => setUser(user))
             .catch((err) => console.error(err));
     };
 
@@ -36,7 +30,6 @@ const TaskPage = () => {
             .then((task) => {
                 setTask(task);
                 loadDocument(task.docId);
-                loadUser(task.userId);
             })
             .catch((err) => console.error(err));
     }, [taskId]);
@@ -45,6 +38,12 @@ const TaskPage = () => {
         <section>
             <Header>
                 <h1>Task Information</h1>
+                <Button
+                    color="secondary"
+                    icon={<MdOpenInNew />}
+                    onClick={() => navigate(`/pdf/${task?._id}`)}>
+                    Go to document annotations
+                </Button>
             </Header>
 
             <div className="taskInfo">
@@ -62,8 +61,7 @@ const TaskPage = () => {
                     <b>Status:</b> {task?.status}
                 </p>
                 <p>
-                    <b>Marked by annotator as complete:</b>{' '}
-                    {task?.markedComplete ? 'True' : 'False'}
+                    <b>Marked as complete:</b> {task?.markedComplete ? 'True' : 'False'}
                 </p>
             </div>
 
@@ -79,21 +77,6 @@ const TaskPage = () => {
                 </p>
                 <p>
                     <b>Pages:</b> {doc?.totalPages}
-                </p>
-            </div>
-
-            <hr />
-
-            <div className="userInfo">
-                <h3>User</h3>
-                <p>
-                    <b>ID:</b> {user?._id}
-                </p>
-                <p>
-                    <b>Email:</b> {user?.email}
-                </p>
-                <p>
-                    <b>Full Name:</b> {user?.fullName}
                 </p>
             </div>
         </section>

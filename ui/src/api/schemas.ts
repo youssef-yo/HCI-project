@@ -105,6 +105,11 @@ export interface UserUpdate {
     role: string;
 }
 
+export enum TaskStatus {
+    ACTIVE = 'ACTIVE',
+    COMPLETE = 'COMPLETE',
+}
+
 export interface PageRange {
     start: number;
     end: number;

@@ -73,58 +73,6 @@ async def get_pdf(
     return Response(file, media_type="application/pdf")
 
 
-@router.post("/{sha}/comments")
-def set_pdf_comments(
-    sha: str,
-    comments: str = Body(...),
-    user: UserDocument = Depends(get_current_user),
-    settings: Settings = Depends(get_settings)
-):
-    status_path = os.path.join(settings.output_directory, "status", f"{user.email}.json")
-    exists = os.path.exists(status_path)
-
-    if not exists:
-        # Not an allocated user. Do nothing.
-        return {}
-
-    update_status_json(status_path, sha, {"comments": comments})
-    return {}
-
-
-@router.post("/{sha}/junk")
-def set_pdf_junk(
-    sha: str,
-    junk: bool = Body(...),
-    user: UserDocument = Depends(get_current_user),
-    settings: Settings = Depends(get_settings)
-):
-    status_path = os.path.join(settings.output_directory, "status", f"{user.email}.json")
-    exists = os.path.exists(status_path)
-    if not exists:
-        # Not an allocated user. Do nothing.
-        return {}
-
-    update_status_json(status_path, sha, {"junk": junk})
-    return {}
-
-
-@router.post("/{sha}/finished")
-def set_pdf_finished(
-    sha: str,
-    finished: bool = Body(...),
-    user: UserDocument = Depends(get_current_user),
-    settings: Settings = Depends(get_settings)
-):
-    status_path = os.path.join(settings.output_directory, "status", f"{user.email}.json")
-    exists = os.path.exists(status_path)
-    if not exists:
-        # Not an allocated user. Do nothing.
-        return {}
-
-    update_status_json(status_path, sha, {"finished": finished})
-    return {}
-
-
 @router.get("/{sha}/annotations")
 def get_annotations(
     sha: str,

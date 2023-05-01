@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from fastapi import (
     APIRouter,
+    Body,
     Depends,
     HTTPException,
     status
@@ -111,3 +112,41 @@ async def update_task_annotations(
         )
     
     await task.update({"$set": {TaskDocument.doc_annotations: annotations}})
+
+
+@router.post("/{task_id}/complete", status_code=status.HTTP_204_NO_CONTENT)
+async def set_task_complete(
+    task_id: PydanticObjectId,
+    complete: bool = Body(...),
+    auth_user: UserDocument = Depends(get_current_user)
+):
+    """Marks the selected task as complete or not complete (by the annotator)."""
+    task = await get_task_by_id(task_id, assert_exists=True)
+    
+    # Check if the user that wants to update is the same that has the task assigned
+    if task.user_id != auth_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden."
+        )
+    
+    await task.update({"$set": {TaskDocument.marked_complete: complete}})
+
+
+@router.post("/{task_id}/comments", status_code=status.HTTP_204_NO_CONTENT)
+async def set_task_comments(
+    task_id: PydanticObjectId,
+    comments: str = Body(...),
+    auth_user: UserDocument = Depends(get_current_user)
+):
+    """Marks the selected task as complete or not complete (by the annotator)."""
+    task = await get_task_by_id(task_id, assert_exists=True)
+    
+    # Check if the user that wants to update is the same that has the task assigned
+    if task.user_id != auth_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden."
+        )
+    
+    await task.update({"$set": {TaskDocument.comments: comments}})

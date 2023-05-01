@@ -7,7 +7,7 @@ import { useAuth } from '../hooks';
 import { Button, Input, InputType } from '../components/common';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-export const LoginPage = () => {
+const LoginPage = () => {
     const { login } = useAuthApi();
     const { setToken } = useAuth();
 
@@ -96,6 +96,8 @@ export const LoginPage = () => {
         </Section>
     );
 };
+
+export default LoginPage;
 
 const Section = styled.section`
     position: absolute;

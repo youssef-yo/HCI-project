@@ -1,16 +1,12 @@
-import { Result, Spin } from '@allenai/varnish';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Spin } from '@allenai/varnish';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAnnotationApi } from '../api';
 import { ROLES } from '../config/roles';
 import { useAuth } from '../hooks';
 import { CenterOnPage } from './CenterOnPage';
-import { ModalPopupImportDocuments } from './sidebar';
 
 enum ViewState {
     LOADING,
-    NOT_FOUND,
     REDIRECT,
 }
 
@@ -18,7 +14,6 @@ export const RedirectToPage = () => {
     const [viewState, setViewState] = useState<ViewState>(ViewState.LOADING);
     const [redirectTarget, setRedirectTarget] = useState<string>('/');
     const { auth } = useAuth();
-    const { getAllocatedPaperStatus } = useAnnotationApi();
 
     useEffect(() => {
         setViewState(ViewState.LOADING);
@@ -38,28 +33,8 @@ export const RedirectToPage = () => {
         }
 
         // User must be an annotator at this point
-        const getFirstPaper = async () => {
-            try {
-                await getAllocatedPaperStatus()
-                    .then((allocation) => allocation?.papers || [])
-                    .then((papers) => {
-                        // First available sha
-                        const sha = papers.find((p) => !!p.sha)?.sha;
-                        console.log(`Sha: ${sha}`);
-
-                        if (!papers.length || !sha) {
-                            setViewState(ViewState.NOT_FOUND);
-                        } else {
-                            setRedirectTarget(`/pdf/${sha}`);
-                            setViewState(ViewState.REDIRECT);
-                        }
-                    });
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        getFirstPaper();
+        setRedirectTarget('/home');
+        setViewState(ViewState.REDIRECT);
     }, [auth]);
 
     switch (viewState) {
@@ -67,14 +42,6 @@ export const RedirectToPage = () => {
             return (
                 <CenterOnPage>
                     <Spin size="large" />
-                </CenterOnPage>
-            );
-
-        case ViewState.NOT_FOUND:
-            return (
-                <CenterOnPage>
-                    <Result icon={<QuestionCircleOutlined />} title="PDFs Not Found" />
-                    <ModalPopupImportDocuments></ModalPopupImportDocuments>
                 </CenterOnPage>
             );
 

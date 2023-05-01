@@ -9,15 +9,14 @@ import { SidebarItem, SidebarItemTitle } from './common';
 
 import DropdownOntoClasses from './DropdownOntoClasses';
 import { DownloadExportedAnnotations } from './DownloadExportedAnnotations';
-// import ModalPopupImportOnto from './ModalPopupImportOnto';
-import ModalPopupImportDocuments from './ModalPopupImportDocuments';
 import CreationRelation from './CreationRelation';
 
-interface Props {
+interface LabelsProps {
     sha: string;
     _setRelationModalVisible: (state: boolean) => void;
 }
-export const Labels = ({ sha, _setRelationModalVisible }: Props) => {
+
+const Labels: React.FC<LabelsProps> = ({ sha, _setRelationModalVisible }) => {
     const annotationStore = useContext(AnnotationStore);
     const onToggle = () => {
         annotationStore.toggleFreeFormAnnotations(!annotationStore.freeFormAnnotations);
@@ -25,8 +24,6 @@ export const Labels = ({ sha, _setRelationModalVisible }: Props) => {
 
     return (
         <SidebarItem>
-            <ModalPopupImportDocuments></ModalPopupImportDocuments>
-            {/* <ModalPopupImportOnto annotationStore={annotationStore}></ModalPopupImportOnto> */}
             <DownloadExportedAnnotations sha={sha}></DownloadExportedAnnotations>
             <div>
                 <SidebarItemTitle>Relation Mode</SidebarItemTitle>
@@ -51,6 +48,8 @@ export const Labels = ({ sha, _setRelationModalVisible }: Props) => {
         </SidebarItem>
     );
 };
+
+export default Labels;
 
 const Toggle = styled(Switch)`
     margin: 4px;

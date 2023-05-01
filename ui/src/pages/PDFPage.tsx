@@ -1,32 +1,30 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react';
-import styled, { ThemeContext } from 'styled-components';
-import { useParams } from 'react-router-dom';
+import { Result, Progress } from '@allenai/varnish';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import * as pdfjs from 'pdfjs-dist';
 import { PDFDocumentProxy, PDFDocumentLoadingTask } from 'pdfjs-dist/types/display/api';
-import { Result, Progress, notification } from '@allenai/varnish';
-
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import styled, { ThemeContext } from 'styled-components';
+import { useContext, useCallback, useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { PDF, CenterOnPage, RelationModal } from '../components';
+import { WithSidebar, Sidebar, Topbar, WithTopbar } from '../components/common';
 import {
     Labels,
     Annotations,
     Relations,
-    AssignedPaperList,
-    Header,
+    AssignedTaskList,
+    Logo,
     Comment,
-    ModalPopupImportDocuments,
 } from '../components/sidebar';
-import { WithSidebar, Sidebar, Topbar, WithTopbar } from '../components/common';
 import {
     pdfURL,
     PageTokens,
-    PaperStatus,
     OntoClass,
     OntoProperty,
-    useAnnotationApi,
     useDocumentApi,
     useOntologyApi,
+    Task,
+    useTaskApi,
 } from '../api';
 import {
     PDFPageInfo,
@@ -52,8 +50,8 @@ enum ViewState {
     ERROR,
 }
 
-export const PDFPage = () => {
-    const { sha } = useParams<{ sha: string }>();
+const PDFPage = () => {
+    const { taskId } = useParams<{ taskId: string }>();
     const [viewState, setViewState] = useState<ViewState>(ViewState.LOADING);
 
     const [doc, setDocument] = useState<PDFDocumentProxy>();
@@ -65,8 +63,8 @@ export const PDFPage = () => {
 
     const [selectedAnnotations, setSelectedAnnotations] = useState<Annotation[]>([]);
 
-    const [assignedPaperStatuses, setAssignedPaperStatuses] = useState<PaperStatus[]>([]);
-    const [activePaperStatus, setActivePaperStatus] = useState<PaperStatus>();
+    const [activeTask, setActiveTask] = useState<Task>();
+    const [assignedTasks, setAssignedTasks] = useState<Task[]>([]);
     const [activeOntoClass, setActiveOntoClass] = useState<OntoClass>();
     const [ontoClasses, setOntoClasses] = useState<OntoClass[]>([]);
     const [ontoProperties, setOntoProperties] = useState<OntoProperty[]>([]);
@@ -79,9 +77,9 @@ export const PDFPage = () => {
 
     const [relationMode, setRelationMode] = useState<boolean>(false);
 
-    const { getAllocatedPaperStatus } = useAnnotationApi();
-    const { getTokens, getAnnotations } = useDocumentApi();
+    const { getTokens } = useDocumentApi();
     const { getClasses, getProperties, getOntologiesList } = useOntologyApi();
+    const { getLoggedUserTasks, getTaskByID, getTaskAnnotations } = useTaskApi();
     // React's Error Boundaries don't work for us because a lot of work is done by pdfjs in
     // a background task (a web worker). We instead setup a top level error handler that's
     // passed around as needed so we can display a nice error to the user when something
@@ -140,49 +138,60 @@ export const PDFPage = () => {
     }, [ontoNames]);
 
     useEffect(() => {
-        getAllocatedPaperStatus()
-            .then((allocation) => {
-                if (allocation.papers.length === 0) {
-                    window.location.replace('/');
-                } else {
-                    setAssignedPaperStatuses(allocation.papers);
-                    setActivePaperStatus(allocation.papers.filter((p) => p.sha === sha)[0]);
-                    console.log(
-                        'Active paper status: ',
-                        allocation.papers.filter((p) => p.sha === sha)[0]
-                    );
-                    if (!allocation.hasAllocatedPapers) {
-                        notification.warn({
-                            message: 'Read Only Mode!',
-                            description:
-                                "This annotation project has no assigned papers for your email address. You can make annotations but they won't be saved.",
-                        });
-                    }
-                    console.log('allocation info: ', allocation);
-                }
+        if (!taskId) {
+            setViewState(ViewState.NOT_FOUND);
+            return;
+        }
+
+        getTaskByID(taskId)
+            .then((task) => {
+                setActiveTask(task);
+
+                // TODO: Check current user can annotate task.
+                // if (!allocation.hasAllocatedPapers) {
+                //     notification.warn({
+                //         message: 'Read Only Mode!',
+                //         description:
+                //             "This annotation project has no assigned papers for your email address. You can make annotations but they won't be saved.",
+                //     });
+                // }
             })
-            .catch((err: any) => {
+            .catch((err) => {
+                console.error(`Task with ID ${taskId} not found!`, err);
+                setViewState(ViewState.NOT_FOUND);
+            });
+    }, [taskId]);
+
+    useEffect(() => {
+        getLoggedUserTasks()
+            .then((tasks) => setAssignedTasks(tasks))
+            .catch((err) => {
                 setViewState(ViewState.ERROR);
                 console.log(err);
             });
-    }, [sha]);
+    }, [activeTask]);
 
     useEffect(() => {
+        if (!activeTask) return;
+
         setDocument(undefined);
         setViewState(ViewState.LOADING);
-        const loadingTask: PDFDocumentLoadingTask = pdfjs.getDocument(pdfURL(sha));
+        const loadingTask: PDFDocumentLoadingTask = pdfjs.getDocument(pdfURL(activeTask.docId));
         loadingTask.onProgress = (p: { loaded: number; total: number }) => {
-            setProgress(Math.round((p.loaded / p.total) * 100));
+            setProgress(Math.round((p.loaded / p.total) * 50));
         };
+
+        // TODO: Load only the needed page tokens.
         Promise.all([
             // PDF.js uses their own `Promise` type, which according to TypeScript doesn't overlap
             // with the base `Promise` interface. To resolve this we (unsafely) cast the PDF.js
             // specific `Promise` back to a generic one. This works, but might have unexpected
             // side-effects, so we should remain wary of this code.
             (loadingTask.promise as unknown) as Promise<PDFDocumentProxy>,
-            getTokens(sha),
+            getTokens(activeTask.docId),
         ])
             .then(([doc, resp]: [PDFDocumentProxy, PageTokens[]]) => {
+                setProgress(75);
                 setDocument(doc);
 
                 // Load all the pages too. In theory this makes things a little slower to startup,
@@ -190,7 +199,7 @@ export const PDFPage = () => {
                 // first, visible page. That said it makes the code simpler, so we're ok with it for
                 // now.
                 const loadPages: Promise<PDFPageInfo>[] = [];
-                for (let i = 1; i <= doc.numPages; i++) {
+                for (let i = activeTask.pageRange.start; i <= activeTask.pageRange.end; i++) {
                     // See line 50 for an explanation of the cast here.
                     loadPages.push(
                         (doc.getPage(i).then((p) => {
@@ -203,10 +212,12 @@ export const PDFPage = () => {
                 return Promise.all(loadPages);
             })
             .then((pages) => {
+                setProgress(90);
                 setPages(pages);
                 // Get any existing annotations for this pdf.
-                getAnnotations(sha)
+                getTaskAnnotations(activeTask._id)
                     .then((paperAnnotations) => {
+                        setProgress(100);
                         setPdfAnnotations(paperAnnotations);
 
                         setViewState(ViewState.LOADED);
@@ -228,7 +239,7 @@ export const PDFPage = () => {
                 console.error(`Error Loading PDF: `, err);
                 setViewState(ViewState.ERROR);
             });
-    }, [sha]);
+    }, [activeTask]);
 
     const topbarHeight = '68px';
     const sidebarWidth = '300px';
@@ -238,8 +249,8 @@ export const PDFPage = () => {
             return (
                 <WithSidebar width={sidebarWidth}>
                     <Sidebar width={sidebarWidth}>
-                        <Header />
-                        <AssignedPaperList papers={assignedPaperStatuses} />
+                        <Logo />
+                        <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
                         <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
@@ -257,9 +268,8 @@ export const PDFPage = () => {
             return (
                 <WithSidebar width={sidebarWidth}>
                     <Sidebar width={sidebarWidth}>
-                        <Header />
-                        <ModalPopupImportDocuments></ModalPopupImportDocuments>
-                        <AssignedPaperList papers={assignedPaperStatuses} />
+                        <Logo />
+                        <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
                         <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
@@ -270,7 +280,7 @@ export const PDFPage = () => {
                 </WithSidebar>
             );
         case ViewState.LOADED:
-            if (doc && pages && pdfAnnotations) {
+            if (taskId && activeTask && doc && pages && pdfAnnotations) {
                 return (
                     <PDFStore.Provider
                         value={{
@@ -302,37 +312,38 @@ export const PDFPage = () => {
                                 setRelationMode,
                             }}>
                             <listeners.UndoAnnotation />
-                            <listeners.SaveWithTimeout sha={sha} />
-                            <listeners.SaveBeforeUnload sha={sha} />
+                            <listeners.SaveWithTimeout taskId={taskId} />
+                            <listeners.SaveBeforeUnload taskId={taskId} />
                             <listeners.HideAnnotationLabels />
                             <WithSidebar width={sidebarWidth}>
                                 <Sidebar width={sidebarWidth}>
-                                    <Header />
+                                    <Logo />
                                     <Labels
-                                        sha={sha}
+                                        sha={taskId}
                                         _setRelationModalVisible={setRelationModalVisible}
                                     />
-                                    <AssignedPaperList papers={assignedPaperStatuses} />
-                                    {activePaperStatus ? (
+                                    <AssignedTaskList tasks={assignedTasks} />
+                                    {activeTask && (
                                         <Annotations
-                                            sha={sha}
+                                            taskId={taskId}
+                                            activeTask={activeTask}
                                             annotations={pdfAnnotations.annotations}
                                         />
-                                    ) : null}
-                                    {activeOntoProperty ? (
+                                    )}
+                                    {activeTask && (
                                         <Relations
                                             annotations={pdfAnnotations.annotations}
                                             relations={pdfAnnotations.relations}
                                         />
-                                    ) : null}
-                                    {activePaperStatus ? (
-                                        <Comment sha={sha} paperStatus={activePaperStatus} />
-                                    ) : null}
+                                    )}
+                                    {activeTask && (
+                                        <Comment taskId={taskId} activeTask={activeTask} />
+                                    )}
                                 </Sidebar>
                                 <WithTopbar height={topbarHeight}>
                                     <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
                                     <PDFContainer>
-                                        {activeOntoProperty ? (
+                                        {activeOntoProperty && (
                                             <RelationModal
                                                 visible={relationModalVisible}
                                                 onClick={onRelationModalOk}
@@ -340,7 +351,7 @@ export const PDFPage = () => {
                                                 source={selectedAnnotations}
                                                 label={activeOntoProperty}
                                             />
-                                        ) : null}
+                                        )}
                                         <PDF />
                                     </PDFContainer>
                                 </WithTopbar>
@@ -356,8 +367,8 @@ export const PDFPage = () => {
             return (
                 <WithSidebar width={sidebarWidth}>
                     <Sidebar width={sidebarWidth}>
-                        <Header />
-                        <AssignedPaperList papers={assignedPaperStatuses} />
+                        <Logo />
+                        <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
                         <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
@@ -369,6 +380,8 @@ export const PDFPage = () => {
             );
     }
 };
+
+export default PDFPage;
 
 const PDFContainer = styled.div(
     ({ theme }) => `

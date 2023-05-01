@@ -11,7 +11,7 @@
 import { createGlobalStyle } from 'styled-components';
 import { Routes, Route, Outlet } from 'react-router-dom';
 
-import { DashPage, LoginPage, PDFPage } from './pages';
+import { DashPage, HomePage, LoginPage, PDFPage } from './pages';
 import { PersistLogin, RedirectToPage, RequireAuth } from './components';
 import { ROLES } from './config/roles';
 
@@ -33,7 +33,8 @@ const App = () => {
 
                         {/* Annotator Routes */}
                         <Route element={<RequireAuth allowedRoles={[ROLES.Annotator]} />}>
-                            <Route path="pdf/:sha" element={<PDFPage />} />
+                            <Route path="home/*" element={<HomePage />} />
+                            <Route path="pdf/:taskId" element={<PDFPage />} />
                         </Route>
                     </Route>
                 </Route>

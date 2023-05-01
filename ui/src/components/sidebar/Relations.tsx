@@ -8,7 +8,7 @@ interface RelationProps {
     relations: RelationGroup[];
 }
 
-export const Relations = ({ annotations, relations }: RelationProps) => {
+const Relations: React.FC<RelationProps> = ({ annotations, relations }) => {
     const annotationStore = useContext(AnnotationStore);
     console.log('Annotations-props: ', annotations);
     console.log('Annotations-context: ', annotationStore.pdfAnnotations.annotations);
@@ -37,3 +37,5 @@ export const Relations = ({ annotations, relations }: RelationProps) => {
         </SidebarItem>
     );
 };
+
+export default Relations;

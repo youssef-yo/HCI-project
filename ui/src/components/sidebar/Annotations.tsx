@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import { SidebarItem, SidebarItemTitle } from './common';
 import { Switch, notification } from '@allenai/varnish';
@@ -6,32 +5,23 @@ import { Annotation } from '../../context';
 
 import { CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { AnnotationSummary } from '../AnnotationSummary';
-import { useDocumentApi } from '../../api';
+import { Task, useTaskApi } from '../../api';
 
 interface AnnotationsProps {
-    sha: string;
+    taskId: string;
+    activeTask: Task;
     annotations: Annotation[];
 }
 
-export const Annotations = ({ sha, annotations }: AnnotationsProps) => {
-    const { setPdfFinished, setPdfJunk } = useDocumentApi();
+const Annotations = ({ taskId, activeTask, annotations }: AnnotationsProps) => {
+    const { markTaskComplete } = useTaskApi();
 
     const onFinishToggle = (isFinished: boolean) => {
-        setPdfFinished(sha, isFinished).then(() => {
+        markTaskComplete(taskId, isFinished).then(() => {
             if (isFinished) {
-                notification.success({ message: 'Marked paper as Finished!' });
+                notification.success({ message: 'Marked task as Finished!' });
             } else {
-                notification.info({ message: 'Marked paper as In Progress.' });
-            }
-        });
-    };
-
-    const onJunkToggle = (isJunk: boolean) => {
-        setPdfJunk(sha, isJunk).then(() => {
-            if (isJunk) {
-                notification.warning({ message: 'Marked paper as Junk!' });
-            } else {
-                notification.info({ message: 'Marked paper as In Progress.' });
+                notification.info({ message: 'Marked task as In Progress.' });
             }
         });
     };
@@ -51,16 +41,8 @@ export const Annotations = ({ sha, annotations }: AnnotationsProps) => {
                 <ToggleDescription>Finished?</ToggleDescription>
                 <Toggle
                     size="small"
+                    defaultChecked={activeTask.markedComplete}
                     onChange={(e) => onFinishToggle(e)}
-                    checkedChildren={<CheckOutlined />}
-                    unCheckedChildren={<CloseOutlined />}
-                />
-            </span>
-            <span>
-                <ToggleDescription>Junk</ToggleDescription>
-                <Toggle
-                    size="small"
-                    onChange={(e) => onJunkToggle(e)}
                     checkedChildren={<CheckOutlined />}
                     unCheckedChildren={<CloseOutlined />}
                 />
@@ -79,6 +61,8 @@ export const Annotations = ({ sha, annotations }: AnnotationsProps) => {
         </SidebarItem>
     );
 };
+
+export default Annotations;
 
 const ExplainerText = styled.div`
     font-size: ${({ theme }) => theme.spacing.sm};

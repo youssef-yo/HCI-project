@@ -1,14 +1,14 @@
 import React from 'react';
 import { Header } from '../../components/common';
 
-const DashSummaryPage = () => {
+const HomeSummaryPage = () => {
     return (
         <section>
             <Header>
-                <h1>Dash Summary</h1>
+                <h1>Home Page</h1>
             </Header>
         </section>
     );
 };
 
-export default DashSummaryPage;
+export default HomeSummaryPage;
