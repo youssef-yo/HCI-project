@@ -55,6 +55,13 @@ const TaskPage = () => {
                 <p>
                     <b>Pages:</b> {task?.pageRange.start} - {task?.pageRange.end}
                 </p>
+                <p>
+                    <b>Status:</b> {task?.status}
+                </p>
+                <p>
+                    <b>Marked by annotator as complete:</b>{' '}
+                    {task?.markedComplete ? 'True' : 'False'}
+                </p>
             </div>
 
             <hr />

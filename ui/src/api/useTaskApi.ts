@@ -10,14 +10,29 @@ import { PdfAnnotations } from '../context';
 const useTaskApi = () => {
     const axiosPrivate = useAxiosPrivate();
 
+    interface TaskQuery {
+        userId?: string;
+        docId?: string;
+    }
+
     /**
      * Gets all the tasks that match the specified criteria.
+     * Parameters that are not set are not included in the query,
+     * meaning that with no parameters there's no filter.
      *
+     * If you don't need any parameters, just pass empty brackets {}.
+     *
+     * @param query Query parameters (docId and userId)
      * @returns Promise with task list
      */
-    const getAllTasks: () => Promise<Task[]> = () => {
+    const getTasks: (query: TaskQuery) => Promise<Task[]> = (query: TaskQuery) => {
         return axiosPrivate
-            .get('/api/tasks')
+            .get('/api/tasks', {
+                params: {
+                    user_id: query.userId,
+                    doc_id: query.docId,
+                },
+            })
             .then((res) => res.data)
             .catch((err) => Promise.reject(err));
     };
@@ -42,7 +57,7 @@ const useTaskApi = () => {
      */
     const getLoggedUserTasks: () => Promise<Task[]> = () => {
         return axiosPrivate
-            .get('/api/tasks/')
+            .get('/api/tasks/me')
             .then((res) => res.data)
             .catch((err) => Promise.reject(err));
     };
@@ -55,7 +70,7 @@ const useTaskApi = () => {
      */
     const createTask: (taskCreate: TaskCreate) => Promise<Task> = (taskCreate: TaskCreate) => {
         return axiosPrivate
-            .post('/api/tasks/', taskCreate)
+            .post('/api/tasks', taskCreate)
             .then((res) => res.data)
             .catch((err) => Promise.reject(err));
     };
@@ -104,7 +119,7 @@ const useTaskApi = () => {
     };
 
     return {
-        getAllTasks,
+        getTasks,
         getTaskByID,
         getLoggedUserTasks,
         createTask,

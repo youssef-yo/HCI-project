@@ -50,7 +50,7 @@ const StyledButton = styled.button<ButtonProps>`
     border-radius: 4px;
 
     font-weight: 600;
-    line-height: 1.75:
+    line-height: 1.75;
     letter-spacing: 0.05em;
     text-transform: uppercase;
 

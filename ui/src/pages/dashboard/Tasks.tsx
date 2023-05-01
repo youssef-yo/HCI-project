@@ -7,11 +7,11 @@ import { useNavigate } from 'react-router-dom';
 const TasksPage = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
 
-    const { getAllTasks } = useTaskApi();
+    const { getTasks } = useTaskApi();
     const navigate = useNavigate();
 
     const loadTasks = () => {
-        getAllTasks()
+        getTasks({})
             .then((tasks) => setTasks(tasks))
             .catch((err) => console.error(err));
     };
@@ -24,7 +24,10 @@ const TasksPage = () => {
         <section>
             <Header>
                 <h1>Tasks</h1>
-                <Button color="secondary" icon={<MdAssignmentAdd />}>
+                <Button
+                    color="secondary"
+                    icon={<MdAssignmentAdd />}
+                    onClick={() => navigate('new')}>
                     Create Task
                 </Button>
             </Header>
@@ -32,18 +35,20 @@ const TasksPage = () => {
             <Table>
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Description</th>
                         <th style={{ textAlign: 'center' }}>Pages</th>
+                        <th style={{ textAlign: 'center' }}>Status</th>
                         <th style={{ textAlign: 'center' }}>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {tasks.map((task) => (
                         <tr key={task._id}>
-                            <td>{task._id}</td>
+                            <td>{task.description}</td>
                             <td style={{ textAlign: 'center' }}>
                                 {task.pageRange.start} - {task.pageRange.end}
                             </td>
+                            <td style={{ textAlign: 'center' }}>{task.status}</td>
                             <td
                                 style={{
                                     display: 'flex',

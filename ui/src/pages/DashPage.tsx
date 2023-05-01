@@ -20,6 +20,7 @@ import {
     OntologiesPage,
     TaskPage,
     DocumentPage,
+    TaskCreatePage,
 } from './dashboard';
 
 export const DashPage = () => {
@@ -87,6 +88,7 @@ export const DashPage = () => {
                             <Route path="docs/:docId" element={<DocumentPage />} />
                             <Route path="tasks" element={<TasksPage />} />
                             <Route path="tasks/:taskId" element={<TaskPage />} />
+                            <Route path="tasks/new" element={<TaskCreatePage />} />
                             <Route path="ontos" element={<OntologiesPage />} />
                         </Route>
                     </Routes>

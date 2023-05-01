@@ -3,6 +3,7 @@ export { default as OntologiesPage } from './Ontologies';
 export { default as DocumentPage } from './Document';
 export { default as DocumentsPage } from './Documents';
 export { default as TaskPage } from './Task';
+export { default as TaskCreatePage } from './TaskCreate';
 export { default as TasksPage } from './Tasks';
 export { default as UsersPage } from './Users';
 export { default as UserCreatePage } from './UserCreate';

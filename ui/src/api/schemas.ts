@@ -115,8 +115,9 @@ export interface Task {
     userId: string;
     docId: string;
     pageRange: PageRange;
-    finished: boolean;
-    junk: boolean;
+    description: string;
+    status: string;
+    markedComplete: boolean;
     comments: string;
     completedAt?: Date;
 }
@@ -125,4 +126,5 @@ export interface TaskCreate {
     userId: string;
     docId: string;
     pageRange: PageRange;
+    description: string;
 }

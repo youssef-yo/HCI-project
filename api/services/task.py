@@ -12,7 +12,8 @@ from models.domain import (
 from models.schemas import (
     PageRange,
     PydanticObjectId,
-    TaskInCreate
+    TaskInCreate,
+    TaskStatus
 )
 
 from .doc import get_document_by_id
@@ -46,7 +47,7 @@ async def find_tasks(
     Gets all the tasks that match the specified criteria.
     """
     query = build_query(user_id, doc_id)
-    
+
     tasks = await TaskDocument.find_many(query).to_list()
     return tasks
 
@@ -61,12 +62,14 @@ async def create_task(task_data: TaskInCreate) -> TaskDocument:
     # Make sure the user exists
     task_user = await get_user_by_id(task_data.user_id, assert_exists=True)
 
-    verify_valid_page_range(task_doc, task_data.page_range)
+    await verify_valid_page_range(task_doc, task_data.page_range)
 
     task = TaskDocument(
         doc_id=task_data.doc_id,
         user_id=task_data.user_id,
-        page_range=task_data.page_range
+        page_range=task_data.page_range,
+        description=task_data.description,
+        status=TaskStatus.active
     )
     await task.create()
 
@@ -88,7 +91,7 @@ def build_query(
     return query
 
 
-def verify_valid_page_range(document: DocumentDocument, page_range: PageRange):
+async def verify_valid_page_range(document: DocumentDocument, page_range: PageRange):
     """
     Checks if the page range of the new task, for the given document, is valid.
 
@@ -103,5 +106,12 @@ def verify_valid_page_range(document: DocumentDocument, page_range: PageRange):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid page range."
         )
-    
-    # TODO: check for range overlap with other tasks of same document
+
+    # Check for range overlap with other active tasks of same document
+    active_tasks = await find_tasks(doc_id=document.id)
+    for task in active_tasks:
+        if task.status == TaskStatus.active and task.page_range.overlaps(page_range):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The selected page range overlaps with a page range of an active task, for the selected document."
+            )

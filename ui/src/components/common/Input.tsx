@@ -6,7 +6,7 @@ export enum InputType {
 }
 
 export type InputProps = {
-    type?: 'text' | 'password';
+    type?: 'text' | 'password' | 'number';
     variant?: InputType;
     color?: 'primary' | 'secondary';
 } & Omit<React.ComponentProps<'input'>, 'ref' | 'type' | 'color'>;
