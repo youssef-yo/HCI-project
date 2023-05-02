@@ -61,7 +61,7 @@ export const SaveWithTimeout = ({ taskId }: WithTaskID) => {
         // annotations and relations are empty.
         if (pdfAnnotations.unsavedChanges) {
             const currentTimeout = setTimeout(() => {
-                saveTaskAnnotations(taskId, pdfAnnotations)
+                saveTaskAnnotations(taskId, pdfAnnotations.taskDeltaAnnotations)
                     .then(() => {
                         setPdfAnnotations(pdfAnnotations.saved());
                     })
@@ -92,7 +92,7 @@ export const SaveBeforeUnload = ({ taskId }: WithTaskID) => {
     useEffect(() => {
         const beforeUnload = (e: BeforeUnloadEvent) => {
             e.preventDefault();
-            saveTaskAnnotations(taskId, pdfAnnotations)
+            saveTaskAnnotations(taskId, pdfAnnotations.taskDeltaAnnotations)
                 .then(() => {
                     setPdfAnnotations(pdfAnnotations.saved());
                 })

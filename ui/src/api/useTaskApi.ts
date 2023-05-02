@@ -1,6 +1,13 @@
 import useAxiosPrivate from './useAxiosPrivate';
 import { Task, TaskCreate } from './schemas';
-import { Annotation, PdfAnnotations, RelationGroup } from '../context';
+import {
+    Annotation,
+    DocAnnotations,
+    RelationGroup,
+    TaskAnnotation,
+    TaskDeltaAnnotations,
+    TaskRelationGroup,
+} from '../context';
 
 /**
  * Task API entry points.
@@ -89,20 +96,42 @@ const useTaskApi = () => {
     };
 
     /**
-     * Gets the annotations of the selected task.
+     * Gets the annotations of the document referred by the selected task,
+     * combined with the changes that happened during the task itself.
      *
      * @param id Task ID
-     * @returns Promise with task annotations
+     * @returns Promise with combined document and task annotations
      */
-    const getTaskAnnotations: (id: string) => Promise<PdfAnnotations> = (id: string) => {
+    const getDocumentWithTaskAnnotations: (id: string) => Promise<DocAnnotations> = (
+        id: string
+    ) => {
         return axiosPrivate
-            .get(`/api/tasks/${id}/annotations`)
+            .get(`/api/tasks/${id}/doc-annotations`)
             .then((res) => {
-                const ann: PdfAnnotations = res.data;
+                const ann: DocAnnotations = res.data;
                 const annotations = ann.annotations.map((a) => Annotation.fromObject(a));
                 const relations = ann.relations.map((r) => RelationGroup.fromObject(r));
 
-                return new PdfAnnotations(annotations, relations);
+                return new DocAnnotations(annotations, relations);
+            })
+            .catch((err) => Promise.reject(err));
+    };
+
+    /**
+     * Gets the annotations of the selected task.
+     *
+     * @param id Task ID
+     * @returns Promise with task delta annotations
+     */
+    const getTaskAnnotations: (id: string) => Promise<TaskDeltaAnnotations> = (id: string) => {
+        return axiosPrivate
+            .get(`/api/tasks/${id}/task-annotations`)
+            .then((res) => {
+                const ann: TaskDeltaAnnotations = res.data;
+                const annotations = ann.annotations.map((a) => TaskAnnotation.fromObject(a));
+                const relations = ann.relations.map((r) => TaskRelationGroup.fromObject(r));
+
+                return new TaskDeltaAnnotations(annotations, relations);
             })
             .catch((err) => Promise.reject(err));
     };
@@ -114,12 +143,12 @@ const useTaskApi = () => {
      * @param pdfAnnotations Task annotations
      * @returns Empty promise
      */
-    const saveTaskAnnotations: (id: string, pdfAnnotations: PdfAnnotations) => Promise<any> = (
+    const saveTaskAnnotations: (
         id: string,
-        pdfAnnotations: PdfAnnotations
-    ) => {
+        taskAnnotations: TaskDeltaAnnotations
+    ) => Promise<any> = (id: string, taskAnnotations: TaskDeltaAnnotations) => {
         return axiosPrivate
-            .put(`/api/tasks/${id}/annotations`, pdfAnnotations)
+            .put(`/api/tasks/${id}/task-annotations`, taskAnnotations)
             .then((res) => res.data)
             .catch((err) => Promise.reject(err));
     };
@@ -164,6 +193,7 @@ const useTaskApi = () => {
         getLoggedUserTasks,
         createTask,
         deleteTask,
+        getDocumentWithTaskAnnotations,
         getTaskAnnotations,
         saveTaskAnnotations,
         markTaskComplete,

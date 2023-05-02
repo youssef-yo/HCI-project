@@ -3,7 +3,11 @@ from .annotations import (
     Bounds,
     PdfAnnotation,
     RelationGroup,
-    TokenId
+    TokenId,
+    TaskAnnotationStatus,
+    TaskAnnotation,
+    TaskRelationGroup,
+    TaskDeltaAnnotation
 )
 from .documents import (
     DocumentOutResponse,

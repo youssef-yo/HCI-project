@@ -14,17 +14,17 @@ interface RelationProps {
 
 const App = ({ relation }: RelationProps) => {
     const [show, setShow] = useState(false);
-    const annotationStore = useContext(AnnotationStore);
+    const { pdfAnnotations, setPdfAnnotations } = useContext(AnnotationStore);
 
     const deleteRelation = () => {
-        annotationStore.setPdfAnnotations(annotationStore.pdfAnnotations.deleteRelation(relation));
+        setPdfAnnotations(pdfAnnotations.deleteRelation(relation));
         handleClose();
     };
     const handleClose = () => {
         setShow(false);
     };
     const handleShow = () => setShow(true);
-    const infoR: infoRelation = annotationStore.pdfAnnotations.getAnnotationsOfRelation(relation);
+    const infoR: infoRelation = pdfAnnotations.getAnnotationsOfRelation(relation);
     return (
         <div>
             {infoR &&

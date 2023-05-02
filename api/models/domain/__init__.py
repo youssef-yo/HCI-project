@@ -1,3 +1,4 @@
+from .doc_commit import DocCommitDocument
 from .doc_structures import DocStructureDocument
 from .documents import DocumentDocument
 from .ontologies import OntologyDocument

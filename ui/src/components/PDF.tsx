@@ -99,7 +99,7 @@ const Page = ({ pageInfo, onError }: PageProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [selection, setSelection] = useState<Bounds>();
 
-    const annotations = annotationStore.pdfAnnotations.annotations.filter(
+    const annotations = annotationStore.pdfAnnotations.docAnnotations.annotations.filter(
         (a) => a.page === pageInfo.page.pageNumber - 1
     );
 

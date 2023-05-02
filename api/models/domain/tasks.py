@@ -5,7 +5,7 @@ from beanie import Document, Indexed, PydanticObjectId
 
 from core.config import get_settings
 
-from models.schemas import PageRange, PdfAnnotation, TaskStatus
+from models.schemas import PageRange, TaskDeltaAnnotation, TaskStatus
 
 
 class TaskDocument(Document):
@@ -17,7 +17,8 @@ class TaskDocument(Document):
     marked_complete: bool = False
     comments: str = ""
     completed_at: Optional[datetime] = None
-    doc_annotations: PdfAnnotation = PdfAnnotation.empty()
+    commit: PydanticObjectId = None
+    task_annotations: TaskDeltaAnnotation = TaskDeltaAnnotation.empty()
 
     class Settings:
         name = get_settings().tasks_collection

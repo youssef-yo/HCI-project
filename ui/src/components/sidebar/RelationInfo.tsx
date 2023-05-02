@@ -8,7 +8,7 @@ interface RelationInfoProps {
     info: infoRelation;
 }
 export const RelationInfo = ({ info }: RelationInfoProps) => {
-    const annotationStore = useContext(AnnotationStore);
+    const { pdfAnnotations, setPdfAnnotations, ontoProperties } = useContext(AnnotationStore);
     const [modifyPropertyClass, setModifyPropertyClass] = useState(false);
     const [properties, setProperties]: [properties: any, setProperties: any] = useState([]);
     const [iRelationInfoInListPropeprties, setIRelationInfoInListPropeprties] = useState<number>(0);
@@ -29,7 +29,7 @@ export const RelationInfo = ({ info }: RelationInfoProps) => {
         if (info.sourceAnnotation !== undefined && info.targetAnnotation !== undefined) {
             const sourceClasses = info.sourceAnnotation.ontoClass.iri;
             const targetClasses = info.targetAnnotation.ontoClass.iri;
-            const ontoPropertiesCompatible = annotationStore.ontoProperties.filter((p) =>
+            const ontoPropertiesCompatible = ontoProperties.filter((p) =>
                 checkCompatibilityWithProperty(p, sourceClasses, targetClasses)
             );
             const listLabels = ontoPropertiesCompatible.map((ontoProperty: OntoProperty) => ({
@@ -49,7 +49,7 @@ export const RelationInfo = ({ info }: RelationInfoProps) => {
                 setIRelationInfoInListPropeprties(indexRelationInfo);
             }
         }
-    }, [annotationStore.ontoProperties]);
+    }, [ontoProperties]);
     const colourStyles = {
         control: (styles: any) => ({ ...styles, backgroundColor: 'white' }),
         option: (styles: any) => {
@@ -62,7 +62,7 @@ export const RelationInfo = ({ info }: RelationInfoProps) => {
         },
     };
     const ontoPropertyFromId = (id: string) => {
-        return annotationStore.ontoProperties.find((ontoProperty: OntoProperty) => {
+        return ontoProperties.find((ontoProperty: OntoProperty) => {
             return ontoProperty.id === id;
         });
     };
@@ -112,7 +112,7 @@ export const RelationInfo = ({ info }: RelationInfoProps) => {
                                         const resultProperty:
                                             | OntoProperty
                                             | undefined = ontoPropertyFromId(choice.value);
-                                        const _relation = annotationStore.pdfAnnotations.getRelationFromId(
+                                        const _relation = pdfAnnotations.getRelationFromId(
                                             info.idRelation
                                         );
                                         console.log('resultProperty:', resultProperty);
@@ -125,14 +125,10 @@ export const RelationInfo = ({ info }: RelationInfoProps) => {
                                                 'Relation before updating ontoProp: ',
                                                 _relation
                                             );
-                                            annotationStore.setPdfAnnotations(
-                                                annotationStore.pdfAnnotations
-                                                    .deleteRelation(_relation)
-                                                    .withNewRelation(
-                                                        _relation.updateOntoProperty({
-                                                            ontoProperty: resultProperty,
-                                                        })
-                                                    )
+                                            setPdfAnnotations(
+                                                pdfAnnotations.updateRelation(_relation, {
+                                                    ontoProperty: resultProperty,
+                                                })
                                             );
                                             console.log('Relation updated: ', _relation);
                                         }

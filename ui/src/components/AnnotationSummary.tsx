@@ -10,12 +10,10 @@ interface AnnotationSummaryProps {
 
 export const AnnotationSummary = ({ annotation }: AnnotationSummaryProps) => {
     const pdfStore = useContext(PDFStore);
-    const annotationStore = useContext(AnnotationStore);
+    const { pdfAnnotations, setPdfAnnotations } = useContext(AnnotationStore);
 
     const onDelete = () => {
-        annotationStore.setPdfAnnotations(
-            annotationStore.pdfAnnotations.deleteAnnotation(annotation)
-        );
+        setPdfAnnotations(pdfAnnotations.deleteAnnotation(annotation));
     };
     const handleScrolling = () => {
         if (!pageInfo) return;

@@ -32,7 +32,7 @@ import {
     AnnotationStore,
     PDFStore,
     RelationGroup,
-    PdfAnnotations,
+    PDFAnnotations,
 } from '../context';
 
 import * as listeners from '../listeners';
@@ -57,14 +57,14 @@ const PDFPage = () => {
     const [doc, setDocument] = useState<PDFDocumentProxy>();
     const [progress, setProgress] = useState(0);
     const [pages, setPages] = useState<PDFPageInfo[]>();
-    const [pdfAnnotations, setPdfAnnotations] = useState<PdfAnnotations>(
-        new PdfAnnotations([], [])
-    );
+
+    const [pdfAnnotations, setPdfAnnotations] = useState<PDFAnnotations>(PDFAnnotations.empty());
 
     const [selectedAnnotations, setSelectedAnnotations] = useState<Annotation[]>([]);
 
     const [activeTask, setActiveTask] = useState<Task>();
     const [assignedTasks, setAssignedTasks] = useState<Task[]>([]);
+
     const [activeOntoClass, setActiveOntoClass] = useState<OntoClass>();
     const [ontoClasses, setOntoClasses] = useState<OntoClass[]>([]);
     const [ontoProperties, setOntoProperties] = useState<OntoProperty[]>([]);
@@ -79,7 +79,12 @@ const PDFPage = () => {
 
     const { getTokens } = useDocumentApi();
     const { getClasses, getProperties, getOntologiesList } = useOntologyApi();
-    const { getLoggedUserTasks, getTaskByID, getTaskAnnotations } = useTaskApi();
+    const {
+        getLoggedUserTasks,
+        getTaskByID,
+        getDocumentWithTaskAnnotations,
+        getTaskAnnotations,
+    } = useTaskApi();
     // React's Error Boundaries don't work for us because a lot of work is done by pdfjs in
     // a background task (a web worker). We instead setup a top level error handler that's
     // passed around as needed so we can display a nice error to the user when something
@@ -214,11 +219,15 @@ const PDFPage = () => {
             .then((pages) => {
                 setProgress(90);
                 setPages(pages);
+
                 // Get any existing annotations for this pdf.
-                getTaskAnnotations(activeTask._id)
-                    .then((paperAnnotations) => {
+                Promise.all([
+                    getDocumentWithTaskAnnotations(activeTask._id),
+                    getTaskAnnotations(activeTask._id),
+                ])
+                    .then(([docAnnotations, taskDeltaAnnotations]) => {
                         setProgress(100);
-                        setPdfAnnotations(paperAnnotations);
+                        setPdfAnnotations(new PDFAnnotations(docAnnotations, taskDeltaAnnotations));
 
                         setViewState(ViewState.LOADED);
                     })
@@ -226,6 +235,18 @@ const PDFPage = () => {
                         console.error(`Error Fetching Existing Annotations: `, err);
                         setViewState(ViewState.ERROR);
                     });
+
+                // getDocumentWithTaskAnnotations(activeTask._id)
+                //     .then((docAnnotations) => {
+                //         setProgress(100);
+                //         setPdfAnnotations(docAnnotations);
+
+                //         setViewState(ViewState.LOADED);
+                //     })
+                //     .catch((err: any) => {
+                //         console.error(`Error Fetching Existing Annotations: `, err);
+                //         setViewState(ViewState.ERROR);
+                //     });
             })
             .catch((err: any) => {
                 if (err instanceof Error) {
@@ -311,9 +332,9 @@ const PDFPage = () => {
                                 relationMode,
                                 setRelationMode,
                             }}>
-                            <listeners.UndoAnnotation />
-                            <listeners.SaveWithTimeout taskId={taskId} />
-                            <listeners.SaveBeforeUnload taskId={taskId} />
+                            {/* <listeners.UndoAnnotation /> */}
+                            {/* <listeners.SaveWithTimeout taskId={taskId} /> */}
+                            {/* <listeners.SaveBeforeUnload taskId={taskId} /> */}
                             <listeners.HideAnnotationLabels />
                             <WithSidebar width={sidebarWidth}>
                                 <Sidebar width={sidebarWidth}>
@@ -327,13 +348,13 @@ const PDFPage = () => {
                                         <Annotations
                                             taskId={taskId}
                                             activeTask={activeTask}
-                                            annotations={pdfAnnotations.annotations}
+                                            annotations={pdfAnnotations.docAnnotations.annotations}
                                         />
                                     )}
                                     {activeTask && (
                                         <Relations
-                                            annotations={pdfAnnotations.annotations}
-                                            relations={pdfAnnotations.relations}
+                                            annotations={pdfAnnotations.docAnnotations.annotations}
+                                            relations={pdfAnnotations.docAnnotations.relations}
                                         />
                                     )}
                                     {activeTask && (

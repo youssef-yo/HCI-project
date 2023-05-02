@@ -149,6 +149,19 @@ async def get_document_tasks(
     return tasks
 
 
+@router.get("/{sha}/tasks/{task_id}/annotations")
+async def get_document_annotations_by_task(
+    sha: PydanticObjectId,
+    task_id: PydanticObjectId,
+    user: UserDocument = Depends(get_current_user)
+):
+    """
+    Retrieves the annotations for the specified document, taking in consideration
+    the modifications that have happened with the specified task.
+    """
+    pass
+
+
 @router.get("/{sha}/tokens", response_model=List[Page])
 async def get_tokens(
     sha: PydanticObjectId,

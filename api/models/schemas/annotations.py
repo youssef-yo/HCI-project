@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Optional, List
 from pydantic import BaseModel
 
@@ -41,6 +42,32 @@ class PdfAnnotation(BaseModel):
     @staticmethod
     def empty():
         return PdfAnnotation(
+            annotations=[],
+            relations=[]
+        )
+
+
+class TaskAnnotationStatus(str, Enum):
+    created = "CREATED",
+    modified = "MODIFIED",
+    deleted = "DELETED"
+
+
+class TaskAnnotation(Annotation):
+    status: TaskAnnotationStatus
+
+
+class TaskRelationGroup(RelationGroup):
+    status: TaskAnnotationStatus
+
+
+class TaskDeltaAnnotation(BaseModel):
+    annotations: List[TaskAnnotation]
+    relations: List[TaskRelationGroup]
+
+    @staticmethod
+    def empty():
+        return TaskDeltaAnnotation(
             annotations=[],
             relations=[]
         )

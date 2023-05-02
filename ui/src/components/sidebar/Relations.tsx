@@ -9,15 +9,16 @@ interface RelationProps {
 }
 
 const Relations: React.FC<RelationProps> = ({ annotations, relations }) => {
-    const annotationStore = useContext(AnnotationStore);
-    console.log('Annotations-props: ', annotations);
-    console.log('Annotations-context: ', annotationStore.pdfAnnotations.annotations);
-    relations.map((relation) =>
-        console.log(
-            'Relation info: ',
-            annotationStore.pdfAnnotations.getAnnotationsOfRelation(relation)
-        )
-    );
+    const { pdfAnnotations } = useContext(AnnotationStore);
+    console.log('Annotations-document: ', annotations);
+    console.log('Annotations-delta: ', pdfAnnotations.taskDeltaAnnotations.annotations);
+    console.log('Relations-document: ', relations);
+    console.log('Relations-delta: ', pdfAnnotations.taskDeltaAnnotations.relations);
+
+    // relations.map((relation) =>
+    //     console.log('Relation info: ', pdfAnnotations.getAnnotationsOfRelation(relation))
+    // );
+
     return (
         <SidebarItem>
             <SidebarItemTitle>Relations</SidebarItemTitle>

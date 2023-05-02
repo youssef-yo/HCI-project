@@ -4,6 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
 from core.config import get_settings
 
 from models.domain import (
+    DocCommitDocument,
     DocStructureDocument,
     DocumentDocument,
     OntologyDocument,
@@ -27,7 +28,7 @@ class MongoClient:
     async def initialize(self) -> None:
         await init_beanie(
             database=self._client[self._database],
-            document_models=[DocStructureDocument, DocumentDocument, OntologyDocument, UserDocument, TaskDocument]
+            document_models=[DocCommitDocument, DocStructureDocument, DocumentDocument, OntologyDocument, UserDocument, TaskDocument]
         )
 
     def close(self) -> None:

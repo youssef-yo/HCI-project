@@ -156,9 +156,9 @@ const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
                 if (index < annotationStore.ontoClasses.length) {
                     const selectedLabel = annotationStore.ontoClasses[index];
                     annotationStore.setPdfAnnotations(
-                        annotationStore.pdfAnnotations
-                            .deleteAnnotation(annotation)
-                            .withNewAnnotation(annotation.update({ ontoClass: selectedLabel }))
+                        annotationStore.pdfAnnotations.updateAnnotation(annotation, {
+                            ontoClass: selectedLabel,
+                        })
                     );
                     onHide();
                 }
@@ -179,9 +179,9 @@ const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
                 // TODO: This might have side-effects to the relation mechanism.
                 // Some additional testing is warranted.
                 annotationStore.setPdfAnnotations(
-                    annotationStore.pdfAnnotations
-                        .deleteAnnotation(annotation)
-                        .withNewAnnotation(annotation.update({ ontoClass: selectedLabel }))
+                    annotationStore.pdfAnnotations.updateAnnotation(annotation, {
+                        ontoClass: selectedLabel,
+                    })
                 );
                 onHide();
             }}
