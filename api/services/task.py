@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Dict, List, Optional
 
 from fastapi import (
@@ -6,17 +7,22 @@ from fastapi import (
 )
 
 from models.domain import (
+    DocCommitDocument,
     DocumentDocument,
-    TaskDocument
+    TaskDocument,
+    UserDocument
 )
 from models.schemas import (
+    DocAnnotations,
     PageRange,
     PydanticObjectId,
+    TaskAnnotationStatus,
+    TaskDeltaAnnotations,
     TaskInCreate,
     TaskStatus
 )
 
-from .doc import get_document_by_id
+from .doc import get_document_by_id, get_document_commit_by_id, get_document_commit_annotations
 from .user import get_user_by_id
 
 
@@ -69,11 +75,175 @@ async def create_task(task_data: TaskInCreate) -> TaskDocument:
         user_id=task_data.user_id,
         page_range=task_data.page_range,
         description=task_data.description,
-        status=TaskStatus.active
+        status=TaskStatus.active,
+        commit=task_doc.commit
     )
     await task.create()
 
     return task
+
+
+async def commit_task_annotations(
+    task: TaskDocument
+) -> DocCommitDocument:
+    """
+    Commits the delta annotations applied during the selected task.
+    """
+    task_doc = await get_document_by_id(task.doc_id, assert_exists=True)
+
+    # If the document has already been committed, take the last committed annotations.
+    # If no previous commit was made on the document, just use empty annotations.
+    if task_doc.commit:
+        doc_annotations = await get_document_commit_annotations(task_doc.commit)
+    else:
+        doc_annotations = DocAnnotations.empty()
+
+    # Apply all delta changes (do not limit to a page range)
+    combined_annotations = combine_document_task_annotations(doc_annotations, task.delta_annotations)
+
+    # Create the new shapshot
+    new_commit = DocCommitDocument(
+        doc_id=task.doc_id,
+        created_at=datetime.now(),
+        doc_annotations=combined_annotations,
+        prev_commit=task_doc.commit
+    )
+    await new_commit.create()
+
+    # Update the document commit pointer
+    await task_doc.update({"$set": {DocumentDocument.commit: new_commit.id}})
+
+    # Update task status as complete
+    await task.update({"$set": {
+        TaskDocument.status: TaskStatus.completed,
+        TaskDocument.completed_at: datetime.now()
+    }})
+
+
+async def get_combined_doc_task_annotations(
+    task: TaskDocument
+) -> DocAnnotations:
+    """
+    Combines the annotations from the previously committed document annotations,
+    referred by the selected task, with the annotation deltas (changes) of the task itself.
+
+    If no commit is referred by the task, the initial document annotations are
+    considered to be none, and simply applies the deltas.
+
+    If the page range is set, the returned document is limited.
+    """
+
+    # If no commit is referred by the task, it means the task was created when
+    # no commits had already been done, so we just return the converted task annotations.
+    if not task.commit:
+        return combine_document_task_annotations(
+            DocAnnotations.empty(),
+            task.delta_annotations
+        )
+
+    # If commit, combine committed document annotations and task delta annotations.
+    doc_annotations = await get_document_commit_annotations(task.commit)
+
+    # Page ranges need to be decreased by 1, the indexing of pages is zero-based
+    page_range = PageRange(
+        start=task.page_range.start - 1,
+        end=task.page_range.end - 1
+    )
+
+    return combine_document_task_annotations(
+        doc_annotations,
+        task.delta_annotations,
+        page_range
+    )
+
+
+def combine_document_task_annotations(
+        doc_annotations: DocAnnotations,
+        task_annotations: TaskDeltaAnnotations,
+        page_range: PageRange = None
+) -> DocAnnotations:
+    """
+    Combines the annotations from the previously committed document annotations,
+    referred by the selected task, with the annotation deltas (changes) of the task itself.
+
+    If no commit is referred by the task, the initial document annotations are
+    considered to be none, and simply applies the deltas.
+
+    If the page range is set, the returned document is limited.
+    """
+    doc_annotations = apply_annotation_deltas(doc_annotations, task_annotations)
+    return validate_annotations(doc_annotations, page_range)
+
+
+def apply_annotation_deltas(
+        doc_annotations: DocAnnotations,
+        delta_annotations: TaskDeltaAnnotations
+) -> DocAnnotations:
+    """
+    Combines the annotations from the selected document annotations,
+    with the annotation deltas (changes).
+    """
+    # print('Delta Annotations: ', delta_annotations.annotations)
+    # print('Delta Relations: ', delta_annotations.annotations)
+
+    for dt_annotation in delta_annotations.annotations:
+        if dt_annotation.status == TaskAnnotationStatus.created:
+            doc_annotations.add_annotation(dt_annotation.to_annotation())
+        elif dt_annotation.status == TaskAnnotationStatus.modified:
+            doc_annotations.update_annotation(dt_annotation.to_annotation())
+        elif dt_annotation.status == TaskAnnotationStatus.deleted:
+            doc_annotations.remove_annotation(dt_annotation.to_annotation())
+
+    for dt_relation in delta_annotations.relations:
+        if dt_relation.status == TaskAnnotationStatus.created:
+            doc_annotations.add_relation(dt_relation.to_relation())
+        elif dt_relation.status == TaskAnnotationStatus.modified:
+            doc_annotations.update_relation(dt_relation.to_relation())
+        elif dt_relation.status == TaskAnnotationStatus.deleted:
+            doc_annotations.remove_relation(dt_relation.to_relation())
+
+    # print('PDF Annotations: ', doc_annotations.annotations)
+    # print('PDF Relations: ', doc_annotations.relations)
+
+    return doc_annotations
+
+
+def validate_annotations(
+        doc_annotations: DocAnnotations,
+        page_range: PageRange
+) -> DocAnnotations:
+    """
+    Extracts only the annotations that belong to the page range.
+
+    Relations that refer to annotations outside the page range are left out.
+    """
+    limited_annotations = DocAnnotations.empty()
+    filtered_annotation_ids: List[str] = []
+
+    def all_filtered_annotations(ids: List[str], filtered_ids: List[str]) -> bool:
+        for id in ids:
+            if id not in filtered_ids:
+                return False
+
+        return True
+
+    if page_range:
+        def predicate(ann): return page_range.is_within(ann.page)
+    else:
+        def predicate(ann): return True
+
+    # Filter annotations that are within the page range
+    for annotation in doc_annotations.annotations:
+        if predicate(annotation):
+            limited_annotations.add_annotation(annotation)
+            filtered_annotation_ids.append(annotation.id)
+
+    # Filter relations whose annotations all belong to the page range
+    for relation in doc_annotations.relations:
+        if all_filtered_annotations(relation.sourceIds, filtered_annotation_ids) and all_filtered_annotations(relation.targetIds, filtered_annotation_ids):
+            limited_annotations.add_relation(relation)
+
+    return limited_annotations
 
 
 def build_query(
@@ -115,3 +285,14 @@ async def verify_valid_page_range(document: DocumentDocument, page_range: PageRa
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"The selected page range overlaps with a page range of an active task, for the selected document."
             )
+
+
+async def verify_can_update_task(task: TaskDocument, user: UserDocument):
+    """
+    Check if the user that wants to update is the same that has the task assigned.
+    """
+    if task.user_id != user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden."
+        )

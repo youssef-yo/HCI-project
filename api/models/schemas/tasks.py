@@ -33,6 +33,12 @@ class PageRange(RWSchema):
             return True
 
         return False
+    
+    def is_within(self, page: int) -> bool:
+        """
+        Checks if the page number is within the range.
+        """
+        return page >= self.start and page <= self.end
 
 
 class TaskBase(RWSchema):

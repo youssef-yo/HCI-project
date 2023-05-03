@@ -333,8 +333,8 @@ const PDFPage = () => {
                                 setRelationMode,
                             }}>
                             {/* <listeners.UndoAnnotation /> */}
-                            {/* <listeners.SaveWithTimeout taskId={taskId} /> */}
-                            {/* <listeners.SaveBeforeUnload taskId={taskId} /> */}
+                            <listeners.SaveWithTimeout taskId={taskId} />
+                            <listeners.SaveBeforeUnload taskId={taskId} />
                             <listeners.HideAnnotationLabels />
                             <WithSidebar width={sidebarWidth}>
                                 <Sidebar width={sidebarWidth}>

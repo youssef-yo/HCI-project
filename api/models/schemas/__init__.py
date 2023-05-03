@@ -1,13 +1,13 @@
 from .annotations import (
     Annotation,
     Bounds,
-    PdfAnnotation,
+    DocAnnotations,
     RelationGroup,
     TokenId,
     TaskAnnotationStatus,
     TaskAnnotation,
     TaskRelationGroup,
-    TaskDeltaAnnotation
+    TaskDeltaAnnotations
 )
 from .documents import (
     DocumentOutResponse,

@@ -1,7 +1,7 @@
 from typing import List, Union
 from pydantic import BaseModel
 
-from models.schemas.mongo import MongoBase
+from models.schemas.mongo import MongoBase, PydanticObjectId
 from models.schemas.rwschema import RWSchema
 
 

@@ -412,7 +412,10 @@ export class TaskDeltaAnnotations {
         }
 
         // Otherwise, create a new delta annotation
-        const newDeltaAnnotation = TaskAnnotation.fromAnnotation(a, TaskAnnotationStatus.MODIFIED);
+        const newDeltaAnnotation = TaskAnnotation.fromAnnotation(
+            a.update(delta),
+            TaskAnnotationStatus.MODIFIED
+        );
         return new TaskDeltaAnnotations(
             this.annotations.concat([newDeltaAnnotation]),
             this.relations,
@@ -433,7 +436,10 @@ export class TaskDeltaAnnotations {
         }
 
         // Otherwise, create a new delta relation
-        const newDeltaRelation = TaskRelationGroup.fromRelation(r, TaskAnnotationStatus.MODIFIED);
+        const newDeltaRelation = TaskRelationGroup.fromRelation(
+            r.updateOntoProperty(delta),
+            TaskAnnotationStatus.MODIFIED
+        );
         return new TaskDeltaAnnotations(
             this.annotations,
             this.relations.concat([newDeltaRelation]),
@@ -446,14 +452,28 @@ export class TaskDeltaAnnotations {
 
         // If the delta annotation is not found, it means that the annotation exists in the
         // document commit, so we have to take note of the deletion.
-        // Same if the delta annotation is found, and it is modified.
-        if (!deltaAnnotation || deltaAnnotation.status === TaskAnnotationStatus.MODIFIED) {
+        if (!deltaAnnotation) {
             const newDeltaAnnotation = TaskAnnotation.fromAnnotation(
                 a,
                 TaskAnnotationStatus.DELETED
             );
             return new TaskDeltaAnnotations(
                 this.annotations.concat([newDeltaAnnotation]),
+                this.relations,
+                true
+            );
+        }
+
+        // If the delta annotation is found, and it has a Modified status, we need to replace it
+        // with a deletion delta.
+        if (deltaAnnotation.status === TaskAnnotationStatus.MODIFIED) {
+            const newAnnotations = this.annotations.filter((ann) => ann.id !== deltaAnnotation.id);
+            const newDeltaAnnotation = TaskAnnotation.fromAnnotation(
+                a,
+                TaskAnnotationStatus.DELETED
+            );
+            return new TaskDeltaAnnotations(
+                newAnnotations.concat([newDeltaAnnotation]),
                 this.relations,
                 true
             );
@@ -470,7 +490,7 @@ export class TaskDeltaAnnotations {
         // If the delta relation is not found, it means that the relation exists in the
         // document commit, so we have to take note of the deletion.
         // Same if the delta relation is found, and it is modified.
-        if (!deltaRelation || deltaRelation.status === TaskAnnotationStatus.MODIFIED) {
+        if (!deltaRelation) {
             const newDeltaRelation = TaskRelationGroup.fromRelation(
                 r,
                 TaskAnnotationStatus.DELETED
@@ -478,6 +498,21 @@ export class TaskDeltaAnnotations {
             return new TaskDeltaAnnotations(
                 this.annotations,
                 this.relations.concat([newDeltaRelation]),
+                true
+            );
+        }
+
+        // If the delta relation is found, and it has a Modified status, we need to replace it
+        // with a deletion delta.
+        if (deltaRelation.status === TaskAnnotationStatus.MODIFIED) {
+            const newRelations = this.relations.filter((rel) => rel.id !== deltaRelation.id);
+            const newDeltaRelation = TaskRelationGroup.fromRelation(
+                r,
+                TaskAnnotationStatus.DELETED
+            );
+            return new TaskDeltaAnnotations(
+                this.annotations,
+                newRelations.concat([newDeltaRelation]),
                 true
             );
         }
@@ -493,10 +528,19 @@ export class TaskDeltaAnnotations {
         deletedRelations.forEach((r) => {
             const deltaRelation = newRelations.find((rel) => rel.id === r.id);
 
-            if (!deltaRelation || deltaRelation.status === TaskAnnotationStatus.MODIFIED) {
+            if (!deltaRelation) {
                 // If the delta relation is not found, it means that the relation exists in the
                 // document commit, so we have to take note of the deletion.
                 // Same if the delta relation is found, and it is modified.
+                const newDeltaRelation = TaskRelationGroup.fromRelation(
+                    r,
+                    TaskAnnotationStatus.DELETED
+                );
+                newRelations = newRelations.concat([newDeltaRelation]);
+            } else if (deltaRelation.status === TaskAnnotationStatus.MODIFIED) {
+                // If the delta relation is found, and it has a Modified status, we need to replace it
+                // with a deletion delta.
+                newRelations = this.relations.filter((rel) => rel.id !== deltaRelation.id);
                 const newDeltaRelation = TaskRelationGroup.fromRelation(
                     r,
                     TaskAnnotationStatus.DELETED

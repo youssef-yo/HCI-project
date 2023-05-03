@@ -35,16 +35,38 @@ class RelationGroup(BaseModel):
     ontoProperty: OntoProperty
 
 
-class PdfAnnotation(BaseModel):
+class DocAnnotations(BaseModel):
     annotations: List[Annotation]
     relations: List[RelationGroup]
 
     @staticmethod
     def empty():
-        return PdfAnnotation(
+        return DocAnnotations(
             annotations=[],
             relations=[]
         )
+    
+    def add_annotation(self, annotation: Annotation):
+        self.annotations.append(annotation)
+
+    def add_relation(self, relation: RelationGroup):
+        self.relations.append(relation)
+
+    def update_annotation(self, annotation: Annotation):
+        updated_annotations = map(lambda ann: annotation if ann.id == annotation.id else ann, self.annotations)
+        self.annotations = list(updated_annotations)
+
+    def update_relation(self, relation: RelationGroup):
+        updated_relations = map(lambda rel: relation if rel.id == relation.id else rel, self.relations)
+        self.relations = list(updated_relations)
+
+    def remove_annotation(self, annotation: Annotation):
+        updated_annotations = filter(lambda ann: ann.id != annotation.id, self.annotations)
+        self.annotations = list(updated_annotations)
+
+    def remove_relation(self, relation: RelationGroup):
+        updated_relations = filter(lambda rel: rel.id != relation.id, self.relations)
+        self.relations = list(updated_relations)
 
 
 class TaskAnnotationStatus(str, Enum):
@@ -56,18 +78,24 @@ class TaskAnnotationStatus(str, Enum):
 class TaskAnnotation(Annotation):
     status: TaskAnnotationStatus
 
+    def to_annotation(self) -> Annotation:
+        return Annotation(**self.dict())
+
 
 class TaskRelationGroup(RelationGroup):
     status: TaskAnnotationStatus
 
+    def to_relation(self) -> RelationGroup:
+        return RelationGroup(**self.dict())
 
-class TaskDeltaAnnotation(BaseModel):
+
+class TaskDeltaAnnotations(BaseModel):
     annotations: List[TaskAnnotation]
     relations: List[TaskRelationGroup]
 
     @staticmethod
     def empty():
-        return TaskDeltaAnnotation(
+        return TaskDeltaAnnotations(
             annotations=[],
             relations=[]
         )

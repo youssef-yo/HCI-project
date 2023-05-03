@@ -18,7 +18,7 @@ from models.schemas import (
     Annotation,
     DocumentOutResponse,
     Page,
-    PdfAnnotation,
+    DocAnnotations,
     PydanticObjectId,
     RelationGroup,
     TaskOutResponse
@@ -78,7 +78,7 @@ def get_annotations(
     sha: str,
     user: UserDocument = Depends(get_current_user),
     settings: Settings = Depends(get_settings)
-) -> PdfAnnotation:
+) -> DocAnnotations:
     annotations = os.path.join(
         settings.output_directory, sha, f"{user.email}_annotations.json"
     )

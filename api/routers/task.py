@@ -16,18 +16,21 @@ from models.domain import (
     UserDocument
 )
 from models.schemas import (
-    PdfAnnotation,
+    DocAnnotations,
     PydanticObjectId,
     TaskInCreate,
-    TaskDeltaAnnotation,
+    TaskDeltaAnnotations,
     TaskOutResponse
 )
 
 from services.oauth2 import get_current_user
 from services.task import (
     create_task,
+    commit_task_annotations,
     find_tasks,
-    get_task_by_id
+    get_combined_doc_task_annotations,
+    get_task_by_id,
+    verify_can_update_task
 )
 
 
@@ -86,7 +89,7 @@ async def delete_task(
     await task.delete()
 
 
-@router.get("/{task_id}/doc-annotations", response_model=PdfAnnotation)
+@router.get("/{task_id}/doc-annotations", response_model=DocAnnotations)
 async def get_document_with_task_annotations(
     task_id: PydanticObjectId,
     auth_user: UserDocument = Depends(get_current_user)
@@ -97,43 +100,32 @@ async def get_document_with_task_annotations(
     """
     task = await get_task_by_id(task_id, assert_exists=True)
 
-    # If no commit is referred by the task, it means the task was created when
-    # no commits had already been done, so we just return the converted task annotations.
-    if not task.commit:
-        return PdfAnnotation.empty()
-    
-    # TODO: If commit, combine committed document annotations and task delta annotations.
-    return PdfAnnotation.empty()
-    
+    pdf_annotations = await get_combined_doc_task_annotations(task)
+    return pdf_annotations
 
 
-@router.get("/{task_id}/task-annotations", response_model=TaskDeltaAnnotation)
+@router.get("/{task_id}/task-annotations", response_model=TaskDeltaAnnotations)
 async def get_task_annotations(
     task_id: PydanticObjectId,
     auth_user: UserDocument = Depends(get_current_user)
 ):
     """Gets the delta annotations and relations tied to the specified task."""
     task = await get_task_by_id(task_id, assert_exists=True)
-    return task.task_annotations
+    return task.delta_annotations
 
 
 @router.put("/{task_id}/task-annotations", status_code=status.HTTP_204_NO_CONTENT)
 async def update_task_annotations(
     task_id: PydanticObjectId,
-    annotations: TaskDeltaAnnotation,
+    annotations: TaskDeltaAnnotations,
     auth_user: UserDocument = Depends(get_current_user)
 ):
     """Updates the delta annotations and relations tied to the specified task."""
     task = await get_task_by_id(task_id, assert_exists=True)
-    
-    # Check if the user that wants to update is the same that has the task assigned
-    if task.user_id != auth_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Forbidden."
-        )
-    
-    await task.update({"$set": {TaskDocument.task_annotations: annotations}})
+
+    verify_can_update_task(task, auth_user)
+
+    await task.update({"$set": {TaskDocument.delta_annotations: annotations}})
 
 
 @router.post("/{task_id}/comments", status_code=status.HTTP_204_NO_CONTENT)
@@ -144,14 +136,9 @@ async def set_task_comments(
 ):
     """Marks the selected task as complete or not complete (by the annotator)."""
     task = await get_task_by_id(task_id, assert_exists=True)
-    
-    # Check if the user that wants to update is the same that has the task assigned
-    if task.user_id != auth_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Forbidden."
-        )
-    
+
+    verify_can_update_task(task, auth_user)
+
     await task.update({"$set": {TaskDocument.comments: comments}})
 
 
@@ -162,7 +149,9 @@ async def commit_task(
 ):
     """Commits the task, by saving a new commit with the updated document annotations."""
     # TODO
-    pass
+    task = await get_task_by_id(task_id, assert_exists=True)
+
+    doc_commit = await commit_task_annotations(task)
 
 
 @router.post("/{task_id}/complete", status_code=status.HTTP_204_NO_CONTENT)
@@ -173,12 +162,7 @@ async def set_task_complete(
 ):
     """Marks the selected task as complete or not complete (by the annotator)."""
     task = await get_task_by_id(task_id, assert_exists=True)
-    
-    # Check if the user that wants to update is the same that has the task assigned
-    if task.user_id != auth_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Forbidden."
-        )
-    
+
+    verify_can_update_task(task, auth_user)
+
     await task.update({"$set": {TaskDocument.marked_complete: complete}})

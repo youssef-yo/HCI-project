@@ -4,10 +4,12 @@ from fastapi import (
 )
 
 from models.domain import (
+    DocCommitDocument,
     DocStructureDocument,
     DocumentDocument
 )
 from models.schemas import (
+    DocAnnotations,
     PydanticObjectId
 )
 
@@ -46,3 +48,39 @@ async def get_document_structure(
         )
 
     return doc_structure
+
+
+async def get_document_commit_by_id(
+    id: PydanticObjectId,
+    assert_exists: bool = False
+) -> DocCommitDocument:
+    """
+    Gets the document commit with the specified identifier.
+    If it does not exist, and the assertion flag has been set,
+    it raises an HTTPException.
+    """
+    doc_commit = await DocCommitDocument.get(id)
+    if not doc_commit and assert_exists:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"PDF document commit with ID {id} not found."
+        )
+
+    return doc_commit
+
+
+async def get_document_commit_annotations(
+    id: PydanticObjectId
+) -> DocAnnotations:
+    """
+    Gets the document annotations at the specified commit.
+    If it does not exist, it raises an HTTPException.
+    """
+    doc_commit = await DocCommitDocument.get(id)
+    if not doc_commit:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"PDF document commit with ID {id} not found."
+        )
+    
+    return doc_commit.doc_annotations
