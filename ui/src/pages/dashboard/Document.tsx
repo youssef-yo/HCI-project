@@ -1,4 +1,4 @@
-import { MdAssignmentAdd, MdOpenInNew } from 'react-icons/md';
+import { MdAddTask, MdOutlineFileDownload, MdOpenInNew } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Header, IconButton, Table } from '../../components/common';
@@ -33,6 +33,10 @@ const DocumentPage = () => {
         <section>
             <Header>
                 <h1>Document Information</h1>
+
+                <Button color="secondary" icon={<MdOutlineFileDownload />}>
+                    Export Annotations
+                </Button>
             </Header>
 
             <div className="docInfo">
@@ -53,7 +57,7 @@ const DocumentPage = () => {
                 <h3>Document Tasks</h3>
                 <Button
                     color="secondary"
-                    icon={<MdAssignmentAdd />}
+                    icon={<MdAddTask />}
                     onClick={() =>
                         navigate(`/dash/tasks/new`, {
                             state: { docId: doc?._id },

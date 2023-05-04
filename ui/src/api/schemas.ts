@@ -4,6 +4,7 @@ export interface JWTToken {
 }
 
 export interface UserInfo {
+    _id: string;
     username: string;
     role: string;
 }
@@ -107,7 +108,8 @@ export interface UserUpdate {
 
 export enum TaskStatus {
     ACTIVE = 'ACTIVE',
-    COMPLETE = 'COMPLETE',
+    COMPLETE = 'COMPLETED',
+    DISMISSED = 'DISMISSED',
 }
 
 export interface PageRange {

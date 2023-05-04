@@ -41,6 +41,11 @@ const EditOntoModal: React.FC<EditOntoModalProps> = ({ show, onHide, ontoID, onU
     };
 
     const onEditOntology = async () => {
+        if (name.trim().length === 0) {
+            setErrorMsg('An ontology name must be specified!');
+            return;
+        }
+
         const ontoUpdate = {
             name: name,
         };

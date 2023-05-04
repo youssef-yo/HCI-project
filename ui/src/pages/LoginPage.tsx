@@ -1,3 +1,4 @@
+import { MdLogin } from 'react-icons/md';
 import { useRef, useState, useEffect, FormEvent } from 'react';
 import styled from 'styled-components';
 import pawlsLogo from '../assets/images/pawlsLogo.png';
@@ -53,7 +54,7 @@ const LoginPage = () => {
     return (
         <Section>
             {Array.from({ length: 200 }, (_, i) => (
-                <span key={i}></span>
+                <span key={i} className="bg-square"></span>
             ))}
 
             <div className="container">
@@ -87,7 +88,11 @@ const LoginPage = () => {
                             required
                         />
 
-                        <Button color="primary" size="large" onClick={handleSubmit}>
+                        <Button
+                            color="primary"
+                            icon={<MdLogin />}
+                            size="large"
+                            onClick={handleSubmit}>
                             Login
                         </Button>
                     </Form>
@@ -128,7 +133,7 @@ const Section = styled.section`
         }
     }
 
-    span {
+    .bg-square {
         position: relative;
         display: block;
         width: calc(6.25vw - 2px);
@@ -138,13 +143,13 @@ const Section = styled.section`
     }
 
     @media (max-width: 900px) {
-        span {
+        .bg-square {
             width: calc(10vw - 2px);
             height: calc(10vw - 2px);
         }
     }
     @media (max-width: 600px) {
-        span {
+        .bg-square {
             width: calc(20vw - 2px);
             height: calc(20vw - 2px);
         }

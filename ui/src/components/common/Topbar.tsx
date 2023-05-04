@@ -1,4 +1,4 @@
-import { MdOutlinePersonOutline } from 'react-icons/md';
+import { MdLogout } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, useLogout } from '../../hooks';
 import { StyledTopbar } from './Topbar.styled';
@@ -32,8 +32,8 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}>
-                <IconButton onClick={onLogout}>
-                    <MdOutlinePersonOutline />
+                <IconButton title="Logout" onClick={onLogout}>
+                    <MdLogout />
                 </IconButton>
             </div>
         </StyledTopbar>

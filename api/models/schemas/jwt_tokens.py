@@ -2,6 +2,7 @@ from models.schemas.rwschema import RWSchema
 
 
 class UserInfo(RWSchema):
+    _id: str
     username: str
     role: str
 

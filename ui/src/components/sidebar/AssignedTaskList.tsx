@@ -18,6 +18,7 @@ const AssignedTaskRow = ({ task }: { task: Task }) => {
     };
 
     const getStatusIcon = (task: Task) => {
+        console.log(task.status);
         if (task.status === TaskStatus.COMPLETE) {
             return <MdDoneAll />;
         } else if (task.markedComplete) {
@@ -40,8 +41,8 @@ const AssignedTaskRow = ({ task }: { task: Task }) => {
 const AssignedTaskList = ({ tasks }: { tasks: Task[] }) => {
     const [showFinished, setShowFinished] = useState<boolean>(false);
 
-    const unfinished = tasks.filter((t) => t.status !== TaskStatus.COMPLETE);
-    const finished = tasks.filter((t) => t.status === TaskStatus.COMPLETE);
+    const unfinished = tasks.filter((t) => t.status === TaskStatus.ACTIVE);
+    const finished = tasks.filter((t) => t.status !== TaskStatus.ACTIVE);
     const ordered = unfinished.concat(finished);
     const tasksToShow = showFinished ? ordered : unfinished;
 

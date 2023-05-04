@@ -44,6 +44,7 @@ async def login(
     # Create JWT access and refresh tokens
     access_token = create_access_token(data={
         "userInfo": {
+            "_id": str(user.id),
             "username": user.email,
             "role": user.role
         }
@@ -131,6 +132,7 @@ async def refresh(
     # Create JWT access token
     access_token = create_access_token(data={
         "userInfo": {
+            "_id": str(found_user.id),
             "username": found_user.email,
             "role": found_user.role
         }

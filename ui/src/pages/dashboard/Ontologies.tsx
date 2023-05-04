@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Ontology, useOntologyApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { EditOntoModal, UploadOntoModal } from '../../components/dashboard';
+import { useDialog } from '../../hooks';
 
 const OntologiesPage = () => {
     const [ontos, setOntos] = useState<Ontology[]>([]);
@@ -11,6 +12,8 @@ const OntologiesPage = () => {
     const [uploadOntoModal, setUploadOntoModal] = useState<boolean>(false);
 
     const { deleteOntology, getOntologiesList } = useOntologyApi();
+
+    const dialog = useDialog();
 
     useEffect(() => {
         loadOntologies();
@@ -43,9 +46,15 @@ const OntologiesPage = () => {
         setOntos(updatedOntos);
     };
 
-    const onDeleteOntology = async (onto: string) => {
-        await deleteOntology(onto);
-        setOntos(ontos.filter((o) => o._id !== onto));
+    const onDeleteOntology = async (onto: Ontology) => {
+        const confirm = await dialog.showConfirmation(
+            'Deleting Ontology',
+            `Are you sure you want to delete the loaded ontology ${onto.name}? This action cannot be undone.`
+        );
+        if (!confirm) return;
+
+        await deleteOntology(onto._id);
+        setOntos(ontos.filter((o) => o._id !== onto._id));
     };
 
     return (
@@ -86,7 +95,7 @@ const OntologiesPage = () => {
                                 </IconButton>
                                 <IconButton
                                     title="Delete Ontology"
-                                    onClick={() => onDeleteOntology(onto._id)}>
+                                    onClick={() => onDeleteOntology(onto)}>
                                     <MdDeleteOutline />
                                 </IconButton>
                             </td>

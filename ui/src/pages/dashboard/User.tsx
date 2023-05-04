@@ -1,16 +1,23 @@
-import { MdAssignmentAdd, MdOpenInNew } from 'react-icons/md';
+import { MdAddTask, MdDeleteOutline, MdOpenInNew, MdOutlineEdit } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Task, User, useTaskApi, useUserApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
+import { useDialog } from '../../hooks';
+import { EditUserModal } from '../../components/dashboard';
 
 const UserPage = () => {
     const { userId } = useParams<{ userId: string }>();
     const [user, setUser] = useState<User>();
     const [tasks, setTasks] = useState<Task[]>([]);
 
-    const { getUserByID } = useUserApi();
+    const [userModal, setUserModal] = useState<boolean>(false);
+    const [editedUser, setEditedUser] = useState<string>('');
+
+    const { getUserByID, deleteUser } = useUserApi();
     const { getTasks } = useTaskApi();
+
+    const dialog = useDialog();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -19,6 +26,8 @@ const UserPage = () => {
             console.error('No user has been selected!');
             return;
         }
+
+        setEditedUser(userId);
 
         getUserByID(userId)
             .then((user) => setUser(user))
@@ -29,10 +38,41 @@ const UserPage = () => {
             .catch((err) => console.error(err));
     }, [userId]);
 
+    const onDeleteUser = async () => {
+        const confirm = await dialog.showConfirmation(
+            'Deleting User',
+            `Are you sure you want to delete the user ${user?.email}? This action cannot be undone.`
+        );
+
+        if (confirm) {
+            deleteUser(user!!._id)
+                .then((_) => navigate('/dash/users'))
+                .catch((err) => console.error(err));
+        }
+    };
+
     return (
         <section>
             <Header>
                 <h1>User Information</h1>
+
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '8px',
+                    }}>
+                    <Button
+                        color="secondary"
+                        icon={<MdOutlineEdit />}
+                        onClick={() => setUserModal(true)}>
+                        Edit User
+                    </Button>
+                    <Button color="secondary" icon={<MdDeleteOutline />} onClick={onDeleteUser}>
+                        Delete User
+                    </Button>
+                </div>
             </Header>
 
             <div className="userInfo">
@@ -56,7 +96,7 @@ const UserPage = () => {
                 <h3>User Tasks</h3>
                 <Button
                     color="secondary"
-                    icon={<MdAssignmentAdd />}
+                    icon={<MdAddTask />}
                     onClick={() =>
                         navigate(`/dash/tasks/new`, {
                             state: { userId: user?._id },
@@ -101,6 +141,13 @@ const UserPage = () => {
                     ))}
                 </tbody>
             </Table>
+
+            <EditUserModal
+                show={userModal}
+                onHide={() => setUserModal(false)}
+                userID={editedUser}
+                onUpdate={(updatedUser) => setUser(updatedUser)}
+            />
         </section>
     );
 };

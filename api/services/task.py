@@ -83,6 +83,21 @@ async def create_task(task_data: TaskInCreate) -> TaskDocument:
     return task
 
 
+async def dismiss_task_annotations(
+    task: TaskDocument
+):
+    """
+    Dismisses the selected task.
+
+    By dismissing a task, it cannot be committed in future, and also makes the page
+    range accessible again for new tasks.
+    """
+    await task.update({"$set": {
+        TaskDocument.status: TaskStatus.dismissed,
+        TaskDocument.completed_at: datetime.now()
+    }})
+
+
 async def commit_task_annotations(
     task: TaskDocument
 ) -> DocCommitDocument:

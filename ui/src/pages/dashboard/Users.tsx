@@ -4,6 +4,7 @@ import { User, useUserApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { EditUserModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
+import { useDialog } from '../../hooks';
 
 const UsersPage = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -12,6 +13,8 @@ const UsersPage = () => {
     const [editedUser, setEditedUser] = useState<string>('');
 
     const { getUsers, deleteUser } = useUserApi();
+
+    const dialog = useDialog();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -35,9 +38,15 @@ const UsersPage = () => {
         setUsers(updatedUsers);
     };
 
-    const onDeleteUser = async (id: string) => {
-        await deleteUser(id)
-            .then((_) => setUsers(users.filter((user) => user._id !== id)))
+    const onDeleteUser = async (user: User) => {
+        const confirm = await dialog.showConfirmation(
+            'Deleting User',
+            `Are you sure you want to delete the user ${user.email}? This action cannot be undone.`
+        );
+        if (!confirm) return;
+
+        await deleteUser(user._id)
+            .then((_) => setUsers(users.filter((u) => u._id !== user._id)))
             .catch((err) => {
                 console.error(err);
             });
@@ -85,9 +94,7 @@ const UsersPage = () => {
                                 <IconButton title="Edit User" onClick={() => onEditUser(user._id)}>
                                     <MdOutlineEdit />
                                 </IconButton>
-                                <IconButton
-                                    title="Delete User"
-                                    onClick={() => onDeleteUser(user._id)}>
+                                <IconButton title="Delete User" onClick={() => onDeleteUser(user)}>
                                     <MdDeleteOutline />
                                 </IconButton>
                             </td>

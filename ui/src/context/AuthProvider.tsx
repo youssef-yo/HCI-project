@@ -3,6 +3,7 @@ import jwtdecode from 'jwt-decode';
 import { JWTTokenData } from '../api';
 
 export type AuthData = {
+    id: string;
     username: string;
     role: string;
 };
@@ -29,12 +30,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (!token) return;
 
         const decoded: JWTTokenData = jwtdecode(token);
-        const { username, role } = decoded.userInfo;
+        const { _id, username, role } = decoded.userInfo;
 
         console.log(`Username: ${username}`);
         console.log(`Role: ${role}`);
 
-        setAuth({ username, role });
+        setAuth({ id: _id, username, role });
     }, [token]);
 
     return (

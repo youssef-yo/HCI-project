@@ -1,3 +1,4 @@
+import { MdAddTask } from 'react-icons/md';
 import styled from 'styled-components';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Button, Header, Input, InputType, Option, Select } from '../../components/common';
@@ -80,6 +81,10 @@ const TaskCreatePage = () => {
         }
         if (!docOption) {
             setErrorMsg('A document must be selected!');
+            return;
+        }
+        if (description.trim().length === 0) {
+            setErrorMsg('A description must be specified!');
             return;
         }
         if (!startPage || !endPage) {
@@ -182,7 +187,12 @@ const TaskCreatePage = () => {
                     required
                 />
 
-                <Button type="submit" color="secondary" size="large" onClick={onCreateTask}>
+                <Button
+                    type="submit"
+                    color="secondary"
+                    icon={<MdAddTask />}
+                    size="large"
+                    onClick={onCreateTask}>
                     Create Task
                 </Button>
             </Form>

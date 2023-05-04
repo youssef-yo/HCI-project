@@ -1,7 +1,9 @@
+import { MdDeleteOutline, MdMergeType, MdOpenInNew } from 'react-icons/md';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Header } from '../../components/common';
-import { Doc, Task, User, useDocumentApi, useTaskApi, useUserApi } from '../../api';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Header } from '../../components/common';
+import { Doc, Task, TaskStatus, User, useDocumentApi, useTaskApi, useUserApi } from '../../api';
+import { useDialog } from '../../hooks';
 
 const TaskPage = () => {
     const { taskId } = useParams<{ taskId: string }>();
@@ -9,9 +11,12 @@ const TaskPage = () => {
     const [doc, setDoc] = useState<Doc>();
     const [user, setUser] = useState<User>();
 
-    const { getTaskByID } = useTaskApi();
+    const { commitTask, dismissTask, getTaskByID } = useTaskApi();
     const { getDocumentByID } = useDocumentApi();
     const { getUserByID } = useUserApi();
+
+    const dialog = useDialog();
+    const navigate = useNavigate();
 
     const loadDocument = (docId: string) => {
         getDocumentByID(docId)
@@ -41,10 +46,81 @@ const TaskPage = () => {
             .catch((err) => console.error(err));
     }, [taskId]);
 
+    const onCommitTask = async () => {
+        const confirm = await dialog.showConfirmation(
+            'Committing Task',
+            <div>
+                <p>Are you sure you want to commit the selected task annotations?</p>
+                <p>
+                    By doing so, all the changes that have been applied by the annotator in this
+                    task will be merged with the annotations of the previous commit.
+                </p>
+                <p>
+                    <b>This action cannot be undone!</b>
+                </p>
+            </div>
+        );
+        if (!confirm) return;
+
+        commitTask(task!!._id)
+            .then((_) => window.location.reload())
+            .catch((err) => console.error(err));
+    };
+
+    const onDismissTask = async () => {
+        const confirm = await dialog.showConfirmation(
+            'Dismissing Task',
+            <div>
+                <p>Are you sure you want to dismiss the selected task annotations?</p>
+                <p>
+                    By doing so, all the changes that have been applied by the annotator in this
+                    task will be discarded, and all the pages allocated to this task will be
+                    available again for future tasks.
+                </p>
+                <p>
+                    <b>This action cannot be undone!</b>
+                </p>
+            </div>
+        );
+        if (!confirm) return;
+
+        dismissTask(task!!._id)
+            .then((_) => window.location.reload())
+            .catch((err) => console.error(err));
+    };
+
     return (
         <section>
             <Header>
                 <h1>Task Information</h1>
+
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '8px',
+                    }}>
+                    {task?.status === TaskStatus.ACTIVE && (
+                        <Button
+                            color="secondary"
+                            icon={<MdDeleteOutline />}
+                            onClick={onDismissTask}>
+                            Dismiss
+                        </Button>
+                    )}
+                    {task?.status === TaskStatus.ACTIVE && (
+                        <Button color="secondary" icon={<MdMergeType />} onClick={onCommitTask}>
+                            Commit
+                        </Button>
+                    )}
+                    <Button
+                        color="secondary"
+                        icon={<MdOpenInNew />}
+                        onClick={() => navigate(`/pdf/${task?._id}`)}>
+                        View document annotations
+                    </Button>
+                </div>
             </Header>
 
             <div className="taskInfo">

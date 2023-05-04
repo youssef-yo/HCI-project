@@ -34,6 +34,11 @@ const App = () => {
                         {/* Annotator Routes */}
                         <Route element={<RequireAuth allowedRoles={[ROLES.Annotator]} />}>
                             <Route path="home/*" element={<HomePage />} />
+                        </Route>
+
+                        {/* Administrator and Annotator shared routes */}
+                        <Route
+                            element={<RequireAuth allowedRoles={[ROLES.Admin, ROLES.Annotator]} />}>
                             <Route path="pdf/:taskId" element={<PDFPage />} />
                         </Route>
                     </Route>

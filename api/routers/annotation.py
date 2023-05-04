@@ -13,8 +13,10 @@ from fastapi.responses import FileResponse
 
 from app import export
 
-from models.schemas import Allocation, PaperStatus
 from models.domain import UserDocument
+from models.schemas import (
+    PydanticObjectId
+)
 
 from core.config import Settings, get_settings
 
@@ -22,44 +24,6 @@ from services.oauth2 import get_current_user
 
 
 router = APIRouter()
-
-
-@router.get("/allocation/info")
-def get_allocation_info(
-    user: UserDocument = Depends(get_current_user),
-    settings: Settings = Depends(get_settings)
-) -> Allocation:
-
-    # In development, the app isn't passed the x_auth_request_email header,
-    # meaning this would always fail. Instead, to smooth local development,
-    # we always return all pdfs, essentially short-circuiting the allocation
-    # mechanism.
-    # user = get_user_from_header(x_auth_request_email)
-
-    status_dir = os.path.join(settings.output_directory, "status")
-    status_path = os.path.join(status_dir, f"{user.email}.json")
-    exists = os.path.exists(status_path)
-
-    if not exists:
-        # If the user doesn't have allocated papers, they can see all the
-        # pdfs but they can't save anything.
-        papers = [PaperStatus.empty(sha, sha) for sha in all_pdf_shas()]
-        response = Allocation(
-            papers=papers,
-            hasAllocatedPapers=False
-        )
-
-    else:
-        with open(status_path) as f:
-            status_json = json.load(f)
-
-        papers = []
-        for sha, status in status_json.items():
-            papers.append(PaperStatus(**status))
-
-        response = Allocation(papers=papers, hasAllocatedPapers=True)
-
-    return response
 
 
 @router.get("/{sha}/export")
@@ -113,3 +77,15 @@ def export_annotations(
 def all_pdf_shas() -> List[str]:
     pdfs = glob.glob(f"{get_settings().output_directory}/*/*.pdf")
     return [p.split("/")[-2] for p in pdfs]
+
+
+@router.get("/{sha}/export/{commit_id}")
+async def export_commit_annotations(
+    sha: PydanticObjectId,
+    commit_id: PydanticObjectId,
+    auth_user: UserDocument = Depends(get_current_user)
+):
+    """
+    Exports the annotations at a specific document commit.
+    """
+    pass

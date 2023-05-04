@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { Input, InputType } from '../common';
+import { Input, InputType, Option, Select } from '../common';
 import { User, useUserApi } from '../../api';
+import { ROLES } from '../../config/roles';
 
 type EditUserModalProps = {
     show: boolean;
@@ -14,7 +15,9 @@ type EditUserModalProps = {
 const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onUpdate }) => {
     const [email, setEmail] = useState<string>('');
     const [fullName, setFullName] = useState<string>('');
-    const [role, setRole] = useState<string>('');
+
+    const [roleOption, setRoleOption] = useState<Option<string>>();
+    const [roleOptions, setRoleOptions] = useState<Option<string>[]>([]);
 
     const [errorMsg, setErrorMsg] = useState<string>('');
     const errorRef = useRef<HTMLParagraphElement>(null);
@@ -24,11 +27,16 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
     useEffect(() => {
         if (!show || !userID) return;
 
+        const options = buildRoleOptions([ROLES.Admin, ROLES.Annotator]);
+        setRoleOptions(options);
+
         getUserByID(userID)
             .then((user) => {
                 setEmail(user.email);
                 setFullName(user.fullName);
-                setRole(user.role);
+
+                const option = options.find((o) => o.value === user.role);
+                setRoleOption(option);
             })
             .catch((err) => {
                 if (!err?.response) {
@@ -40,17 +48,35 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
             });
     }, [show, userID]);
 
+    const buildRoleOptions = (roles: string[]) => {
+        const roleOptions: Option<string>[] = roles.map((role) => {
+            return {
+                label: role,
+                value: role,
+            };
+        });
+        return roleOptions;
+    };
+
     const handleClose = () => {
         setErrorMsg('');
         setFullName('');
-        setRole('');
         onHide();
     };
 
     const onEditUser = async () => {
+        if (fullName.trim().length === 0) {
+            setErrorMsg('The user name must be specified!');
+            return;
+        }
+        if (!roleOption) {
+            setErrorMsg('A user role must be selected!');
+            return;
+        }
+
         const userUpdate = {
             fullName: fullName,
-            role: role,
+            role: roleOption.value,
         };
 
         updateUser(userID, userUpdate)
@@ -92,15 +118,12 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
                         required
                     />
 
-                    <Input
-                        type="text"
-                        variant={InputType.STANDARD}
-                        color="secondary"
-                        id="role"
-                        placeholder="Role"
-                        onChange={(e) => setRole(e.target.value)}
-                        value={role}
-                        required
+                    <Select
+                        placeHolder="Select Role"
+                        options={roleOptions}
+                        value={roleOption}
+                        onChange={(role) => setRoleOption(role)}
+                        isSearchable
                     />
                 </Form>
             </Modal.Body>

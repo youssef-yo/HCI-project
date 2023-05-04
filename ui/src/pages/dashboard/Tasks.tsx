@@ -1,4 +1,4 @@
-import { MdAssignmentAdd, MdOpenInNew } from 'react-icons/md';
+import { MdAddTask, MdOpenInNew } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { Task, useTaskApi } from '../../api';
@@ -24,10 +24,7 @@ const TasksPage = () => {
         <section>
             <Header>
                 <h1>Tasks</h1>
-                <Button
-                    color="secondary"
-                    icon={<MdAssignmentAdd />}
-                    onClick={() => navigate('new')}>
+                <Button color="secondary" icon={<MdAddTask />} onClick={() => navigate('new')}>
                     Create Task
                 </Button>
             </Header>

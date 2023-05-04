@@ -9,6 +9,7 @@ from models.schemas.rwschema import RWSchema
 class TaskStatus(str, Enum):
     active = "ACTIVE"
     completed = "COMPLETED"
+    dismissed = "DISMISSED"
 
 
 class PageRange(RWSchema):

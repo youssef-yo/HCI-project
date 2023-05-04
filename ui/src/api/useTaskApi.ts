@@ -83,6 +83,34 @@ const useTaskApi = () => {
     };
 
     /**
+     * Commits the delta annotations applied during the selected task.
+     *
+     * @param id Task ID
+     * @returns Empty promise
+     */
+    const commitTask: (id: string) => Promise<any> = (id: string) => {
+        return axiosPrivate
+            .post(`/api/tasks/${id}/commit`)
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err));
+    };
+
+    /**
+     * Dismisses the selected task.
+     * By dismissing a task, it cannot be committed in future, and also makes the
+     * page range accessible again for new tasks.
+     *
+     * @param id Task ID
+     * @returns Empty promise
+     */
+    const dismissTask: (id: string) => Promise<any> = (id: string) => {
+        return axiosPrivate
+            .post(`/api/tasks/${id}/dismiss`)
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err));
+    };
+
+    /**
      * Deletes the task with the given identifier.
      *
      * @param id Task ID
@@ -192,7 +220,9 @@ const useTaskApi = () => {
         getTaskByID,
         getLoggedUserTasks,
         createTask,
+        commitTask,
         deleteTask,
+        dismissTask,
         getDocumentWithTaskAnnotations,
         getTaskAnnotations,
         saveTaskAnnotations,

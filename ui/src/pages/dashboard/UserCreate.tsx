@@ -1,15 +1,20 @@
-import { FormEvent, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { MdOutlinePersonAddAlt } from 'react-icons/md';
 import styled from 'styled-components';
+import { FormEvent, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUserApi } from '../../api';
-import { Button, Header, Input, InputType } from '../../components/common';
+import { Button, Header, Input, InputType, Option, Select } from '../../components/common';
+import { ROLES } from '../../config/roles';
 
 const UserCreatePage = () => {
     const [email, setEmail] = useState<string>('');
     const [fullName, setFullName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
-    const [role, setRole] = useState<string>('');
+
+    const [roleOption, setRoleOption] = useState<Option<string>>();
+
+    const [roleOptions, setRoleOptions] = useState<Option<string>[]>([]);
 
     const [errorMsg, setErrorMsg] = useState<string>('');
     const errorRef = useRef<HTMLParagraphElement>(null);
@@ -17,9 +22,40 @@ const UserCreatePage = () => {
     const navigate = useNavigate();
     const { createUser } = useUserApi();
 
+    useEffect(() => {
+        const options = buildRoleOptions([ROLES.Admin, ROLES.Annotator]);
+        setRoleOptions(options);
+    }, []);
+
+    const buildRoleOptions = (roles: string[]) => {
+        const roleOptions: Option<string>[] = roles.map((role) => {
+            return {
+                label: role,
+                value: role,
+            };
+        });
+        return roleOptions;
+    };
+
     const onCreateUser = async (e: FormEvent) => {
         e.preventDefault();
 
+        if (email.trim().length === 0) {
+            setErrorMsg('An email must be specified!');
+            return;
+        }
+        if (fullName.trim().length === 0) {
+            setErrorMsg('The user name must be specified!');
+            return;
+        }
+        if (!roleOption) {
+            setErrorMsg('A user role must be selected!');
+            return;
+        }
+        if (password.trim().length === 0) {
+            setErrorMsg('A password must be specified!');
+            return;
+        }
         if (password !== confirmPassword) {
             setErrorMsg('Passwords must match!');
             return;
@@ -29,7 +65,7 @@ const UserCreatePage = () => {
             email: email,
             fullName: fullName,
             password: password,
-            role: role,
+            role: roleOption.value,
         };
 
         createUser(newUser)
@@ -81,14 +117,12 @@ const UserCreatePage = () => {
                     required
                 />
 
-                <Input
-                    type="text"
-                    variant={InputType.STANDARD}
-                    id="role"
-                    placeholder="Role"
-                    onChange={(e) => setRole(e.target.value)}
-                    value={role}
-                    required
+                <Select
+                    placeHolder="Select Role"
+                    options={roleOptions}
+                    value={roleOption}
+                    onChange={(role) => setRoleOption(role)}
+                    isSearchable
                 />
 
                 <Input
@@ -111,7 +145,12 @@ const UserCreatePage = () => {
                     required
                 />
 
-                <Button type="submit" color="secondary" size="large" onClick={onCreateUser}>
+                <Button
+                    type="submit"
+                    color="secondary"
+                    icon={<MdOutlinePersonAddAlt />}
+                    size="large"
+                    onClick={onCreateUser}>
                     Create User
                 </Button>
             </Form>

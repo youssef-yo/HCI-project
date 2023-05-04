@@ -1,4 +1,4 @@
-import { Result, Progress } from '@allenai/varnish';
+import { Result, Progress, notification } from '@allenai/varnish';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import * as pdfjs from 'pdfjs-dist';
 import { PDFDocumentProxy, PDFDocumentLoadingTask } from 'pdfjs-dist/types/display/api';
@@ -25,6 +25,7 @@ import {
     useOntologyApi,
     Task,
     useTaskApi,
+    TaskStatus,
 } from '../api';
 import {
     PDFPageInfo,
@@ -36,6 +37,7 @@ import {
 } from '../context';
 
 import * as listeners from '../listeners';
+import { useAuth } from '../hooks';
 
 // This tells PDF.js the URL the code to load for it's webworker, which handles heavy-handed
 // tasks in a background thread. Ideally we'd load this from the application itself rather
@@ -64,6 +66,7 @@ const PDFPage = () => {
 
     const [activeTask, setActiveTask] = useState<Task>();
     const [assignedTasks, setAssignedTasks] = useState<Task[]>([]);
+    const [canAnnotate, setCanAnnotate] = useState<boolean>(false);
 
     const [activeOntoClass, setActiveOntoClass] = useState<OntoClass>();
     const [ontoClasses, setOntoClasses] = useState<OntoClass[]>([]);
@@ -76,6 +79,8 @@ const PDFPage = () => {
     const [ontoNames, setOntoNames] = useState<string[]>();
 
     const [relationMode, setRelationMode] = useState<boolean>(false);
+
+    const { auth } = useAuth();
 
     const { getTokens } = useDocumentApi();
     const { getClasses, getProperties, getOntologiesList } = useOntologyApi();
@@ -152,20 +157,29 @@ const PDFPage = () => {
             .then((task) => {
                 setActiveTask(task);
 
-                // TODO: Check current user can annotate task.
-                // if (!allocation.hasAllocatedPapers) {
-                //     notification.warn({
-                //         message: 'Read Only Mode!',
-                //         description:
-                //             "This annotation project has no assigned papers for your email address. You can make annotations but they won't be saved.",
-                //     });
-                // }
+                if (task.status !== TaskStatus.ACTIVE) {
+                    const status = task.status === TaskStatus.COMPLETE ? 'committed' : 'dismissed';
+                    notification.warn({
+                        message: 'Read Only Mode!',
+                        description: `The current task has already been ${status}. You can make annotations but they won't be saved.`,
+                    });
+                    setCanAnnotate(false);
+                } else if (auth?.id !== task.userId) {
+                    notification.warn({
+                        message: 'Read Only Mode!',
+                        description:
+                            "The current task is assigned to another annotator. You can make annotations but they won't be saved.",
+                    });
+                    setCanAnnotate(false);
+                } else {
+                    setCanAnnotate(true);
+                }
             })
             .catch((err) => {
                 console.error(`Task with ID ${taskId} not found!`, err);
                 setViewState(ViewState.NOT_FOUND);
             });
-    }, [taskId]);
+    }, [taskId, auth]);
 
     useEffect(() => {
         getLoggedUserTasks()
@@ -333,8 +347,8 @@ const PDFPage = () => {
                                 setRelationMode,
                             }}>
                             {/* <listeners.UndoAnnotation /> */}
-                            <listeners.SaveWithTimeout taskId={taskId} />
-                            <listeners.SaveBeforeUnload taskId={taskId} />
+                            {canAnnotate && <listeners.SaveWithTimeout taskId={taskId} />}
+                            {canAnnotate && <listeners.SaveBeforeUnload taskId={taskId} />}
                             <listeners.HideAnnotationLabels />
                             <WithSidebar width={sidebarWidth}>
                                 <Sidebar width={sidebarWidth}>

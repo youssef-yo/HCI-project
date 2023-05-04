@@ -11,7 +11,6 @@ from fastapi import (
 from db.database import MongoClient, get_db
 
 from models.domain import (
-    DocumentDocument,
     TaskDocument,
     UserDocument
 )
@@ -20,6 +19,7 @@ from models.schemas import (
     PydanticObjectId,
     TaskInCreate,
     TaskDeltaAnnotations,
+    TaskStatus,
     TaskOutResponse
 )
 
@@ -27,6 +27,7 @@ from services.oauth2 import get_current_user
 from services.task import (
     create_task,
     commit_task_annotations,
+    dismiss_task_annotations,
     find_tasks,
     get_combined_doc_task_annotations,
     get_task_by_id,
@@ -84,8 +85,18 @@ async def delete_task(
     task_id: PydanticObjectId,
     auth_user: UserDocument = Depends(get_current_user)
 ):
-    """Deletes the task with the specified ID."""
+    """
+    Deletes the task with the specified ID.
+    NOTE: A task should be deleted only if created by mistake, and not committed.
+    """
     task = await get_task_by_id(task_id, assert_exists=True)
+
+    if task.status != TaskStatus.active:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot delete task. The task has already been completed or dismissed."
+        )
+    
     await task.delete()
 
 
@@ -123,6 +134,12 @@ async def update_task_annotations(
     """Updates the delta annotations and relations tied to the specified task."""
     task = await get_task_by_id(task_id, assert_exists=True)
 
+    if task.status != TaskStatus.active:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot update task annotations. Task has already been completed or dismissed."
+        )
+
     verify_can_update_task(task, auth_user)
 
     await task.update({"$set": {TaskDocument.delta_annotations: annotations}})
@@ -134,7 +151,7 @@ async def set_task_comments(
     comments: str = Body(...),
     auth_user: UserDocument = Depends(get_current_user)
 ):
-    """Marks the selected task as complete or not complete (by the annotator)."""
+    """Sets the comments for the selected task (by the annotator)."""
     task = await get_task_by_id(task_id, assert_exists=True)
 
     verify_can_update_task(task, auth_user)
@@ -148,10 +165,15 @@ async def commit_task(
     auth_user: UserDocument = Depends(get_current_user)
 ):
     """Commits the task, by saving a new commit with the updated document annotations."""
-    # TODO
     task = await get_task_by_id(task_id, assert_exists=True)
 
-    doc_commit = await commit_task_annotations(task)
+    if task.status != TaskStatus.active:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot commit task. The task has already been completed or dismissed."
+        )
+
+    await commit_task_annotations(task)
 
 
 @router.post("/{task_id}/complete", status_code=status.HTTP_204_NO_CONTENT)
@@ -166,3 +188,25 @@ async def set_task_complete(
     verify_can_update_task(task, auth_user)
 
     await task.update({"$set": {TaskDocument.marked_complete: complete}})
+
+
+@router.post("/{task_id}/dismiss", status_code=status.HTTP_204_NO_CONTENT)
+async def dismiss_task(
+    task_id: PydanticObjectId,
+    auth_user: UserDocument = Depends(get_current_user)
+):
+    """
+    Dismisses the task.
+
+    By dismissing a task, it cannot be committed in future, and also makes the page
+    range accessible again for new tasks.
+    """
+    task = await get_task_by_id(task_id, assert_exists=True)
+
+    if task.status != TaskStatus.active:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot dismiss task. The task has already been completed or dismissed."
+        )
+    
+    await dismiss_task_annotations(task)
