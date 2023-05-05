@@ -10,6 +10,7 @@ from .annotations import (
     TaskDeltaAnnotations
 )
 from .documents import (
+    DocCommitOutResponse,
     DocumentOutResponse,
     Page
 )

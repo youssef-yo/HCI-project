@@ -52,7 +52,7 @@ enum ViewState {
     ERROR,
 }
 
-const PDFPage = () => {
+const PDFTaskPage = () => {
     const { taskId } = useParams<{ taskId: string }>();
     const [viewState, setViewState] = useState<ViewState>(ViewState.LOADING);
 
@@ -416,7 +416,7 @@ const PDFPage = () => {
     }
 };
 
-export default PDFPage;
+export default PDFTaskPage;
 
 const PDFContainer = styled.div(
     ({ theme }) => `

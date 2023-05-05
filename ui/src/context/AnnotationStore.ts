@@ -175,7 +175,7 @@ export class DocAnnotations {
         return new DocAnnotations(this.annotations, updatedRelations, true);
     }
 
-    deleteAnnotation(a: Annotation): [DocAnnotations, RelationGroup[]] {
+    deleteAnnotation(a: Annotation): DocAnnotations {
         const newAnnotations = this.annotations.filter((ann) => ann.id !== a.id);
         const deletedRelations: RelationGroup[] = [];
 
@@ -189,10 +189,7 @@ export class DocAnnotations {
 
         console.log('Deleted Relations: ', deletedRelations);
 
-        return [
-            new DocAnnotations(newAnnotations, newRelations as RelationGroup[], true),
-            deletedRelations,
-        ];
+        return new DocAnnotations(newAnnotations, newRelations as RelationGroup[], true);
     }
 
     deleteRelation(r: RelationGroup): DocAnnotations {
@@ -211,6 +208,17 @@ export class DocAnnotations {
             .filter((r) => r !== undefined);
 
         return new DocAnnotations(this.annotations, newRelations as RelationGroup[], true);
+    }
+
+    anticipateDeletedRelations(a: Annotation): RelationGroup[] {
+        const deletedRelations: RelationGroup[] = [];
+
+        this.relations.forEach((r) => {
+            const relation = r.updateForAnnotationDeletion(a);
+            if (!relation) deletedRelations.push(r);
+        });
+
+        return deletedRelations;
     }
 
     getAnnotationsOfRelation(r: RelationGroup): infoRelation {
@@ -608,7 +616,8 @@ export class PDFAnnotations {
     }
 
     deleteAnnotation(a: Annotation): PDFAnnotations {
-        const [updatedDocAnnotations, deletedRelations] = this.docAnnotations.deleteAnnotation(a);
+        const deletedRelations = this.docAnnotations.anticipateDeletedRelations(a);
+        const updatedDocAnnotations = this.docAnnotations.deleteAnnotation(a);
 
         const updatedDeltaRelations = this.taskDeltaAnnotations
             .deleteAnnotation(a)

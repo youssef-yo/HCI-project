@@ -117,7 +117,7 @@ const TaskPage = () => {
                     <Button
                         color="secondary"
                         icon={<MdOpenInNew />}
-                        onClick={() => navigate(`/pdf/${task?._id}`)}>
+                        onClick={() => navigate(`/pdf-task/${task?._id}`)}>
                         View document annotations
                     </Button>
                 </div>

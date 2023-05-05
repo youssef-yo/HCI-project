@@ -11,7 +11,7 @@
 import { createGlobalStyle } from 'styled-components';
 import { Routes, Route, Outlet } from 'react-router-dom';
 
-import { DashPage, HomePage, LoginPage, PDFPage } from './pages';
+import { DashPage, HomePage, LoginPage, PDFCommitPage, PDFTaskPage } from './pages';
 import { PersistLogin, RedirectToPage, RequireAuth } from './components';
 import { ROLES } from './config/roles';
 
@@ -39,7 +39,8 @@ const App = () => {
                         {/* Administrator and Annotator shared routes */}
                         <Route
                             element={<RequireAuth allowedRoles={[ROLES.Admin, ROLES.Annotator]} />}>
-                            <Route path="pdf/:taskId" element={<PDFPage />} />
+                            <Route path="pdf-commit/:commitId" element={<PDFCommitPage />} />
+                            <Route path="pdf-task/:taskId" element={<PDFTaskPage />} />
                         </Route>
                     </Route>
                 </Route>

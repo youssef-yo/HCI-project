@@ -1,21 +1,19 @@
-import json
-import os
 from typing import Any, Dict, List, Optional
 
 from fastapi import (
     APIRouter,
-    Body,
     Depends,
     HTTPException,
     status
 )
 from fastapi.responses import Response
-from fastapi.encoders import jsonable_encoder
 
 from db.database import MongoClient, get_db
 
 from models.schemas import (
     Annotation,
+    DocAnnotations,
+    DocCommitOutResponse,
     DocumentOutResponse,
     Page,
     DocAnnotations,
@@ -24,6 +22,7 @@ from models.schemas import (
     TaskOutResponse
 )
 from models.domain import (
+    DocCommitDocument,
     DocStructureDocument,
     DocumentDocument,
     TaskDocument,
@@ -32,7 +31,9 @@ from models.domain import (
 
 from services.doc import (
     get_document_by_id,
-    get_document_structure
+    get_document_structure,
+    get_document_commit_by_id,
+    get_document_commit_annotations
 )
 from services.oauth2 import get_current_user
 
@@ -56,6 +57,17 @@ async def get_document(
     return doc
 
 
+@router.get("/{sha}/commits", response_model=List[DocCommitOutResponse])
+async def get_document_commits(
+    sha: PydanticObjectId
+):
+    """
+    Gets the commits that have been created so far for the specified document.
+    """
+    doc_commits = await DocCommitDocument.find_many(DocCommitDocument.doc_id == sha).sort(-DocCommitDocument.created_at).to_list()
+    return doc_commits
+
+
 @router.get("/{sha}/pdf", response_class=Response)
 async def get_pdf(
     sha: PydanticObjectId,
@@ -73,95 +85,6 @@ async def get_pdf(
     return Response(file, media_type="application/pdf")
 
 
-@router.get("/{sha}/annotations")
-def get_annotations(
-    sha: str,
-    user: UserDocument = Depends(get_current_user),
-    settings: Settings = Depends(get_settings)
-) -> DocAnnotations:
-    annotations = os.path.join(
-        settings.output_directory, sha, f"{user.email}_annotations.json"
-    )
-    exists = os.path.exists(annotations)
-
-    if exists:
-        with open(annotations) as f:
-            blob = json.load(f)
-
-        return blob
-
-    else:
-        return {"annotations": [], "relations": []}
-
-
-@router.post("/{sha}/annotations")
-def save_annotations(
-    sha: str,
-    annotations: List[Annotation],
-    relations: List[RelationGroup],
-    user: UserDocument = Depends(get_current_user),
-    settings: Settings = Depends(get_settings)
-):
-    """
-    sha: str
-        PDF sha to save annotations for.
-    annotations: List[Annotation]
-        A json blob of the annotations to save.
-    relations: List[RelationGroup]
-        A json blob of the relations between the annotations to save.
-    x_auth_request_email: str
-        This is a header sent with the requests which specifies the user login.
-        For local development, this will be None, because the authentication
-        is controlled by the Skiff Kubernetes cluster.
-    """
-    # Update the annotations in the annotation json file.
-    annotations_path = os.path.join(
-        settings.output_directory, sha, f"{user.email}_annotations.json"
-    )
-    json_annotations = [jsonable_encoder(a) for a in annotations]
-    json_relations = [jsonable_encoder(r) for r in relations]
-
-    # Update the annotation counts in the status file.
-    status_path = os.path.join(settings.output_directory, "status", f"{user.email}.json")
-    exists = os.path.exists(status_path)
-    if not exists:
-        # Not an allocated user. Do nothing.
-        return {}
-
-    with open(annotations_path, "w+") as f:
-        json.dump({"annotations": json_annotations, "relations": json_relations}, f)
-
-    update_status_json(
-        status_path, sha, {"annotations": len(annotations), "relations": len(relations)}
-    )
-
-    return {}
-
-
-@router.get("/{sha}/tasks", response_model=List[TaskOutResponse])
-async def get_document_tasks(
-    sha: PydanticObjectId,
-    user: UserDocument = Depends(get_current_user)
-):
-    doc = await get_document_by_id(sha, assert_exists=True)
-    
-    tasks = await TaskDocument.find_many(TaskDocument.doc_id == sha).to_list()
-    return tasks
-
-
-@router.get("/{sha}/tasks/{task_id}/annotations")
-async def get_document_annotations_by_task(
-    sha: PydanticObjectId,
-    task_id: PydanticObjectId,
-    user: UserDocument = Depends(get_current_user)
-):
-    """
-    Retrieves the annotations for the specified document, taking in consideration
-    the modifications that have happened with the specified task.
-    """
-    pass
-
-
 @router.get("/{sha}/tokens", response_model=List[Page])
 async def get_tokens(
     sha: PydanticObjectId,
@@ -174,11 +97,23 @@ async def get_tokens(
     return doc_structure.structure
 
 
-def update_status_json(status_path: str, sha: str, data: Dict[str, Any]):
+@router.get("/commits/{commit_id}", response_model=DocCommitOutResponse)
+async def get_document_commit(
+    commit_id: PydanticObjectId
+):
+    """
+    Gets a specific commit that has been created.
+    """
+    doc_commit = await get_document_commit_by_id(commit_id, assert_exists=True)
+    return doc_commit
 
-    with open(status_path, "r+") as st:
-        status_json = json.load(st)
-        status_json[sha] = {**status_json[sha], **data}
-        st.seek(0)
-        json.dump(status_json, st)
-        st.truncate()
+
+@router.get("/commits/{commit_id}/annotations", response_model=DocAnnotations)
+async def get_commit_annotations(
+    commit_id: PydanticObjectId
+):
+    """
+    Gets the annotations of the specified commit, belonging to a document.
+    """
+    commit_annotations = await get_document_commit_annotations(commit_id)
+    return commit_annotations

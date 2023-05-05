@@ -2,14 +2,15 @@ import { MdAddTask, MdOutlineFileDownload, MdOpenInNew } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Header, IconButton, Table } from '../../components/common';
-import { Doc, Task, useDocumentApi, useTaskApi } from '../../api';
+import { Doc, DocCommit, Task, useDocumentApi, useTaskApi } from '../../api';
 
 const DocumentPage = () => {
     const { docId } = useParams<{ docId: string }>();
     const [doc, setDoc] = useState<Doc>();
     const [tasks, setTasks] = useState<Task[]>([]);
+    const [commits, setCommits] = useState<DocCommit[]>([]);
 
-    const { getDocumentByID } = useDocumentApi();
+    const { getDocumentByID, getDocumentCommits } = useDocumentApi();
     const { getTasks } = useTaskApi();
     const navigate = useNavigate();
 
@@ -26,6 +27,10 @@ const DocumentPage = () => {
 
         getTasks({ docId: docId })
             .then((tasks) => setTasks(tasks))
+            .catch((err) => console.error(err));
+
+        getDocumentCommits(docId)
+            .then((commits) => setCommits(commits))
             .catch((err) => console.error(err));
     }, [docId]);
 
@@ -96,6 +101,47 @@ const DocumentPage = () => {
                                     title="View Task"
                                     onClick={() => navigate(`/dash/tasks/${task._id}`)}>
                                     <MdOpenInNew />
+                                </IconButton>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
+
+            <hr />
+
+            <Header>
+                <h3>Document Commits</h3>
+            </Header>
+
+            <Table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th style={{ textAlign: 'center' }}>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {commits.map((commit) => (
+                        <tr key={commit._id}>
+                            <td>{commit._id}</td>
+                            <td>{commit.createdAt}</td>
+                            <td
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                }}>
+                                <IconButton
+                                    title="View Commit"
+                                    onClick={() => navigate(`/pdf-commit/${commit._id}`)}>
+                                    <MdOpenInNew />
+                                </IconButton>
+                                <IconButton title="Export Commit Annotations">
+                                    <MdOutlineFileDownload />
                                 </IconButton>
                             </td>
                         </tr>

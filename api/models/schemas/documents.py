@@ -1,4 +1,5 @@
-from typing import List, Union
+from datetime import datetime
+from typing import List, Optional, Union
 from pydantic import BaseModel
 
 from models.schemas.mongo import MongoBase, PydanticObjectId
@@ -44,3 +45,13 @@ class DocumentOutResponse(DocumentBase, MongoBase):
                 "totalPages": 16
             }
         }
+
+
+class DocCommitBase(RWSchema):
+    doc_id: PydanticObjectId
+    created_at: datetime
+    prev_commit: Optional[PydanticObjectId]
+
+
+class DocCommitOutResponse(DocCommitBase, MongoBase):
+    pass

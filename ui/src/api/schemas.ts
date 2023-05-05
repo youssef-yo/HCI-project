@@ -51,6 +51,13 @@ export interface Doc {
     totalPages: number;
 }
 
+export interface DocCommit {
+    _id: string;
+    docId: string;
+    createdAt: Date;
+    prevCommit?: string;
+}
+
 export interface PaperStatus {
     sha: string;
     name: string;
