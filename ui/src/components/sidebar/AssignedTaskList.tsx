@@ -8,7 +8,7 @@ import { TaskExtended, TaskStatus } from '../../api';
 
 const AssignedTaskRow = ({ task }: { task: TaskExtended }) => {
     const getStatusColour = (task: TaskExtended) => {
-        if (task.status === TaskStatus.COMPLETE) {
+        if (task.status === TaskStatus.COMMITTED) {
             return '#1EC28E';
         } else if (task.markedComplete) {
             return '#d5a03a';
@@ -19,7 +19,7 @@ const AssignedTaskRow = ({ task }: { task: TaskExtended }) => {
 
     const getStatusIcon = (task: TaskExtended) => {
         console.log(task.status);
-        if (task.status === TaskStatus.COMPLETE) {
+        if (task.status === TaskStatus.COMMITTED) {
             return <MdDoneAll />;
         } else if (task.markedComplete) {
             return <MdTaskAlt />;

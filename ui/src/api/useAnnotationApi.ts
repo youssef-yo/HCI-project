@@ -19,18 +19,35 @@ const useAnnotationApi = () => {
     };
 
     /**
-     * Exports the annotations for the specified paper.
+     * Exports the latest annotations for the specified paper.
      *
      * @param sha Paper ID
      * @returns Promise
      */
-    const exportAnnotations = async (sha: string) => {
-        return axiosPrivate.get(`/api/annotation/${sha}/export`, {
-            responseType: 'blob',
-        });
+    const exportLatestAnnotations = async (sha: string) => {
+        return axiosPrivate
+            .get(`/api/annotation/${sha}/export`, {
+                responseType: 'blob',
+            })
+            .catch((err) => Promise.reject(err));
     };
 
-    return { getAllocatedPaperStatus, exportAnnotations };
+    /**
+     * Exports the annotations from the selected commit, for the specified paper.
+     *
+     * @param sha Paper ID
+     * @param commit Commit ID
+     * @returns Promise
+     */
+    const exportCommitAnnotations = async (sha: string, commmitId: string) => {
+        return axiosPrivate
+            .get(`/api/annotation/${sha}/export/${commmitId}`, {
+                responseType: 'blob',
+            })
+            .catch((err) => Promise.reject(err));
+    };
+
+    return { getAllocatedPaperStatus, exportLatestAnnotations, exportCommitAnnotations };
 };
 
 export default useAnnotationApi;

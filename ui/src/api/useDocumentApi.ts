@@ -1,4 +1,5 @@
 import axios from 'axios';
+import useAxiosPrivate from './useAxiosPrivate';
 import { Doc, DocCommit, PageTokens } from './schemas';
 import { Annotation, DocAnnotations, RelationGroup } from '../context';
 
@@ -16,6 +17,8 @@ export function pdfURL(sha: string): string {
  * @returns API functions
  */
 const useDocumentApi = () => {
+    const axiosPrivate = useAxiosPrivate();
+
     /**
      * Get all documents that have been uploaded.
      *
@@ -48,7 +51,7 @@ const useDocumentApi = () => {
      * @returns Promise with commit list
      */
     const getDocumentCommits: (id: string) => Promise<DocCommit[]> = (id: string) => {
-        return axios
+        return axiosPrivate
             .get(`/api/docs/${id}/commits`)
             .then((res) => res.data)
             .catch((err) => Promise.reject(err));
@@ -61,7 +64,7 @@ const useDocumentApi = () => {
      * @returns Promise with commit
      */
     const getCommitByID: (id: string) => Promise<DocCommit> = (id: string) => {
-        return axios
+        return axiosPrivate
             .get(`/api/docs/commits/${id}`)
             .then((res) => res.data)
             .catch((err) => Promise.reject(err));
@@ -74,7 +77,7 @@ const useDocumentApi = () => {
      * @returns Promise with document annotations
      */
     const getCommitAnnotations: (id: string) => Promise<DocAnnotations> = (id: string) => {
-        return axios
+        return axiosPrivate
             .get(`/api/docs/commits/${id}/annotations`)
             .then((res) => {
                 const ann: DocAnnotations = res.data;

@@ -35,7 +35,7 @@ from models.domain import (
     UserDocument
 )
 
-from services.oauth2 import get_current_user
+from services.oauth2 import get_current_admin
 
 
 router = APIRouter()
@@ -43,7 +43,7 @@ router = APIRouter()
 
 @router.post("/doc", response_model=DocumentOutResponse)
 async def upload_document(
-    user: UserDocument = Depends(get_current_user),
+    user: UserDocument = Depends(get_current_admin),
     file: UploadFile = File(...),
     db: MongoClient = Depends(get_db)
 ) -> DocumentOutResponse:
@@ -94,7 +94,7 @@ async def upload_document(
 
 @router.post("/ontology", response_model=OntologyData)
 async def upload_ontology(
-    user: UserDocument = Depends(get_current_user),
+    user: UserDocument = Depends(get_current_admin),
     file: UploadFile = File(...),
     db: MongoClient = Depends(get_db)
 ) -> OntologyData:

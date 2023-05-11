@@ -1,7 +1,4 @@
-import glob
-import json
 import os
-from typing import List
 
 from fastapi import (
     APIRouter,
@@ -14,12 +11,11 @@ from fastapi.responses import FileResponse
 from app import export
 
 from models.domain import UserDocument
-from models.schemas import (
-    PydanticObjectId
-)
+from models.schemas import PydanticObjectId
 
 from core.config import Settings, get_settings
 
+from services.doc import get_document_by_id, get_document_commit_by_id
 from services.oauth2 import get_current_user
 
 
@@ -27,44 +23,37 @@ router = APIRouter()
 
 
 @router.get("/{sha}/export")
-def export_annotations(
+async def export_annotations(
     sha: str,
     user: UserDocument = Depends(get_current_user),
     settings: Settings = Depends(get_settings)
 ):
-    annotations = os.path.join(
-        settings.output_directory, sha, f"{user.email}_annotations.json"
-    )
-    exists = os.path.exists(annotations)
+    """
+    Exports the latest annotations at a specific document.
+    """
+    document = await get_document_by_id(sha, assert_exists=True)
 
-    path_pdfs_satus = os.path.join(settings.output_directory, "status", f"{user.email}.json")
-
-    with open(path_pdfs_satus, "r") as f:
-        pdfs_satus = json.load(f)
-
-    total_pages = pdfs_satus[sha]["totalPages"]
-    path_document = pdfs_satus[sha]["path"]
-    abspath_document = os.path.abspath(path_document)
-
-    if not exists:
+    if not document.commit:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"pdf {sha} not found."
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No commits have been made for this document yet."
         )
 
-    abspath_annotations = os.path.abspath(annotations)
+    commit = await get_document_commit_by_id(document.commit, assert_exists=True)
+
+    data = commit.doc_annotations.dict()
+
     path_export = os.path.join(
-        settings.directory_extracted_annotations, f"{sha}_extractedAnnotations"
+        settings.directory_extracted_annotations, f"{document.name}-{commit.id}"
     )
     abspath_export = os.path.abspath(path_export)
 
     # export the annotations end get path where the file generated has been saved
     abspath_export_result = export.export_annotations(
-        abspath_annotations,
+        data,
         abspath_export,
-        sha,
-        abspath_document,
-        total_pages
+        document.name,
+        document.total_pages
     )
     filename_export_result = abspath_export_result.split("/")[-1]
 
@@ -74,18 +63,36 @@ def export_annotations(
     return FileResponse(abspath_export_result, headers={"Access-Control-Expose-Headers": "Content-Disposition"}, media_type="text/turtle", filename=filename_export_result)
 
 
-def all_pdf_shas() -> List[str]:
-    pdfs = glob.glob(f"{get_settings().output_directory}/*/*.pdf")
-    return [p.split("/")[-2] for p in pdfs]
-
-
 @router.get("/{sha}/export/{commit_id}")
 async def export_commit_annotations(
     sha: PydanticObjectId,
     commit_id: PydanticObjectId,
-    auth_user: UserDocument = Depends(get_current_user)
+    auth_user: UserDocument = Depends(get_current_user),
+    settings: Settings = Depends(get_settings)
 ):
     """
-    Exports the annotations at a specific document commit.
+    Exports the annotations of a specific document commit.
     """
-    pass
+    commit = await get_document_commit_by_id(commit_id, assert_exists=True)
+    document = await get_document_by_id(commit.doc_id, assert_exists=True)
+
+    data = commit.doc_annotations.dict()
+
+    path_export = os.path.join(
+        settings.directory_extracted_annotations, f"{document.name}-{commit.id}"
+    )
+    abspath_export = os.path.abspath(path_export)
+
+    # export the annotations end get path where the file generated has been saved
+    abspath_export_result = export.export_annotations(
+        data,
+        abspath_export,
+        document.name,
+        document.total_pages
+    )
+    filename_export_result = abspath_export_result.split("/")[-1]
+
+    # per export di nt:
+    # return FileResponse(abspath_export_result, headers={"Access-Control-Expose-Headers":"Content-Disposition"}, media_type="application/n-triples", filename=filename_export_result)
+    # per export di ttl:
+    return FileResponse(abspath_export_result, headers={"Access-Control-Expose-Headers": "Content-Disposition"}, media_type="text/turtle", filename=filename_export_result)

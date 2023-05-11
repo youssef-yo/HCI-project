@@ -159,7 +159,7 @@ const PDFTaskPage = () => {
                 setActiveTask(task);
 
                 if (task.status !== TaskStatus.ACTIVE) {
-                    const status = task.status === TaskStatus.COMPLETE ? 'committed' : 'dismissed';
+                    const status = task.status === TaskStatus.COMMITTED ? 'committed' : 'dismissed';
                     notification.warn({
                         message: 'Read Only Mode!',
                         description: `The current task has already been ${status}. You can make annotations but they won't be saved.`,

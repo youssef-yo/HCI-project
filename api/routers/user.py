@@ -7,6 +7,8 @@ from fastapi import (
     status
 )
 
+from core.config import Settings, get_settings
+
 from models.domain import UserDocument
 from models.schemas import (
     PydanticObjectId,
@@ -16,7 +18,10 @@ from models.schemas import (
 )
 
 from services.security import hash_password
-from services.oauth2 import get_current_user as get_current_auth_user
+from services.oauth2 import (
+    get_current_admin,
+    get_current_user as get_current_auth_user
+)
 from services.user import get_user_by_id
 
 
@@ -25,7 +30,7 @@ router = APIRouter()
 
 @router.get("", response_model=List[UserOutResponse])
 async def get_users(
-    auth_user: str = Depends(get_current_auth_user),
+    auth_user: UserDocument = Depends(get_current_auth_user),
 ) -> List[UserOutResponse]:
     """
     Returns all the users currently created.
@@ -36,7 +41,7 @@ async def get_users(
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=UserOutResponse)
 async def create_user(
     user: UserInCreate,
-    auth_user: str = Depends(get_current_auth_user),
+    auth_user: UserDocument = Depends(get_current_admin),
 ) -> UserOutResponse:
     """
     Creates a new user, if another one with the same email does not already exist.
@@ -65,7 +70,7 @@ async def create_user(
 
 @router.get("/me", response_model=UserOutResponse)
 def get_current_user(
-    auth_user: str = Depends(get_current_auth_user)
+    auth_user: UserDocument = Depends(get_current_auth_user)
 ) -> UserOutResponse:
     """
     Returns the user that is currently logged in.
@@ -76,7 +81,7 @@ def get_current_user(
 @router.get("/{id}", response_model=UserOutResponse)
 async def get_user(
     id: PydanticObjectId,
-    auth_user: str = Depends(get_current_auth_user)
+    auth_user: UserDocument = Depends(get_current_auth_user)
 ) -> UserOutResponse:
     """
     Returns the user with the given ID, if exists.
@@ -89,7 +94,7 @@ async def get_user(
 async def update_user(
     id: PydanticObjectId,
     req: UserInUpdate,
-    auth_user: str = Depends(get_current_auth_user)
+    auth_user: UserDocument = Depends(get_current_admin)
 ) -> UserOutResponse:
     """
     Updates the user with the specified ID, with the given updated properties.
@@ -108,10 +113,24 @@ async def update_user(
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
     id: PydanticObjectId,
-    auth_user: str = Depends(get_current_auth_user)
+    auth_user: UserDocument = Depends(get_current_admin),
+    settings: Settings = Depends(get_settings)
 ):
     """
     Deletes the user with the given ID, if exists.
     """
     user = await get_user_by_id(id, assert_exists=True)
+
+    if (user.id == auth_user.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You cannot delete yourself."
+        )
+    
+    if (user.email == settings.base_admin_email):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This user cannot be deleted."
+        )
+
     await user.delete()

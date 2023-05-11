@@ -112,3 +112,31 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserDocument:
         )
 
     return user
+
+
+async def get_current_admin(user: UserDocument = Depends(get_current_user)) -> UserDocument:
+    """
+    Gets the current user, and verifies that the user is an admin.
+
+    NOTE: In future, you might want to swap over to checking permissions, not roles.
+    Check https://fastapi.tiangolo.com/pt/advanced/security/oauth2-scopes/
+    """
+    if user.role != "Administrator":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Not enough permissions."
+        )
+    
+
+async def get_current_annotator(user: UserDocument = Depends(get_current_user)) -> UserDocument:
+    """
+    Gets the current user, and verifies that the user is an annotator.
+
+    NOTE: In future, you might want to swap over to checking permissions, not roles.
+    Check https://fastapi.tiangolo.com/pt/advanced/security/oauth2-scopes/
+    """
+    if user.role != "Annotator":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Not enough permissions."
+        )

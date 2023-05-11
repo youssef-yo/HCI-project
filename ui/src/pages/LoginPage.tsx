@@ -3,7 +3,7 @@ import { useRef, useState, useEffect, FormEvent } from 'react';
 import styled from 'styled-components';
 import pawlsLogo from '../assets/images/pawlsLogo.png';
 
-import { useAuthApi } from '../api';
+import { getApiError, useAuthApi } from '../api';
 import { useAuth } from '../hooks';
 import { Button, Input, InputType } from '../components/common';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -29,6 +29,11 @@ const LoginPage = () => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
+        if (username.trim().length === 0 || password.trim().length === 0) {
+            setErrorMsg('Both username and password must be provided!');
+            return;
+        }
+
         const formData = new FormData();
         formData.set('username', username);
         formData.set('password', password);
@@ -40,15 +45,7 @@ const LoginPage = () => {
                 setPassword('');
                 navigate(from, { replace: true });
             })
-            .catch((err) => {
-                if (!err?.response) {
-                    setErrorMsg('Server Unavailable.');
-                } else if (err.response?.status === 401) {
-                    setErrorMsg('Invalid username or password.');
-                } else {
-                    setErrorMsg('Something went wrong...');
-                }
-            });
+            .catch((err) => setErrorMsg(getApiError(err)));
     };
 
     return (

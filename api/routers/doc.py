@@ -1,31 +1,24 @@
-from typing import Any, Dict, List, Optional
+from typing import List
 
 from fastapi import (
     APIRouter,
-    Depends,
-    HTTPException,
-    status
+    Depends
 )
 from fastapi.responses import Response
 
 from db.database import MongoClient, get_db
 
 from models.schemas import (
-    Annotation,
     DocAnnotations,
     DocCommitOutResponse,
     DocumentOutResponse,
     Page,
     DocAnnotations,
-    PydanticObjectId,
-    RelationGroup,
-    TaskOutResponse
+    PydanticObjectId
 )
 from models.domain import (
     DocCommitDocument,
-    DocStructureDocument,
     DocumentDocument,
-    TaskDocument,
     UserDocument
 )
 
@@ -36,8 +29,6 @@ from services.doc import (
     get_document_commit_annotations
 )
 from services.oauth2 import get_current_user
-
-from core.config import Settings, get_settings
 
 
 router = APIRouter()
@@ -59,7 +50,8 @@ async def get_document(
 
 @router.get("/{sha}/commits", response_model=List[DocCommitOutResponse])
 async def get_document_commits(
-    sha: PydanticObjectId
+    sha: PydanticObjectId,
+    auth_user: UserDocument = Depends(get_current_user)
 ):
     """
     Gets the commits that have been created so far for the specified document.
@@ -99,7 +91,8 @@ async def get_tokens(
 
 @router.get("/commits/{commit_id}", response_model=DocCommitOutResponse)
 async def get_document_commit(
-    commit_id: PydanticObjectId
+    commit_id: PydanticObjectId,
+    auth_user: UserDocument = Depends(get_current_user)
 ):
     """
     Gets a specific commit that has been created.
@@ -110,7 +103,8 @@ async def get_document_commit(
 
 @router.get("/commits/{commit_id}/annotations", response_model=DocAnnotations)
 async def get_commit_annotations(
-    commit_id: PydanticObjectId
+    commit_id: PydanticObjectId,
+    auth_user: UserDocument = Depends(get_current_user)
 ):
     """
     Gets the annotations of the specified commit, belonging to a document.

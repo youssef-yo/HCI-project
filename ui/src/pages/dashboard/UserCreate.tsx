@@ -2,7 +2,7 @@ import { MdOutlinePersonAddAlt } from 'react-icons/md';
 import styled from 'styled-components';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUserApi } from '../../api';
+import { getApiError, useUserApi } from '../../api';
 import { Button, Header, Input, InputType, Option, Select } from '../../components/common';
 import { ROLES } from '../../config/roles';
 
@@ -73,15 +73,7 @@ const UserCreatePage = () => {
                 console.log(`User ${user.email} successfully created!`);
                 navigate(`/dash/users/${user._id}`);
             })
-            .catch((err) => {
-                if (!err?.response) {
-                    setErrorMsg('Server Unavailable.');
-                } else if (err.response?.status === 409) {
-                    setErrorMsg('Another user with the same email already exists.');
-                } else {
-                    setErrorMsg('Something went wrong...');
-                }
-            });
+            .catch((err) => setErrorMsg(getApiError(err)));
     };
 
     return (

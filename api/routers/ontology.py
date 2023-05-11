@@ -20,7 +20,7 @@ from models.schemas import (
     PydanticObjectId
 )
 
-from services.oauth2 import get_current_user
+from services.oauth2 import get_current_admin
 from services.ontology import get_onto_by_id
 
 
@@ -74,7 +74,7 @@ async def get_properties(
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_ontology(
     id: PydanticObjectId,
-    user: UserDocument = Depends(get_current_user),
+    user: UserDocument = Depends(get_current_admin),
     db: MongoClient = Depends(get_db)
 ):
     # TODO: Use transactions to ensure atomicity
@@ -93,7 +93,7 @@ async def delete_ontology(
 async def update_ontology(
     id: PydanticObjectId,
     req: OntologyInUpdate,
-    user: UserDocument = Depends(get_current_user)
+    user: UserDocument = Depends(get_current_admin)
 ):
     """Updates the ontology with the specified ID, with the given update properties"""
     if req.name:

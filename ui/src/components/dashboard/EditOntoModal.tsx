@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { Input, InputType } from '../common';
-import { Ontology, useOntologyApi } from '../../api';
+import { Ontology, getApiError, useOntologyApi } from '../../api';
 
 type EditOntoModalProps = {
     show: boolean;
@@ -55,14 +55,7 @@ const EditOntoModal: React.FC<EditOntoModalProps> = ({ show, onHide, ontoID, onU
                 onUpdate(onto);
                 handleClose();
             })
-            .catch((err) => {
-                if (!err?.response) {
-                    setErrorMsg('Server Unavailable.');
-                } else {
-                    setErrorMsg(err.response?.data?.detail);
-                    console.error(err);
-                }
-            });
+            .catch((err) => setErrorMsg(getApiError(err)));
     };
 
     return (

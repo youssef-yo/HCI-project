@@ -115,7 +115,7 @@ export interface UserUpdate {
 
 export enum TaskStatus {
     ACTIVE = 'ACTIVE',
-    COMPLETE = 'COMPLETED',
+    COMMITTED = 'COMMITTED',
     DISMISSED = 'DISMISSED',
 }
 

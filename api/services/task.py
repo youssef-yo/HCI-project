@@ -180,7 +180,7 @@ async def commit_task_annotations(
 
     # Update task status as complete
     await task.update({"$set": {
-        TaskDocument.status: TaskStatus.completed,
+        TaskDocument.status: TaskStatus.committed,
         TaskDocument.completed_at: datetime.now()
     }})
 

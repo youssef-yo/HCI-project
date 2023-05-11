@@ -2,7 +2,7 @@ import { MdAddTask } from 'react-icons/md';
 import styled from 'styled-components';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Button, Header, Input, InputType, Option, Select } from '../../components/common';
-import { Doc, User, useDocumentApi, useTaskApi, useUserApi } from '../../api';
+import { Doc, User, getApiError, useDocumentApi, useTaskApi, useUserApi } from '../../api';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const TaskCreatePage = () => {
@@ -107,15 +107,7 @@ const TaskCreatePage = () => {
                 console.log(`Task ${task._id} successfully created.`);
                 navigate(`/dash/tasks/${task._id}`);
             })
-            .catch((err) => {
-                if (!err?.response) {
-                    setErrorMsg('Server Unavailable.');
-                } else if (err.response?.data?.detail) {
-                    setErrorMsg(err.response.data.detail);
-                } else {
-                    setErrorMsg('Something went wrong...');
-                }
-            });
+            .catch((err) => setErrorMsg(getApiError(err)));
     };
 
     return (

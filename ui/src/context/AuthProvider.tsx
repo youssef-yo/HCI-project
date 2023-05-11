@@ -26,14 +26,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [auth, setAuth] = useState<AuthData | null>(null);
 
     useEffect(() => {
-        console.log(`Token: ${token}`);
+        // console.log(`Token: ${token}`);
         if (!token) return;
 
         const decoded: JWTTokenData = jwtdecode(token);
         const { _id, username, role } = decoded.userInfo;
 
-        console.log(`Username: ${username}`);
-        console.log(`Role: ${role}`);
+        // console.log(`Username: ${username}`);
+        // console.log(`Role: ${role}`);
 
         setAuth({ id: _id, username, role });
     }, [token]);

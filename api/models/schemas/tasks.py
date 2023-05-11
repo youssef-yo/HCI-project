@@ -10,7 +10,7 @@ from models.schemas.rwschema import RWSchema
 
 class TaskStatus(str, Enum):
     active = "ACTIVE"
-    completed = "COMPLETED"
+    committed = "COMMITTED"
     dismissed = "DISMISSED"
 
 

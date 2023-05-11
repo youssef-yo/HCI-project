@@ -24,7 +24,11 @@ from models.schemas import (
     TaskOutResponse
 )
 
-from services.oauth2 import get_current_user
+from services.oauth2 import (
+    get_current_admin,
+    get_current_annotator,
+    get_current_user
+)
 from services.task import (
     create_task,
     commit_task_annotations,
@@ -56,7 +60,7 @@ async def get_tasks(
 @router.post("", response_model=TaskOutResponse)
 async def create_document_task(
     task_data: TaskInCreate,
-    auth_user: UserDocument = Depends(get_current_user)
+    auth_user: UserDocument = Depends(get_current_admin)
 ):
     task = await create_task(task_data)
     return task
@@ -84,7 +88,7 @@ async def get_task(
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(
     task_id: PydanticObjectId,
-    auth_user: UserDocument = Depends(get_current_user)
+    auth_user: UserDocument = Depends(get_current_admin)
 ):
     """
     Deletes the task with the specified ID.
@@ -130,7 +134,7 @@ async def get_task_annotations(
 async def update_task_annotations(
     task_id: PydanticObjectId,
     annotations: TaskDeltaAnnotations,
-    auth_user: UserDocument = Depends(get_current_user)
+    auth_user: UserDocument = Depends(get_current_annotator)
 ):
     """Updates the delta annotations and relations tied to the specified task."""
     task = await get_task_by_id(task_id, assert_exists=True)
@@ -163,7 +167,7 @@ async def set_task_comments(
 @router.post("/{task_id}/commit", status_code=status.HTTP_204_NO_CONTENT)
 async def commit_task(
     task_id: PydanticObjectId,
-    auth_user: UserDocument = Depends(get_current_user)
+    auth_user: UserDocument = Depends(get_current_admin)
 ):
     """Commits the task, by saving a new commit with the updated document annotations."""
     task = await get_task_by_id(task_id, assert_exists=True)
@@ -194,7 +198,7 @@ async def set_task_complete(
 @router.post("/{task_id}/dismiss", status_code=status.HTTP_204_NO_CONTENT)
 async def dismiss_task(
     task_id: PydanticObjectId,
-    auth_user: UserDocument = Depends(get_current_user)
+    auth_user: UserDocument = Depends(get_current_admin)
 ):
     """
     Dismisses the task.

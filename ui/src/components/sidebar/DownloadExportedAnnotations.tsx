@@ -6,7 +6,7 @@ import { notification } from '@allenai/varnish';
 
 export const DownloadExportedAnnotations = ({ sha }: any) => {
     const [buttonState, setButtonState] = useState<ButtonState>(ButtonState.Primary);
-    const { exportAnnotations } = useAnnotationApi();
+    const { exportLatestAnnotations: exportAnnotations } = useAnnotationApi();
 
     const preDownloading = () => setButtonState(ButtonState.Loading);
     const postDownloading = () => setButtonState(ButtonState.Primary);

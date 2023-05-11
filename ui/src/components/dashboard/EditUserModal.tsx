@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { Input, InputType, Option, Select } from '../common';
-import { User, useUserApi } from '../../api';
+import { User, getApiError, useUserApi } from '../../api';
 import { ROLES } from '../../config/roles';
 
 type EditUserModalProps = {
@@ -84,14 +84,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
                 onUpdate(user);
                 handleClose();
             })
-            .catch((err) => {
-                if (!err?.response) {
-                    setErrorMsg('Server Unavailable.');
-                } else {
-                    setErrorMsg(err.response?.data?.detail);
-                    console.error(err);
-                }
-            });
+            .catch((err) => setErrorMsg(getApiError(err)));
     };
 
     return (
