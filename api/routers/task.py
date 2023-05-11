@@ -19,6 +19,7 @@ from models.schemas import (
     PydanticObjectId,
     TaskInCreate,
     TaskDeltaAnnotations,
+    TaskExtendedOutResponse,
     TaskStatus,
     TaskOutResponse
 )
@@ -28,7 +29,7 @@ from services.task import (
     create_task,
     commit_task_annotations,
     dismiss_task_annotations,
-    find_tasks,
+    find_tasks_extended,
     get_combined_doc_task_annotations,
     get_task_by_id,
     verify_can_update_task
@@ -38,7 +39,7 @@ from services.task import (
 router = APIRouter()
 
 
-@router.get("", response_model=List[TaskOutResponse])
+@router.get("", response_model=List[TaskExtendedOutResponse])
 async def get_tasks(
     user_id: Optional[PydanticObjectId] = None,
     doc_id: Optional[PydanticObjectId] = None,
@@ -48,7 +49,7 @@ async def get_tasks(
     Gets all tasks.
     It's possible to filter by user ID and document ID.
     """
-    tasks = await find_tasks(user_id, doc_id)
+    tasks = await find_tasks_extended(user_id, doc_id)
     return tasks
 
 
@@ -61,12 +62,12 @@ async def create_document_task(
     return task
 
 
-@router.get("/me", response_model=List[TaskOutResponse])
+@router.get("/me", response_model=List[TaskExtendedOutResponse])
 async def get_own_tasks(
     user: UserDocument = Depends(get_current_user)
 ):
     """Gets the tasks that are assigned to the user making the request."""
-    tasks = await find_tasks(user_id=user.id)
+    tasks = await find_tasks_extended(user_id=user.id)
     return tasks
 
 

@@ -4,10 +4,10 @@ import { MdDoneAll, MdEdit, MdTaskAlt } from 'react-icons/md';
 import styled from 'styled-components';
 import { useState } from 'react';
 import { SidebarItem, SidebarItemTitle, Contrast } from './common';
-import { Task, TaskStatus } from '../../api';
+import { TaskExtended, TaskStatus } from '../../api';
 
-const AssignedTaskRow = ({ task }: { task: Task }) => {
-    const getStatusColour = (task: Task) => {
+const AssignedTaskRow = ({ task }: { task: TaskExtended }) => {
+    const getStatusColour = (task: TaskExtended) => {
         if (task.status === TaskStatus.COMPLETE) {
             return '#1EC28E';
         } else if (task.markedComplete) {
@@ -17,7 +17,7 @@ const AssignedTaskRow = ({ task }: { task: Task }) => {
         return '#AEB7C4';
     };
 
-    const getStatusIcon = (task: Task) => {
+    const getStatusIcon = (task: TaskExtended) => {
         console.log(task.status);
         if (task.status === TaskStatus.COMPLETE) {
             return <MdDoneAll />;
@@ -31,14 +31,17 @@ const AssignedTaskRow = ({ task }: { task: Task }) => {
     return (
         <PaddedRow>
             <Contrast key={task._id}>
-                <a href={`/pdf/${task._id}`}>{task.description}</a>
+                <a href={`/pdf-task/${task._id}`}>{task.document?.name}</a>
+            </Contrast>
+            <Contrast>
+                {task.pageRange.start} - {task.pageRange.end}
             </Contrast>
             <SmallTag color={getStatusColour(task)}>{getStatusIcon(task)}</SmallTag>
         </PaddedRow>
     );
 };
 
-const AssignedTaskList = ({ tasks }: { tasks: Task[] }) => {
+const AssignedTaskList = ({ tasks }: { tasks: TaskExtended[] }) => {
     const [showFinished, setShowFinished] = useState<boolean>(false);
 
     const unfinished = tasks.filter((t) => t.status === TaskStatus.ACTIVE);
@@ -48,7 +51,7 @@ const AssignedTaskList = ({ tasks }: { tasks: Task[] }) => {
 
     return (
         <SidebarItem>
-            <SidebarItemTitle>Documents</SidebarItemTitle>
+            <SidebarItemTitle>Tasks</SidebarItemTitle>
             <ToggleDescription>Show Finished Tasks:</ToggleDescription>
             <Toggle
                 size="small"

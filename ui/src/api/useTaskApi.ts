@@ -1,5 +1,5 @@
 import useAxiosPrivate from './useAxiosPrivate';
-import { Task, TaskCreate } from './schemas';
+import { Task, TaskCreate, TaskExtended } from './schemas';
 import {
     Annotation,
     DocAnnotations,
@@ -32,7 +32,7 @@ const useTaskApi = () => {
      * @param query Query parameters (docId and userId)
      * @returns Promise with task list
      */
-    const getTasks: (query: TaskQuery) => Promise<Task[]> = (query: TaskQuery) => {
+    const getTasks: (query: TaskQuery) => Promise<TaskExtended[]> = (query: TaskQuery) => {
         return axiosPrivate
             .get('/api/tasks', {
                 params: {
@@ -62,7 +62,7 @@ const useTaskApi = () => {
      *
      * @returns Promise with task list
      */
-    const getLoggedUserTasks: () => Promise<Task[]> = () => {
+    const getLoggedUserTasks: () => Promise<TaskExtended[]> = () => {
         return axiosPrivate
             .get('/api/tasks/me')
             .then((res) => res.data)

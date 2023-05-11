@@ -2,6 +2,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
+from pydantic import BaseModel, EmailStr
+
 from models.schemas.mongo import MongoBase, PydanticObjectId
 from models.schemas.rwschema import RWSchema
 
@@ -12,7 +14,7 @@ class TaskStatus(str, Enum):
     dismissed = "DISMISSED"
 
 
-class PageRange(RWSchema):
+class PageRange(BaseModel):
     start: int
     end: int
 
@@ -58,3 +60,26 @@ class TaskOutResponse(TaskBase, MongoBase):
     marked_complete: bool
     comments: str
     completed_at: Optional[datetime]
+
+
+class TaskDocument(MongoBase):
+    name: str
+    total_pages: str
+
+
+class TaskAnnotator(MongoBase):
+    email: EmailStr
+    full_name: str
+
+
+class TaskExtended(MongoBase):
+    document: Optional[TaskDocument]
+    annotator: Optional[TaskAnnotator]
+    page_range: PageRange
+    description: str
+    status: TaskStatus
+    marked_complete: bool
+
+
+class TaskExtendedOutResponse(RWSchema, TaskExtended):
+    pass

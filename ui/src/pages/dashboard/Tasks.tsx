@@ -1,11 +1,11 @@
 import { MdAddTask, MdOpenInNew } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { Button, Header, IconButton, Table } from '../../components/common';
-import { Task, useTaskApi } from '../../api';
+import { TaskExtended, useTaskApi } from '../../api';
 import { useNavigate } from 'react-router-dom';
 
 const TasksPage = () => {
-    const [tasks, setTasks] = useState<Task[]>([]);
+    const [tasks, setTasks] = useState<TaskExtended[]>([]);
 
     const { getTasks } = useTaskApi();
     const navigate = useNavigate();
@@ -32,7 +32,8 @@ const TasksPage = () => {
             <Table>
                 <thead>
                     <tr>
-                        <th>Description</th>
+                        <th>Document</th>
+                        <th>Annotator</th>
                         <th style={{ textAlign: 'center' }}>Pages</th>
                         <th style={{ textAlign: 'center' }}>Status</th>
                         <th style={{ textAlign: 'center' }}>Actions</th>
@@ -41,7 +42,8 @@ const TasksPage = () => {
                 <tbody>
                     {tasks.map((task) => (
                         <tr key={task._id}>
-                            <td>{task.description}</td>
+                            <td>{task.document?.name}</td>
+                            <td>{task.annotator?.email}</td>
                             <td style={{ textAlign: 'center' }}>
                                 {task.pageRange.start} - {task.pageRange.end}
                             </td>

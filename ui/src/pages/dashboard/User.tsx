@@ -1,7 +1,7 @@
 import { MdAddTask, MdDeleteOutline, MdOpenInNew, MdOutlineEdit } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Task, User, useTaskApi, useUserApi } from '../../api';
+import { TaskExtended, User, useTaskApi, useUserApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { useDialog } from '../../hooks';
 import { EditUserModal } from '../../components/dashboard';
@@ -9,7 +9,7 @@ import { EditUserModal } from '../../components/dashboard';
 const UserPage = () => {
     const { userId } = useParams<{ userId: string }>();
     const [user, setUser] = useState<User>();
-    const [tasks, setTasks] = useState<Task[]>([]);
+    const [tasks, setTasks] = useState<TaskExtended[]>([]);
 
     const [userModal, setUserModal] = useState<boolean>(false);
     const [editedUser, setEditedUser] = useState<string>('');
@@ -109,7 +109,7 @@ const UserPage = () => {
             <Table>
                 <thead>
                     <tr>
-                        <th>Description</th>
+                        <th>Document</th>
                         <th style={{ textAlign: 'center' }}>Pages</th>
                         <th style={{ textAlign: 'center' }}>Status</th>
                         <th style={{ textAlign: 'center' }}>Actions</th>
@@ -118,7 +118,7 @@ const UserPage = () => {
                 <tbody>
                     {tasks.map((task) => (
                         <tr key={task._id}>
-                            <td>{task.description}</td>
+                            <td>{task.document?.name}</td>
                             <td style={{ textAlign: 'center' }}>
                                 {task.pageRange.start} - {task.pageRange.end}
                             </td>

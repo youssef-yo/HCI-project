@@ -26,6 +26,7 @@ import {
     Task,
     useTaskApi,
     TaskStatus,
+    TaskExtended,
 } from '../api';
 import {
     PDFPageInfo,
@@ -65,7 +66,7 @@ const PDFTaskPage = () => {
     const [selectedAnnotations, setSelectedAnnotations] = useState<Annotation[]>([]);
 
     const [activeTask, setActiveTask] = useState<Task>();
-    const [assignedTasks, setAssignedTasks] = useState<Task[]>([]);
+    const [assignedTasks, setAssignedTasks] = useState<TaskExtended[]>([]);
     const [canAnnotate, setCanAnnotate] = useState<boolean>(false);
 
     const [activeOntoClass, setActiveOntoClass] = useState<OntoClass>();
@@ -353,10 +354,7 @@ const PDFTaskPage = () => {
                             <WithSidebar width={sidebarWidth}>
                                 <Sidebar width={sidebarWidth}>
                                     <Logo />
-                                    <Labels
-                                        sha={taskId}
-                                        _setRelationModalVisible={setRelationModalVisible}
-                                    />
+                                    <Labels _setRelationModalVisible={setRelationModalVisible} />
                                     <AssignedTaskList tasks={assignedTasks} />
                                     {activeTask && (
                                         <Annotations

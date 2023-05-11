@@ -8,15 +8,13 @@ import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { SidebarItem, SidebarItemTitle } from './common';
 
 import DropdownOntoClasses from './DropdownOntoClasses';
-import { DownloadExportedAnnotations } from './DownloadExportedAnnotations';
 import CreationRelation from './CreationRelation';
 
 interface LabelsProps {
-    sha: string;
     _setRelationModalVisible: (state: boolean) => void;
 }
 
-const Labels: React.FC<LabelsProps> = ({ sha, _setRelationModalVisible }) => {
+const Labels: React.FC<LabelsProps> = ({ _setRelationModalVisible }) => {
     const annotationStore = useContext(AnnotationStore);
     const onToggle = () => {
         annotationStore.toggleFreeFormAnnotations(!annotationStore.freeFormAnnotations);
@@ -24,7 +22,6 @@ const Labels: React.FC<LabelsProps> = ({ sha, _setRelationModalVisible }) => {
 
     return (
         <SidebarItem>
-            <DownloadExportedAnnotations sha={sha}></DownloadExportedAnnotations>
             <div>
                 <SidebarItemTitle>Relation Mode</SidebarItemTitle>
                 <CreationRelation

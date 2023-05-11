@@ -2,12 +2,12 @@ import { MdAddTask, MdOutlineFileDownload, MdOpenInNew } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Header, IconButton, Table } from '../../components/common';
-import { Doc, DocCommit, Task, useDocumentApi, useTaskApi } from '../../api';
+import { Doc, DocCommit, TaskExtended, useDocumentApi, useTaskApi } from '../../api';
 
 const DocumentPage = () => {
     const { docId } = useParams<{ docId: string }>();
     const [doc, setDoc] = useState<Doc>();
-    const [tasks, setTasks] = useState<Task[]>([]);
+    const [tasks, setTasks] = useState<TaskExtended[]>([]);
     const [commits, setCommits] = useState<DocCommit[]>([]);
 
     const { getDocumentByID, getDocumentCommits } = useDocumentApi();
@@ -75,7 +75,7 @@ const DocumentPage = () => {
             <Table>
                 <thead>
                     <tr>
-                        <th>Description</th>
+                        <th>Annotator</th>
                         <th style={{ textAlign: 'center' }}>Pages</th>
                         <th style={{ textAlign: 'center' }}>Status</th>
                         <th style={{ textAlign: 'center' }}>Actions</th>
@@ -84,7 +84,7 @@ const DocumentPage = () => {
                 <tbody>
                     {tasks.map((task) => (
                         <tr key={task._id}>
-                            <td>{task.description}</td>
+                            <td>{task.annotator?.email}</td>
                             <td style={{ textAlign: 'center' }}>
                                 {task.pageRange.start} - {task.pageRange.end}
                             </td>
@@ -126,7 +126,7 @@ const DocumentPage = () => {
                     {commits.map((commit) => (
                         <tr key={commit._id}>
                             <td>{commit._id}</td>
-                            <td>{commit.createdAt}</td>
+                            <td>{new Date(commit.createdAt).toUTCString()}</td>
                             <td
                                 style={{
                                     display: 'flex',

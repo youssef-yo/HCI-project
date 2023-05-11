@@ -306,10 +306,7 @@ const PDFCommitPage = () => {
                             <WithSidebar width={sidebarWidth}>
                                 <Sidebar width={sidebarWidth}>
                                     <Logo />
-                                    <Labels
-                                        sha={commitId}
-                                        _setRelationModalVisible={setRelationModalVisible}
-                                    />
+                                    <Labels _setRelationModalVisible={setRelationModalVisible} />
                                     {activeCommit && (
                                         <Relations
                                             annotations={pdfAnnotations.docAnnotations.annotations}

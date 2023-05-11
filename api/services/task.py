@@ -6,6 +6,8 @@ from fastapi import (
     status
 )
 
+from core.config import get_settings
+
 from models.domain import (
     DocCommitDocument,
     DocumentDocument,
@@ -18,6 +20,7 @@ from models.schemas import (
     PydanticObjectId,
     TaskAnnotationStatus,
     TaskDeltaAnnotations,
+    TaskExtended,
     TaskInCreate,
     TaskStatus
 )
@@ -55,6 +58,53 @@ async def find_tasks(
     query = build_query(user_id, doc_id)
 
     tasks = await TaskDocument.find_many(query).to_list()
+    return tasks
+
+
+async def find_tasks_extended(
+    user_id: Optional[PydanticObjectId] = None,
+    doc_id: Optional[PydanticObjectId] = None
+) -> List[TaskDocument]:
+    """
+    Gets all the tasks that match the specified criteria.
+    """
+    query = build_query(user_id, doc_id)
+
+    tasks = await TaskDocument.aggregate([
+        {
+            "$match": query
+        },
+        {
+            "$lookup": {
+                "from": get_settings().docs_collection,
+                "localField": "doc_id",
+                "foreignField": "_id",
+                "as": "document"
+            }
+        },
+        {
+            "$lookup": {
+                "from": get_settings().users_collection,
+                "localField": "user_id",
+                "foreignField": "_id",
+                "as": "annotator"
+            }
+        },
+        {
+            "$set": {
+                "document": {"$first": "$document"},
+                "annotator": {"$first": "$annotator"}
+            }
+        },
+        {
+            "$project": {
+                "user_id": 0,
+                "doc_id": 0,
+                "delta_annotations": 0
+            }
+        }
+    ], projection_model=TaskExtended).to_list()
+
     return tasks
 
 

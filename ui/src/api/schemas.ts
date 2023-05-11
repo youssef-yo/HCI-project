@@ -136,6 +136,28 @@ export interface Task {
     completedAt?: Date;
 }
 
+export interface TaskDocument {
+    _id: string;
+    name: string;
+    totalPages: number;
+}
+
+export interface TaskAnnotator {
+    _id: string;
+    email: string;
+    fullName: string;
+}
+
+export interface TaskExtended {
+    _id: string;
+    document?: TaskDocument;
+    annotator?: TaskAnnotator;
+    pageRange: PageRange;
+    description: string;
+    status: string;
+    markedComplete: boolean;
+}
+
 export interface TaskCreate {
     userId: string;
     docId: string;

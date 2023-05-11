@@ -39,6 +39,8 @@ from .ontologies import (
 from .tasks import (
     PageRange,
     TaskInCreate,
+    TaskExtended,
+    TaskExtendedOutResponse,
     TaskOutResponse,
     TaskStatus
 )
