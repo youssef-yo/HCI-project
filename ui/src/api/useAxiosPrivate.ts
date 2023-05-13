@@ -33,7 +33,7 @@ const useAxiosPrivate = () => {
                 const prevRequest = error?.config;
 
                 // Status 403 == Forbidden
-                if (error?.response?.status === 403 && !prevRequest?.sent) {
+                if (error?.response?.status === 401 && !prevRequest?.sent) {
                     prevRequest.sent = true;
                     const newAccessToken = await refresh();
                     prevRequest.headers.Authorization = `Bearer ${newAccessToken}`;

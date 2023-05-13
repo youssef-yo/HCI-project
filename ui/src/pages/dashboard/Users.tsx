@@ -1,10 +1,11 @@
 import { MdDeleteOutline, MdOpenInNew, MdOutlineEdit, MdOutlinePersonAddAlt } from 'react-icons/md';
 import { useEffect, useState } from 'react';
-import { User, useUserApi } from '../../api';
+import { User, getApiError, useUserApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { EditUserModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
 import { useDialog } from '../../hooks';
+import { notification } from '@allenai/varnish';
 
 const UsersPage = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -47,9 +48,12 @@ const UsersPage = () => {
 
         await deleteUser(user._id)
             .then((_) => setUsers(users.filter((u) => u._id !== user._id)))
-            .catch((err) => {
-                console.error(err);
-            });
+            .catch((err) =>
+                notification.error({
+                    message: 'Error deleting user!',
+                    description: getApiError(err),
+                })
+            );
     };
 
     return (

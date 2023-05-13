@@ -1,10 +1,11 @@
 import { MdAddTask, MdDeleteOutline, MdOpenInNew, MdOutlineEdit } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { TaskExtended, User, useTaskApi, useUserApi } from '../../api';
+import { TaskExtended, User, getApiError, useTaskApi, useUserApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { useDialog } from '../../hooks';
 import { EditUserModal } from '../../components/dashboard';
+import { notification } from '@allenai/varnish';
 
 const UserPage = () => {
     const { userId } = useParams<{ userId: string }>();
@@ -47,7 +48,12 @@ const UserPage = () => {
         if (confirm) {
             deleteUser(user!!._id)
                 .then((_) => navigate('/dash/users'))
-                .catch((err) => console.error(err));
+                .catch((err) =>
+                    notification.error({
+                        message: 'Error deleting user!',
+                        description: getApiError(err),
+                    })
+                );
         }
     };
 

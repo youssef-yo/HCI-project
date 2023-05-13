@@ -38,7 +38,9 @@ export const AnnotationSummary = ({ annotation }: AnnotationSummaryProps) => {
     return (
         <PaddedRow>
             <Overflow title={text}>{text}</Overflow>
-            <SmallTag title={annotation.ontoClass.text}>{annotation.ontoClass.text}</SmallTag>
+            <SmallTag title={annotation.ontoClass.text} color={annotation.ontoClass.color}>
+                {annotation.ontoClass.text}
+            </SmallTag>
             <DeleteFilled onClick={onDelete} />
             <RightCircleOutlined onClick={handleScrolling} />
         </PaddedRow>

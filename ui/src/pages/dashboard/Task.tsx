@@ -2,8 +2,18 @@ import { MdDeleteOutline, MdMergeType, MdOpenInNew } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Header } from '../../components/common';
-import { Doc, Task, TaskStatus, User, useDocumentApi, useTaskApi, useUserApi } from '../../api';
+import {
+    Doc,
+    Task,
+    TaskStatus,
+    User,
+    getApiError,
+    useDocumentApi,
+    useTaskApi,
+    useUserApi,
+} from '../../api';
 import { useDialog } from '../../hooks';
+import { notification } from '@allenai/varnish';
 
 const TaskPage = () => {
     const { taskId } = useParams<{ taskId: string }>();
@@ -64,7 +74,12 @@ const TaskPage = () => {
 
         commitTask(task!!._id)
             .then((_) => window.location.reload())
-            .catch((err) => console.error(err));
+            .catch((err) =>
+                notification.error({
+                    message: 'Could not commit task!',
+                    description: getApiError(err),
+                })
+            );
     };
 
     const onDismissTask = async () => {
@@ -86,7 +101,12 @@ const TaskPage = () => {
 
         dismissTask(task!!._id)
             .then((_) => window.location.reload())
-            .catch((err) => console.error(err));
+            .catch((err) =>
+                notification.error({
+                    message: 'Could not dismiss task!',
+                    description: getApiError(err),
+                })
+            );
     };
 
     return (

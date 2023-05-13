@@ -96,7 +96,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserDocument:
     Gets the current user, related to the JWT access token.
     """
     credentials_exception = HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
+        status_code=status.HTTP_401_UNAUTHORIZED,
         detail=f"Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"}
     )
@@ -127,6 +127,8 @@ async def get_current_admin(user: UserDocument = Depends(get_current_user)) -> U
             detail=f"Not enough permissions."
         )
     
+    return user
+    
 
 async def get_current_annotator(user: UserDocument = Depends(get_current_user)) -> UserDocument:
     """
@@ -140,3 +142,5 @@ async def get_current_annotator(user: UserDocument = Depends(get_current_user)) 
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Not enough permissions."
         )
+    
+    return user
