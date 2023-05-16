@@ -16,6 +16,7 @@ class TaskDocument(Document):
     status: TaskStatus
     marked_complete: bool = False
     comments: str = ""
+    created_at: datetime
     completed_at: Optional[datetime] = None
     commit: PydanticObjectId = None
     delta_annotations: TaskDeltaAnnotations = TaskDeltaAnnotations.empty()

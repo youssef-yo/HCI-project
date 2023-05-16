@@ -128,6 +128,7 @@ const DocumentPage = () => {
                 <thead>
                     <tr>
                         <th>Annotator</th>
+                        <th>Created At</th>
                         <th style={{ textAlign: 'center' }}>Pages</th>
                         <th style={{ textAlign: 'center' }}>Status</th>
                         <th style={{ textAlign: 'center' }}>Actions</th>
@@ -137,6 +138,7 @@ const DocumentPage = () => {
                     {tasks.map((task) => (
                         <tr key={task._id}>
                             <td>{task.annotator?.email}</td>
+                            <td>{new Date(task.createdAt).toUTCString()}</td>
                             <td style={{ textAlign: 'center' }}>
                                 {task.pageRange.start} - {task.pageRange.end}
                             </td>

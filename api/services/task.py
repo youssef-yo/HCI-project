@@ -97,6 +97,11 @@ async def find_tasks_extended(
             }
         },
         {
+            "$sort": {
+                "created_at": -1
+            }
+        },
+        {
             "$project": {
                 "user_id": 0,
                 "doc_id": 0,
@@ -126,7 +131,8 @@ async def create_task(task_data: TaskInCreate) -> TaskDocument:
         page_range=task_data.page_range,
         description=task_data.description,
         status=TaskStatus.active,
-        commit=task_doc.commit
+        commit=task_doc.commit,
+        created_at=datetime.now()
     )
     await task.create()
 

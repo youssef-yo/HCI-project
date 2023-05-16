@@ -59,6 +59,7 @@ class TaskOutResponse(TaskBase, MongoBase):
     status: TaskStatus
     marked_complete: bool
     comments: str
+    created_at: datetime
     completed_at: Optional[datetime]
 
 
@@ -79,6 +80,7 @@ class TaskExtended(MongoBase):
     description: str
     status: TaskStatus
     marked_complete: bool
+    created_at: datetime
 
 
 class TaskExtendedOutResponse(RWSchema, TaskExtended):

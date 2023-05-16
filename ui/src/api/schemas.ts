@@ -133,6 +133,7 @@ export interface Task {
     status: string;
     markedComplete: boolean;
     comments: string;
+    createdAt: Date;
     completedAt?: Date;
 }
 
@@ -156,6 +157,7 @@ export interface TaskExtended {
     description: string;
     status: string;
     markedComplete: boolean;
+    createdAt: Date;
 }
 
 export interface TaskCreate {

@@ -2,6 +2,7 @@ export * from './common';
 export { default as Annotations } from './Annotations';
 export { default as AssignedTaskList } from './AssignedTaskList';
 export { default as Comment } from './Comment';
+export { default as CommitAnnotations } from './CommitAnnotations';
 export { default as DropdownOntoClasses } from './DropdownOntoClasses';
 export { default as DropdownOntoProperties } from './DropdownOntoProperties';
 export { default as FileItem } from './FileItem';

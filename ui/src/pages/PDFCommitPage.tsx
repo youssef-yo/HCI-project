@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 
 import { PDF, CenterOnPage, RelationModal } from '../components';
 import { WithSidebar, Sidebar, Topbar, WithTopbar } from '../components/common';
-import { Labels, Relations, Logo } from '../components/sidebar';
+import { Labels, Relations, Logo, CommitAnnotations } from '../components/sidebar';
 import {
     pdfURL,
     PageTokens,
@@ -307,6 +307,9 @@ const PDFCommitPage = () => {
                                 <Sidebar width={sidebarWidth}>
                                     <Logo />
                                     <Labels _setRelationModalVisible={setRelationModalVisible} />
+                                    <CommitAnnotations
+                                        annotations={pdfAnnotations.docAnnotations.annotations}
+                                    />
                                     {activeCommit && (
                                         <Relations
                                             annotations={pdfAnnotations.docAnnotations.annotations}
