@@ -1,5 +1,5 @@
 <div align="center">
-    ONTO-PAWLS
+    <img align="center" src="/ui/src/assets/images/pawlsLogo.png" alt="OntoPAWLS icon" />
 </div>
 
 ------------------------------------------------

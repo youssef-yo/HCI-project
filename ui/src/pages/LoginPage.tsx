@@ -1,12 +1,12 @@
 import { MdLogin } from 'react-icons/md';
 import { useRef, useState, useEffect, FormEvent } from 'react';
 import styled from 'styled-components';
-import pawlsLogo from '../assets/images/pawlsLogo.png';
 
 import { getApiError, useAuthApi } from '../api';
 import { useAuth } from '../hooks';
 import { Button, Input, InputType } from '../components/common';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Logo } from '../components/sidebar';
 
 const LoginPage = () => {
     const { login } = useAuthApi();
@@ -56,7 +56,7 @@ const LoginPage = () => {
 
             <div className="container">
                 <div className="content">
-                    <img src={pawlsLogo} />
+                    <Logo />
 
                     <Form onSubmit={handleSubmit}>
                         {errorMsg && (
@@ -173,10 +173,6 @@ const Section = styled.section`
         align-items: center;
         flex-direction: column;
         gap: 40px;
-    }
-
-    .content img {
-        max-width: 80%;
     }
 `;
 
