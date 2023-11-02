@@ -7,7 +7,7 @@ fastapi
 uvicorn
 
 # MongoDB driver and additional libraries
-beanie==1.17.0
+beanie==1.23.1
 
 # used for testing/formatting
 pytest
@@ -32,6 +32,7 @@ python-jose[cryptography]
 
 # Data validation
 pydantic[email]
+pydantic-settings
 
 pandas
 pdfplumber

@@ -19,6 +19,6 @@ class RWSchema(BaseModel):
     Limit the use of this class only for the schemas that represent the response from the server.
     """
     class Config(BaseConfig):
-        allow_population_by_field_name = True
+        populate_by_name = True
         alias_generator = convert_field_to_camel_case
         json_encoders = {datetime: convert_datetime_to_realworld}

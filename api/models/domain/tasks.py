@@ -18,7 +18,7 @@ class TaskDocument(Document):
     comments: str = ""
     created_at: datetime
     completed_at: Optional[datetime] = None
-    commit: PydanticObjectId = None
+    commit: Optional[PydanticObjectId] = None
     delta_annotations: TaskDeltaAnnotations = TaskDeltaAnnotations.empty()
 
     class Settings:

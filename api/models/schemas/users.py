@@ -15,7 +15,7 @@ class UserInCreate(UserBase):
     password: str
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "email": "mammt@example.com",
                 "password": "omae_wa_mo_shindeiru",
@@ -30,7 +30,7 @@ class UserInUpdate(RWSchema):
     role: Optional[str]
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "fullName": "Jason Bourne",
                 "role": "Annotator",
@@ -40,7 +40,7 @@ class UserInUpdate(RWSchema):
 
 class UserOutResponse(UserBase, MongoBase):
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "email": "mammt@example.com",
                 "fullName": "Jason Bourne",

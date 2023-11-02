@@ -65,7 +65,7 @@ class TaskOutResponse(TaskBase, MongoBase):
 
 class TaskDocument(MongoBase):
     name: str
-    total_pages: str
+    total_pages: int
 
 
 class TaskAnnotator(MongoBase):

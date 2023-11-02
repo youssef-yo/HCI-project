@@ -39,7 +39,7 @@ class DocumentBase(RWSchema):
 
 class DocumentOutResponse(DocumentBase, MongoBase):
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "name": "T-LCM_Pedals_User_Manual_Eng_Compressed",
                 "totalPages": 16

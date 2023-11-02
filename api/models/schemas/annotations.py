@@ -24,7 +24,7 @@ class Annotation(BaseModel):
     date: str
     bounds: Bounds
     tokens: Optional[List[TokenId]] = None
-    text: str = None
+    text: Optional[str] = None
 
 
 class RelationGroup(BaseModel):
