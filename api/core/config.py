@@ -7,7 +7,6 @@ from utils.utils import create_folder
 class Settings(BaseSettings):
     # All of this will turn into MongoDB collections... eventually... and hopefully...
     directory_extracted_annotations: str = "extracted_annotations/"
-    output_directory: str = "/skiff_files/apps/pawls/papers/"
 
     # This are default development values, the real values must be set in a .env file
     # to get a string like this run:
@@ -40,6 +39,4 @@ def get_settings() -> Settings:
 
 
 # Build directories and files
-create_folder(get_settings().output_directory)
-
 create_folder(get_settings().directory_extracted_annotations)

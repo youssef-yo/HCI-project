@@ -1,21 +1,18 @@
-FROM python:3.7.2
+FROM python:3.12.0
 
 # Setup a spot for the api code
 WORKDIR /usr/local/src/skiff/app/api
 
-ARG GITHUB_ACCESS_TOKEN
-
 # Install Python dependencies
-RUN pip install --upgrade pip setuptools wheel
-COPY requirements.txt .
+RUN pip install --upgrade pip poetry
+COPY pyproject.toml poetry.lock ./
 
-RUN pip install -r requirements.txt
+RUN poetry install --without dev --no-root
 
 
 # Copy over the source code
-COPY app app/
-COPY main.py main.py
+COPY . .
 
 # Kick things off
-ENTRYPOINT [ "uvicorn" ]
+ENTRYPOINT [ "poetry", "run", "uvicorn" ]
 CMD ["main:app", "--host", "0.0.0.0"]

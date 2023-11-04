@@ -10,8 +10,13 @@ services:
         build:
           context: ./api
         volumes:
-            - ./api:/usr/local/src/skiff/app/api
-            - ./skiff_files/apps/pawls:/skiff_files/apps/pawls
+            - ./api/app:/usr/local/src/skiff/app/api/app
+            - ./api/core:/usr/local/src/skiff/app/api/core
+            - ./api/db:/usr/local/src/skiff/app/api/db
+            - ./api/models:/usr/local/src/skiff/app/api/models
+            - ./api/routers:/usr/local/src/skiff/app/api/routers
+            - ./api/services:/usr/local/src/skiff/app/api/services
+            - ./api/utils:/usr/local/src/skiff/app/api/utils
         environment:
             # This ensures that errors are printed as they occur, which
             # makes debugging easier.
