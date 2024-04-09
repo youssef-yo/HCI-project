@@ -45,6 +45,7 @@ const useUploadApi = () => {
                 data: file,
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
+            console.log('FINISH');
             return response;
         } catch (error) {
             console.log(error);

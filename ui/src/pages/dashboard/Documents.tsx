@@ -1,4 +1,4 @@
-import { MdOpenInNew, MdOutlineEdit, MdOutlineNoteAdd } from 'react-icons/md';
+import { MdOpenInNew, MdOutlineNoteAdd } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { Doc, useDocumentApi } from '../../api';
@@ -65,9 +65,6 @@ const DocumentsPage = () => {
                                     title="View Document"
                                     onClick={() => navigate(`${doc._id}`)}>
                                     <MdOpenInNew />
-                                </IconButton>
-                                <IconButton title="Edit Document">
-                                    <MdOutlineEdit />
                                 </IconButton>
                             </td>
                         </tr>
