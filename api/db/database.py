@@ -12,7 +12,6 @@ from models.domain import (
     TaskDocument
 )
 
-
 class MongoClient:
     """MongoDB client manager."""
 

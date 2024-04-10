@@ -52,7 +52,23 @@ const useUploadApi = () => {
         }
     };
 
-    return { uploadDocument, uploadOntology };
+    const uploadAnalyze = async (file: FormData) => {
+        console.log('File in uploadDocument: ', file);
+        try {
+            const response = await axiosPrivate({
+                method: 'post',
+                url: '/api/upload/upload_analyze',
+                data: file,
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            console.log('FINISH');
+            return response;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    return { uploadDocument, uploadOntology, uploadAnalyze };
 };
 
 export default useUploadApi;

@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/styles/FileItem.scss';
 
-const FileItem = ({ file, deleteFile }: { file: any; deleteFile: any }) => {
+const FileItem = ({ file, deleteFile }: { file: File; deleteFile: any }) => {
+    console.log('file item: ', file.name);
     return (
         <li className="file-item" key={file.name}>
             <FontAwesomeIcon icon={faFileAlt} />

@@ -41,6 +41,56 @@ from services.oauth2 import get_current_admin
 router = APIRouter()
 
 
+@router.post("/upload_analyze", response_model=DocumentOutResponse)
+async def upload_analyze_document(
+    user: UserDocument = Depends(get_current_admin),
+    file: UploadFile = File(...), # qua voglio una lista di files
+    db: MongoClient = Depends(get_db)
+) -> DocumentOutResponse:
+    """
+    Uploads a PDF file.
+    It also extracts the PDF structure (pages and tokens) for later use.
+    """
+    # TODO: Use transactions to ensure atomicity
+    # TODO: Maybe implement a progress tracker... this operation can take long
+    pdf = str(file.filename)
+    pdf_name = Path(pdf).stem
+
+    print(f"File: {file.filename}")
+    print(f"Content Type: {file.content_type}")
+    print(f"Size: {file.size}")
+    print(f"Headers: {file.headers}")
+
+    structure = preprocess("pdfplumber", file.file)
+    npages = len(structure)
+
+    # Upload the document file with GridFS
+    file.file.seek(0)
+    file_id = await db.gridFS.upload_from_stream(
+        file.filename,
+        file.file,
+        metadata={"contentType": file.content_type}
+    )
+
+    # Upload the document data
+    document = DocumentDocument(
+        name=pdf_name,
+        file_id=file_id,
+        total_pages=npages,
+    )
+    await document.create()
+
+    # Upload the PDF structure in a separate collection (maybe in future in GridFS).
+    # This is because the structure can be quite large, and could hinder the
+    # performance for simpler document queries that do not involve the structure itself.
+    doc_structure = DocStructureDocument(
+        doc_id=document.id,
+        structure=structure
+    )
+    await doc_structure.create()
+
+    return document
+
 @router.post("/doc", response_model=DocumentOutResponse)
 async def upload_document(
     user: UserDocument = Depends(get_current_admin),
@@ -138,6 +188,7 @@ async def upload_ontology(
     await ontology.create()
 
     return result
+
 
 
 def analyze_ontology(file: BinaryIO) -> OntologyData:
