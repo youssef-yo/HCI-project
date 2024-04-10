@@ -46,35 +46,35 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ show, onHide }) => {
     //     console.log('Tried deleting file...');
     // };
 
-    const handleUploadAnalyze = async () => {
+    const handleUploadAnalyze = () => {
         if (files.length === 0) return;
 
         setIsUploading(true);
-
+        onHide();
         try {
             // Loop attraverso ogni file e esegui l'upload sul database
             for (const file of files) {
-                await uploadFile(file);
+                uploadFile(file);
             }
 
             setIsUploading(false);
             setAnyFileUploaded(true);
             setFiles([]);
-            onHide();
-            window.location.reload(); // Ricarica la pagina dopo l'upload
+            // onHide();
+            // window.location.reload(); // Ricarica la pagina dopo l'upload
         } catch (error) {
             console.error("Errore durante l'upload dei file:", error);
             setIsUploading(false);
         }
     };
 
-    const uploadFile = async (file: File) => {
+    const uploadFile = (file: File) => {
         const formData = new FormData();
         formData.append('file', file);
 
         try {
             // Effettua l'upload del file al backend per l'analisi
-            await uploadAnalyze(formData);
+            uploadAnalyze(formData);
         } catch (error) {
             console.error(`Errore durante l'upload del file ${file}:`, error);
             throw error; // Rilancia l'errore per gestirlo più avanti, se necessario

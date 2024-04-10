@@ -1,3 +1,6 @@
+import threading
+import asyncio
+
 import shutil
 import tempfile
 from pathlib import Path
@@ -39,40 +42,38 @@ from services.oauth2 import get_current_admin
 
 
 router = APIRouter()
+loop = asyncio.get_event_loop()
 
+async def upload_file_async(file_data, file_metadata, db):
 
-@router.post("/upload_analyze", response_model=DocumentOutResponse)
-async def upload_analyze_document(
-    user: UserDocument = Depends(get_current_admin),
-    file: UploadFile = File(...), # qua voglio una lista di files
-    db: MongoClient = Depends(get_db)
-) -> DocumentOutResponse:
-    """
-    Uploads a PDF file.
-    It also extracts the PDF structure (pages and tokens) for later use.
-    """
-    # TODO: Use transactions to ensure atomicity
-    # TODO: Maybe implement a progress tracker... this operation can take long
-    pdf = str(file.filename)
+    pdf = str(file_metadata["filename"])
     pdf_name = Path(pdf).stem
 
-    print(f"File: {file.filename}")
-    print(f"Content Type: {file.content_type}")
-    print(f"Size: {file.size}")
-    print(f"Headers: {file.headers}")
+    print(f"File: {file_metadata['filename']}")
+    print(f"Content Type: {file_metadata['content_type']}")
+    print(f"Size: {file_metadata['file_size']}")
+    print(f"Headers: {file_metadata['headers']}")
 
-    structure = preprocess("pdfplumber", file.file)
-    npages = len(structure)
+    # Write file_data to a temporary file
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        temp_file.write(file_data)
+        temp_file.seek(0)
 
-    # Upload the document file with GridFS
-    file.file.seek(0)
-    file_id = await db.gridFS.upload_from_stream(
-        file.filename,
-        file.file,
-        metadata={"contentType": file.content_type}
-    )
+        # Process the temporary file
+        structure = preprocess("pdfplumber", temp_file)
 
-    # Upload the document data
+        npages = len(structure)
+
+        # Reset the file pointer to the beginning
+        temp_file.seek(0)
+
+        # Upload the file from the temporary file
+        file_id = await db.gridFS.upload_from_stream(
+            file_metadata["filename"],
+            temp_file,
+            metadata={"contentType": file_metadata["content_type"]}
+        )
+
     document = DocumentDocument(
         name=pdf_name,
         file_id=file_id,
@@ -80,16 +81,42 @@ async def upload_analyze_document(
     )
     await document.create()
 
-    # Upload the PDF structure in a separate collection (maybe in future in GridFS).
-    # This is because the structure can be quite large, and could hinder the
-    # performance for simpler document queries that do not involve the structure itself.
     doc_structure = DocStructureDocument(
         doc_id=document.id,
         structure=structure
     )
     await doc_structure.create()
 
-    return document
+@router.post("/upload_analyze", response_model=DocumentOutResponse)
+async def pre_upload(
+    user: UserDocument = Depends(get_current_admin),
+    file: UploadFile = File(...),
+    db: MongoClient = Depends(get_db)
+) -> DocumentOutResponse:
+
+    async def upload_analyze_document(
+        user: UserDocument = Depends(get_current_admin),
+        file: UploadFile = File(...),
+        db: MongoClient = Depends(get_db)
+    ) -> DocumentOutResponse:
+
+        file_data = await file.read()
+        file_metadata = {
+            "filename": file.filename,
+            "content_type": file.content_type,
+            "file_size": file.file.seek(0, 2),  # Get file size
+            "headers": file.headers
+        }
+
+        # Esegue upload_file_async in background
+        asyncio.create_task(upload_file_async(file_data, file_metadata, db))
+
+        # Puoi fare altre operazioni qui o semplicemente restituire una risposta immediata
+        return {"message": "File upload in corso."}
+    
+    # Utilizza await invece di loop.run_until_complete()
+    return await upload_analyze_document(user, file, db)
+
 
 @router.post("/doc", response_model=DocumentOutResponse)
 async def upload_document(
