@@ -42,7 +42,6 @@ from services.oauth2 import get_current_admin
 
 
 router = APIRouter()
-loop = asyncio.get_event_loop()
 
 async def upload_file_async(file_data, file_metadata, db):
 
@@ -86,36 +85,36 @@ async def upload_file_async(file_data, file_metadata, db):
         structure=structure
     )
     await doc_structure.create()
-
-@router.post("/upload_analyze", response_model=DocumentOutResponse)
+    
+@router.post("/upload_analyze")
 async def pre_upload(
     user: UserDocument = Depends(get_current_admin),
     file: UploadFile = File(...),
     db: MongoClient = Depends(get_db)
-) -> DocumentOutResponse:
+):
 
-    async def upload_analyze_document(
-        user: UserDocument = Depends(get_current_admin),
-        file: UploadFile = File(...),
-        db: MongoClient = Depends(get_db)
-    ) -> DocumentOutResponse:
+    def upload_analyze_document(
+        file_data: bytes,
+        file_metadata: dict,
+        db: MongoClient
+    ):
+        asyncio.run(upload_file_async(file_data, file_metadata, db))
 
-        file_data = await file.read()
+    # Utilizza threading per eseguire l'operazione in un thread separato
+    def run_upload_analyze_document(file: UploadFile, db: MongoClient):
+        file_data = file.file.read()
         file_metadata = {
             "filename": file.filename,
             "content_type": file.content_type,
             "file_size": file.file.seek(0, 2),  # Get file size
             "headers": file.headers
         }
-        print("HERE 1")
-        # Esegue upload_file_async in background
-        asyncio.create_task(upload_file_async(file_data, file_metadata, db))
-        print("HERE 2")
-        # Puoi fare altre operazioni qui o semplicemente restituire una risposta immediata
-        return {"message": "File upload in corso."}
+        threading.Thread(target=upload_analyze_document, args=(file_data, file_metadata, db)).start()
     
-    # Utilizza await invece di loop.run_until_complete()
-    return await upload_analyze_document(user, file, db)
+    run_upload_analyze_document(file, db)
+    
+    # Ritorna una risposta immediata
+    return {"message": "Operazione di upload avviata in un thread separato."}
 
 
 @router.post("/doc", response_model=DocumentOutResponse)

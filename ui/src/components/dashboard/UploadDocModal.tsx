@@ -11,8 +11,7 @@ type UploadDocModalProps = {
 
 const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHide }) => {
     const [files, setFiles] = useState<File[]>([]);
-    const [isUploading, setIsUploading] = useState<boolean>(false);
-    const [setAnyFileUploaded] = useState<boolean>(false);
+    const [isUploading] = useState<boolean>(false);
     const supportedFiles = 'PDF';
 
     const { uploadAnalyze } = useUploadApi();
@@ -50,22 +49,21 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHi
     const handleUploadAnalyze = () => {
         if (files.length === 0) return;
 
-        setIsUploading(true);
+        // setIsUploading(true);
         onHide();
         try {
             // Loop attraverso ogni file e esegui l'upload sul database
             for (const file of files) {
-                var tmp = uploadFile(file);
+                uploadFile(file);
             }
-            console.log(tmp);
-            setIsUploading(false);
-            setAnyFileUploaded(true);
+            // setIsUploading(false);
+            // setAnyFileUploaded(true);
             setFiles([]);
             // onHide();
             // window.location.reload(); // Ricarica la pagina dopo l'upload
         } catch (error) {
             console.error("Errore durante l'upload dei file:", error);
-            setIsUploading(false);
+            // setIsUploading(false);
         }
     };
 
