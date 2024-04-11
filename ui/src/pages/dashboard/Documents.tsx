@@ -72,7 +72,11 @@ const DocumentsPage = () => {
                 </tbody>
             </Table>
 
-            <UploadDocModal show={uploadDocModal} onHide={handleUploadModalClose} />
+            <UploadDocModal
+                updateTable={loadDocs}
+                show={uploadDocModal}
+                onHide={handleUploadModalClose}
+            />
         </section>
     );
 };

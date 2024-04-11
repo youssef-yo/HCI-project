@@ -4,14 +4,15 @@ import { InputFile, FileList } from '../sidebar';
 import { useUploadApi } from '../../api';
 
 type UploadDocModalProps = {
+    updateTable: () => void;
     show: boolean;
     onHide: () => void;
 };
 
-const UploadDocModal: React.FC<UploadDocModalProps> = ({ show, onHide }) => {
+const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHide }) => {
     const [files, setFiles] = useState<File[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
-    const [anyFileUploaded, setAnyFileUploaded] = useState<boolean>(false);
+    const [setAnyFileUploaded] = useState<boolean>(false);
     const supportedFiles = 'PDF';
 
     const { uploadAnalyze } = useUploadApi();
@@ -54,9 +55,9 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ show, onHide }) => {
         try {
             // Loop attraverso ogni file e esegui l'upload sul database
             for (const file of files) {
-                uploadFile(file);
+                var tmp = uploadFile(file);
             }
-
+            console.log(tmp);
             setIsUploading(false);
             setAnyFileUploaded(true);
             setFiles([]);
@@ -74,7 +75,7 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ show, onHide }) => {
 
         try {
             // Effettua l'upload del file al backend per l'analisi
-            uploadAnalyze(formData);
+            return uploadAnalyze(formData);
         } catch (error) {
             console.error(`Errore durante l'upload del file ${file}:`, error);
             throw error; // Rilancia l'errore per gestirlo più avanti, se necessario
@@ -82,14 +83,8 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ show, onHide }) => {
     };
 
     const handleClose = () => {
-        if (anyFileUploaded && !isUploading) {
-            onHide();
-            window.location.reload();
-        }
-        if (!anyFileUploaded && !isUploading) {
-            setFiles([]);
-            onHide();
-        }
+        onHide();
+        updateTable();
     };
 
     return (

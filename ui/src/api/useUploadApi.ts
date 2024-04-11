@@ -64,6 +64,7 @@ const useUploadApi = () => {
             console.log('FINISH');
             return response;
         } catch (error) {
+            console.log('ERROR');
             console.log(error);
         }
     };

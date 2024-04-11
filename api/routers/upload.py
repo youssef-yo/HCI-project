@@ -107,10 +107,10 @@ async def pre_upload(
             "file_size": file.file.seek(0, 2),  # Get file size
             "headers": file.headers
         }
-
+        print("HERE 1")
         # Esegue upload_file_async in background
         asyncio.create_task(upload_file_async(file_data, file_metadata, db))
-
+        print("HERE 2")
         # Puoi fare altre operazioni qui o semplicemente restituire una risposta immediata
         return {"message": "File upload in corso."}
     
