@@ -1,5 +1,6 @@
 import threading
 import asyncio
+import mimetypes
 
 import shutil
 import tempfile
@@ -40,52 +41,131 @@ from models.domain import (
 
 from services.oauth2 import get_current_admin
 
+from typing import List
+from motor.motor_asyncio import AsyncIOMotorClient
+import concurrent.futures
+from beanie import PydanticObjectId
 
 router = APIRouter()
 
-async def upload_file_async(file_data, file_metadata, db):
+@router.post("/upload")
+async def upload(
+    user: UserDocument = Depends(get_current_admin),
+    files: List[UploadFile] = File(...),
+    db: MongoClient = Depends(get_db)
+):
+    # Save the files in db and get their ID
+    file_ids = []
+    for file in files:
+        file_ids.append(await save_file_to_database(file, db))
 
-    pdf = str(file_metadata["filename"])
-    pdf_name = Path(pdf).stem
+    # Avvia il processo di elaborazione in background per ogni file
+    for file, file_id in zip(files, file_ids):
+        # await process_uploaded_file.delay(file.filename, file_id, db)
+        # Recupera il file dal GridFS usando l'ID
+        file_data = await find_document_by_id(db, file_id)
+        if file_data:
+            threading.Thread(target=upload_document_from_id, args=(file.filename, file_id, file_data, db)).start()
+            # asyncio.create_task(upload_document_from_id(file.filename, file_id, file_data, db))
+        else:
+            raise HTTPException(status_code=404, detail="File non trovato nel database")
 
-    print(f"File: {file_metadata['filename']}")
-    print(f"Content Type: {file_metadata['content_type']}")
-    print(f"Size: {file_metadata['file_size']}")
-    print(f"Headers: {file_metadata['headers']}")
+    return {"message": "Operazione di upload avviata in background."}
 
-    # Write file_data to a temporary file
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        temp_file.write(file_data)
-        temp_file.seek(0)
+# def between_callback(filename, file_id, file_data, db):
+#     async def run_upload():
+#         await upload_document_from_id(filename, file_id, file_data, db)
 
-        # Process the temporary file
-        structure = preprocess("pdfplumber", temp_file)
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#     loop.run_until_complete(run_upload())
+#     loop.close()
 
-        npages = len(structure)
 
-        # Reset the file pointer to the beginning
-        temp_file.seek(0)
+async def find_document_by_id(db, file_id):
+    async for file in db.gridFS.find({"_id": ObjectId(file_id)}):
+        return file
 
-        # Upload the file from the temporary file
-        file_id = await db.gridFS.upload_from_stream(
-            file_metadata["filename"],
-            temp_file,
-            metadata={"contentType": file_metadata["content_type"]}
-        )
+
+async def save_file_to_database(file: UploadFile, db: MongoClient):
+    file_id = await db.gridFS.upload_from_stream(
+        file.filename,
+        file.file,
+        metadata={"contentType": file.content_type}
+    )
+    return file_id
+
+def upload_document_from_id(filename: str, file_id: PydanticObjectId, file_data, db: MongoClient) -> DocumentOutResponse:
+    """
+    Carica un documento dal database usando l'ID del file.
+    """
+    def upload_sync():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(upload(filename, file_id, file_data, db))
+        loop.close()
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.submit(upload_sync)
+    
+        
+# async def create_document(document):
+#     print('arrivo1')
+#     await document.create()
+#     print('Arrivo2')
+
+async def upload(filename: str, file_id: PydanticObjectId, file_data, db: MongoClient):
+    structure = preprocess("pdfplumber", file_data)
+    npages = len(structure)
 
     document = DocumentDocument(
-        name=pdf_name,
+        name=filename,
         file_id=file_id,
         total_pages=npages,
     )
-    await document.create()
-
-    doc_structure = DocStructureDocument(
-        doc_id=document.id,
-        structure=structure
-    )
-    await doc_structure.create()
     
+    task_document = asyncio.create_task(document.create())
+    
+    try:
+        await asyncio.wait_for(task_document, timeout=2)  # Timeout di 10 secondi
+        doc_structure = DocStructureDocument(
+            doc_id=document.id,
+            structure=structure
+        )
+        task_doc_structure = asyncio.create_task(doc_structure.create())
+        await asyncio.wait_for(task_doc_structure, timeout=2)  # Timeout di 10 secondi
+    except asyncio.TimeoutError:
+        print("Timeout durante l'attesa del completamento dei task.")
+    
+    task_document.cancel()
+    task_doc_structure.cancel()
+    
+
+# def upload_document_from_id(filename: str, file_id: str, file_data, db: MongoClient) -> DocumentOutResponse:
+#     """
+#     Carica un documento dal database usando l'ID del file.
+#     """   
+#     loop = asyncio.get_running_loop()
+
+#     async def upload():
+#         structure = await preprocess("pdfplumber", file_data)
+
+#         npages = len(structure)
+
+#         document = DocumentDocument(
+#             name=filename,
+#             file_id=file_id,
+#             total_pages=npages,
+#         )
+#         await document.create()
+
+#         doc_structure = DocStructureDocument(
+#             doc_id=document.id,
+#             structure=structure
+#         )
+#         await doc_structure.create()
+
+#     await loop.run_in_executor(None, upload)
+
 @router.post("/upload_analyze")
 async def pre_upload(
     user: UserDocument = Depends(get_current_admin),
@@ -94,28 +174,60 @@ async def pre_upload(
 ):
 
     def upload_analyze_document(
-        file_data: bytes,
-        file_metadata: dict,
+        temp_file_path: str,  # Passa il percorso del file temporaneo anziché il file stesso
+        original_filename: str,  # Passa il nome del file originale
         db: MongoClient
     ):
-        asyncio.run(upload_file_async(file_data, file_metadata, db))
+        # Apri il file temporaneo in modalità lettura binaria
+        with open(temp_file_path, 'rb') as temp_file:
+            pdf_name = Path(original_filename).stem
+
+            # Processa il file temporaneo
+            #TODO: PROBLEMA è qua
+            structure = preprocess("pdfplumber", temp_file)
+
+            npages = len(structure)
+
+            # Resetta il puntatore del file all'inizio
+            temp_file.seek(0)
+
+            # Ottieni il tipo di contenuto del file
+            content_type, _ = mimetypes.guess_type(original_filename)
+
+            # Upload del file dal file temporaneo
+            file_id = asyncio.run(db.gridFS.upload_from_stream(
+                original_filename,  # Usa il nome del file originale
+                temp_file,
+                metadata={"contentType": content_type}
+            ))
+
+            document = DocumentDocument(
+                name=pdf_name,
+                file_id=file_id,
+                total_pages=npages,
+            )
+            asyncio.run(document.create())
+
+            doc_structure = DocStructureDocument(
+                doc_id=document.id,
+                structure=structure
+            )
+            asyncio.run(doc_structure.create())
 
     # Utilizza threading per eseguire l'operazione in un thread separato
     def run_upload_analyze_document(file: UploadFile, db: MongoClient):
-        file_data = file.file.read()
-        file_metadata = {
-            "filename": file.filename,
-            "content_type": file.content_type,
-            "file_size": file.file.seek(0, 2),  # Get file size
-            "headers": file.headers
-        }
-        threading.Thread(target=upload_analyze_document, args=(file_data, file_metadata, db)).start()
-    
+        # Crea una copia del file
+        copied_file_path = f"copy_{file.filename}"
+        with open(copied_file_path, 'wb') as copied_file:
+            copied_file.write(file.file.read())
+
+            # Esegui l'analisi del documento in un thread separato
+            threading.Thread(target=upload_analyze_document, args=(copied_file_path, file.filename, db)).start()
+
     run_upload_analyze_document(file, db)
     
     # Ritorna una risposta immediata
     return {"message": "Operazione di upload avviata in un thread separato."}
-
 
 @router.post("/doc", response_model=DocumentOutResponse)
 async def upload_document(

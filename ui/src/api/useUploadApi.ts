@@ -68,25 +68,44 @@ const useUploadApi = () => {
     //         console.log(error);
     //     }
     // };
-    const uploadAnalyze = async (file: FormData) => {
-        console.log('File in uploadDocument: ', file);
+    // const uploadAnalyze = async (file: FormData) => {
+    //     console.log('File in uploadDocument: ', file);
+    //     try {
+    //         axiosPrivate({
+    //             method: 'post',
+    //             url: '/api/upload/upload_analyze',
+    //             data: file,
+    //             headers: { 'Content-Type': 'multipart/form-data' },
+    //         });
+    //         console.log('Upload avviato in background.');
+    //         return 'Upload';
+    //     } catch (error) {
+    //         console.log('ERROR');
+    //         console.log(error);
+    //         return 'errore';
+    //     }
+    // };
+
+    const uploadFile = async (files) => {
+        const formData = new FormData();
+        files.forEach((file) => {
+            formData.append('files', file);
+        });
         try {
-            axiosPrivate({
+            await axiosPrivate({
                 method: 'post',
-                url: '/api/upload/upload_analyze',
-                data: file,
+                url: '/api/upload/upload',
+                data: formData,
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             console.log('Upload avviato in background.');
-            return 'Upload';
         } catch (error) {
-            console.log('ERROR');
-            console.log(error);
-            return 'errore';
+            console.error(`Errore durante l'upload del file`, error);
+            throw error;
         }
     };
 
-    return { uploadDocument, uploadOntology, uploadAnalyze };
+    return { uploadDocument, uploadOntology, uploadFile };
 };
 
 export default useUploadApi;
