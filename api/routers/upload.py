@@ -65,7 +65,9 @@ async def upload(
         # Recupera il file dal GridFS usando l'ID
         file_data = await find_document_by_id(db, file_id)
         if file_data:
-            threading.Thread(target=upload_document_from_id, args=(file.filename, file_id, file_data, db)).start()
+            pdf = str(file.filename)
+            pdf_name = Path(pdf).stem
+            threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, file_data, db)).start()
             # asyncio.create_task(upload_document_from_id(file.filename, file_id, file_data, db))
         else:
             raise HTTPException(status_code=404, detail="File non trovato nel database")
@@ -88,6 +90,7 @@ async def find_document_by_id(db, file_id):
 
 
 async def save_file_to_database(file: UploadFile, db: MongoClient):
+    file.file.seek(0)
     file_id = await db.gridFS.upload_from_stream(
         file.filename,
         file.file,
@@ -95,14 +98,16 @@ async def save_file_to_database(file: UploadFile, db: MongoClient):
     )
     return file_id
 
-def upload_document_from_id(filename: str, file_id: PydanticObjectId, file_data, db: MongoClient) -> DocumentOutResponse:
+def upload_document_from_id(filename: str, file_id: PydanticObjectId, file_data, db: MongoClient):
     """
     Carica un documento dal database usando l'ID del file.
     """
     def upload_sync():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(upload(filename, file_id, file_data, db))
+
+        structure = loop.run_until_complete(analyze(filename, file_id, file_data))
+        loop.run_until_complete(upload(filename, file_id, structure))
         loop.close()
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.submit(upload_sync)
@@ -113,58 +118,38 @@ def upload_document_from_id(filename: str, file_id: PydanticObjectId, file_data,
 #     await document.create()
 #     print('Arrivo2')
 
-async def upload(filename: str, file_id: PydanticObjectId, file_data, db: MongoClient):
+async def analyze(filename: str, file_id: PydanticObjectId, file_data):
     structure = preprocess("pdfplumber", file_data)
-    npages = len(structure)
 
+    return structure
+
+async def upload(filename: str, file_id: PydanticObjectId, structure):
+    npages = len(structure)
+    print(filename)
+    print(file_id)
+    print(npages)
+    # file_data = find_document_by_id(db, file_id)
+    # if file_data:
+    #     print("Nice")
+    # else:
+    #     print("mae")
     document = DocumentDocument(
         name=filename,
         file_id=file_id,
         total_pages=npages,
     )
-    
-    task_document = asyncio.create_task(document.create())
-    
+    # task_document = asyncio.create_task(document.create())
+    # task_doc_structure = asyncio.create_task(doc_structure.create())
     try:
-        await asyncio.wait_for(task_document, timeout=2)  # Timeout di 10 secondi
-        doc_structure = DocStructureDocument(
+        await asyncio.wait_for(document.create(), timeout=5)
+        doc_structure = DocStructureDocument(   
             doc_id=document.id,
             structure=structure
         )
-        task_doc_structure = asyncio.create_task(doc_structure.create())
-        await asyncio.wait_for(task_doc_structure, timeout=2)  # Timeout di 10 secondi
+        await asyncio.wait_for(doc_structure.create(), timeout=5)
     except asyncio.TimeoutError:
         print("Timeout durante l'attesa del completamento dei task.")
     
-    task_document.cancel()
-    task_doc_structure.cancel()
-    
-
-# def upload_document_from_id(filename: str, file_id: str, file_data, db: MongoClient) -> DocumentOutResponse:
-#     """
-#     Carica un documento dal database usando l'ID del file.
-#     """   
-#     loop = asyncio.get_running_loop()
-
-#     async def upload():
-#         structure = await preprocess("pdfplumber", file_data)
-
-#         npages = len(structure)
-
-#         document = DocumentDocument(
-#             name=filename,
-#             file_id=file_id,
-#             total_pages=npages,
-#         )
-#         await document.create()
-
-#         doc_structure = DocStructureDocument(
-#             doc_id=document.id,
-#             structure=structure
-#         )
-#         await doc_structure.create()
-
-#     await loop.run_in_executor(None, upload)
 
 @router.post("/upload_analyze")
 async def pre_upload(
@@ -194,6 +179,12 @@ async def pre_upload(
             # Ottieni il tipo di contenuto del file
             content_type, _ = mimetypes.guess_type(original_filename)
 
+            document = DocumentDocument(
+                name=pdf_name,
+                file_id=file_id,
+                total_pages=npages,
+            )
+            
             # Upload del file dal file temporaneo
             file_id = asyncio.run(db.gridFS.upload_from_stream(
                 original_filename,  # Usa il nome del file originale
@@ -201,11 +192,7 @@ async def pre_upload(
                 metadata={"contentType": content_type}
             ))
 
-            document = DocumentDocument(
-                name=pdf_name,
-                file_id=file_id,
-                total_pages=npages,
-            )
+            
             asyncio.run(document.create())
 
             doc_structure = DocStructureDocument(
