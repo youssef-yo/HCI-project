@@ -1,5 +1,6 @@
 import threading
 import asyncio
+import mimetypes
 
 import shutil
 import tempfile
@@ -40,132 +41,140 @@ from models.domain import (
 
 from services.oauth2 import get_current_admin
 
+from typing import List
+from motor.motor_asyncio import AsyncIOMotorClient
+import concurrent.futures
+from beanie import PydanticObjectId
 
 router = APIRouter()
 
-async def upload_file_async(file_data, file_metadata, db):
-
-    pdf = str(file_metadata["filename"])
-    pdf_name = Path(pdf).stem
-
-    print(f"File: {file_metadata['filename']}")
-    print(f"Content Type: {file_metadata['content_type']}")
-    print(f"Size: {file_metadata['file_size']}")
-    print(f"Headers: {file_metadata['headers']}")
-
-    # Write file_data to a temporary file
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        temp_file.write(file_data)
-        temp_file.seek(0)
-
-        # Process the temporary file
-        structure = preprocess("pdfplumber", temp_file)
-
-        npages = len(structure)
-
-        # Reset the file pointer to the beginning
-        temp_file.seek(0)
-
-        # Upload the file from the temporary file
-        file_id = await db.gridFS.upload_from_stream(
-            file_metadata["filename"],
-            temp_file,
-            metadata={"contentType": file_metadata["content_type"]}
-        )
-
-    document = DocumentDocument(
-        name=pdf_name,
-        file_id=file_id,
-        total_pages=npages,
-    )
-    await document.create()
-
-    doc_structure = DocStructureDocument(
-        doc_id=document.id,
-        structure=structure
-    )
-    await doc_structure.create()
-    
-@router.post("/upload_analyze")
-async def pre_upload(
+@router.post("/upload")
+async def upload(
     user: UserDocument = Depends(get_current_admin),
-    file: UploadFile = File(...),
+    files: List[UploadFile] = File(...),
     db: MongoClient = Depends(get_db)
 ):
+    # Save the files in db and get their ID
+    file_ids = []
+    for file in files:
+        file_ids.append(await save_file_to_database(file, db))
 
-    def upload_analyze_document(
-        file_data: bytes,
-        file_metadata: dict,
-        db: MongoClient
-    ):
-        asyncio.run(upload_file_async(file_data, file_metadata, db))
+    for file, file_id in zip(files, file_ids):
+        file_data = await find_document_by_id(db, file_id)
+        if file_data:
+            pdf = str(file.filename)
+            pdf_name = Path(pdf).stem
+            threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, file_data, db)).start()
+        else:
+            raise HTTPException(status_code=404, detail="File non trovato nel database")
 
-    # Utilizza threading per eseguire l'operazione in un thread separato
-    def run_upload_analyze_document(file: UploadFile, db: MongoClient):
-        file_data = file.file.read()
-        file_metadata = {
-            "filename": file.filename,
-            "content_type": file.content_type,
-            "file_size": file.file.seek(0, 2),  # Get file size
-            "headers": file.headers
-        }
-        threading.Thread(target=upload_analyze_document, args=(file_data, file_metadata, db)).start()
-    
-    run_upload_analyze_document(file, db)
-    
-    # Ritorna una risposta immediata
-    return {"message": "Operazione di upload avviata in un thread separato."}
+    return {"message": "Operazione di upload avviata in background."}
 
 
-@router.post("/doc", response_model=DocumentOutResponse)
-async def upload_document(
-    user: UserDocument = Depends(get_current_admin),
-    file: UploadFile = File(...),
-    db: MongoClient = Depends(get_db)
-) -> DocumentOutResponse:
-    """
-    Uploads a PDF file.
-    It also extracts the PDF structure (pages and tokens) for later use.
-    """
-    # TODO: Use transactions to ensure atomicity
-    # TODO: Maybe implement a progress tracker... this operation can take long
-    pdf = str(file.filename)
-    pdf_name = Path(pdf).stem
+async def find_document_by_id(db, file_id):
+    async for file in db.gridFS.find({"_id": ObjectId(file_id)}):
+        return file
 
-    print(f"File: {file.filename}")
-    print(f"Content Type: {file.content_type}")
-    print(f"Size: {file.size}")
-    print(f"Headers: {file.headers}")
 
-    structure = preprocess("pdfplumber", file.file)
-    npages = len(structure)
-
-    # Upload the document file with GridFS
+async def save_file_to_database(file: UploadFile, db: MongoClient):
     file.file.seek(0)
     file_id = await db.gridFS.upload_from_stream(
         file.filename,
         file.file,
         metadata={"contentType": file.content_type}
     )
+    return file_id
 
-    # Upload the document data
+def upload_document_from_id(filename: str, file_id: PydanticObjectId, file_data, db: MongoClient):
+    """
+    Carica un documento dal database usando l'ID del file.
+    """
+    def upload_sync():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        structure = loop.run_until_complete(analyze(filename, file_id, file_data))
+        loop.run_until_complete(upload(filename, file_id, structure, db))
+        loop.close()
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.submit(upload_sync)
+    
+
+async def analyze(filename: str, file_id: PydanticObjectId, file_data):
+    structure = preprocess("pdfplumber", file_data)
+
+    return structure
+
+async def upload(filename: str, file_id: PydanticObjectId, structure, db: MongoClient = Depends(get_db)):
+    npages = len(structure)
     document = DocumentDocument(
-        name=pdf_name,
+        name=filename,
         file_id=file_id,
         total_pages=npages,
     )
-    await document.create()
+    
+    try:
+        await document.create()
+    except Exception as e:
+        pass
+    try:
+        doc_structure = DocStructureDocument(   
+            doc_id=document.id,
+            structure=structure
+        )
+        await doc_structure.create()
+    except Exception as e:
+        pass
 
-    # Upload the PDF structure in a separate collection (maybe in future in GridFS).
-    # This is because the structure can be quite large, and could hinder the
-    # performance for simpler document queries that do not involve the structure itself.
-    doc_structure = DocStructureDocument(
-        doc_id=document.id,
-        structure=structure
-    )
-    await doc_structure.create()
+# @router.post("/doc", response_model=DocumentOutResponse)
+# async def upload_document(
+#     user: UserDocument = Depends(get_current_admin),
+#     file: UploadFile = File(...),
+#     db: MongoClient = Depends(get_db)
+# ) -> DocumentOutResponse:
+#     """
+#     Uploads a PDF file.
+#     It also extracts the PDF structure (pages and tokens) for later use.
+#     """
+#     # TODO: Use transactions to ensure atomicity
+#     # TODO: Maybe implement a progress tracker... this operation can take long
+#     pdf = str(file.filename)
+#     pdf_name = Path(pdf).stem
 
-    return document
+#     print(f"File: {file.filename}")
+#     print(f"Content Type: {file.content_type}")
+#     print(f"Size: {file.size}")
+#     print(f"Headers: {file.headers}")
+
+#     structure = preprocess("pdfplumber", file.file)
+#     npages = len(structure)
+
+#     # Upload the document file with GridFS
+#     file.file.seek(0)
+#     file_id = await db.gridFS.upload_from_stream(
+#         file.filename,
+#         file.file,
+#         metadata={"contentType": file.content_type}
+#     )
+
+#     # Upload the document data
+#     document = DocumentDocument(
+#         name=pdf_name,
+#         file_id=file_id,
+#         total_pages=npages,
+#     )
+#     await document.create()
+
+#     # Upload the PDF structure in a separate collection (maybe in future in GridFS).
+#     # This is because the structure can be quite large, and could hinder the
+#     # performance for simpler document queries that do not involve the structure itself.
+#     doc_structure = DocStructureDocument(
+#         doc_id=document.id,
+#         structure=structure
+#     )
+#     await doc_structure.create()
+
+#     return document
 
 
 @router.post("/ontology", response_model=OntologyData)

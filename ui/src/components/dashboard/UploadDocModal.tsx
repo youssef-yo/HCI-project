@@ -14,7 +14,7 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHi
     const [isUploading] = useState<boolean>(false);
     const supportedFiles = 'PDF';
 
-    const { uploadAnalyze } = useUploadApi();
+    const { uploadFile } = useUploadApi();
 
     const addFile = (_file: File) => {
         setFiles([...files, _file]);
@@ -24,59 +24,49 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHi
         setFiles(files.filter((file: File) => file.name !== _fileName));
     };
 
-    // const changeStateFileIsUploading = (value: boolean) => {
-    //     setIsUploading(value);
-    //     console.log('File is uploding? ', isUploading);
-    // };
-    // const changeStateAnyFileUploaded = (value: boolean) => {
-    //     setAnyFileUploaded(value);
-    //     console.log('Any file was uploaded? ', isUploading);
-    //     // if no file was uploaded then there is no need to refreshh the page after the modal is closed.
+    // const handleUploadAnalyze = () => {
+    //     if (files.length === 0) return;
+
+    //     // setIsUploading(true);
+    //     onHide();
+    //     try {
+    //         // Loop attraverso ogni file e esegui l'upload sul database
+    //         for (const file of files) {
+    //             uploadFile(file);
+    //         }
+    //         // setIsUploading(false);
+    //         // setAnyFileUploaded(true);
+    //         setFiles([]);
+    //         // onHide();
+    //         // window.location.reload(); // Ricarica la pagina dopo l'upload
+    //     } catch (error) {
+    //         console.error("Errore durante l'upload dei file:", error);
+    //         // setIsUploading(false);
+    //     }
     // };
 
-    // const updateFiles = (_file: string) => {
-    //     setFiles([...files, _file]);
-    //     console.log(files);
+    // const uploadFile = (file: File) => {
+    //     const formData = new FormData();
+    //     formData.append('file', file);
+
+    //     try {
+    //         // Effettua l'upload del file al backend per l'analisi
+    //         return uploadAnalyze(formData);
+    //     } catch (error) {
+    //         console.error(`Errore durante l'upload del file ${file}:`, error);
+    //         throw error; // Rilancia l'errore per gestirlo più avanti, se necessario
+    //     }
     // };
 
-    // const removeFile = (_file: string) => {
-    //     // For now it does nothing, when we'll load documents in MongoDB, we'll take care of this...
-    //     // deleteOntology(_file);
-    //     // setFiles(files.filter((file: any) => file.name !== _file));
-    //     console.log('Tried deleting file...');
-    // };
-
-    const handleUploadAnalyze = () => {
+    const handleUploadAnalyze = async () => {
         if (files.length === 0) return;
 
-        // setIsUploading(true);
         onHide();
         try {
-            // Loop attraverso ogni file e esegui l'upload sul database
-            for (const file of files) {
-                uploadFile(file);
-            }
-            // setIsUploading(false);
-            // setAnyFileUploaded(true);
+            await uploadFile(files);
             setFiles([]);
-            // onHide();
-            // window.location.reload(); // Ricarica la pagina dopo l'upload
         } catch (error) {
             console.error("Errore durante l'upload dei file:", error);
-            // setIsUploading(false);
-        }
-    };
-
-    const uploadFile = (file: File) => {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            // Effettua l'upload del file al backend per l'analisi
-            return uploadAnalyze(formData);
-        } catch (error) {
-            console.error(`Errore durante l'upload del file ${file}:`, error);
-            throw error; // Rilancia l'errore per gestirlo più avanti, se necessario
         }
     };
 

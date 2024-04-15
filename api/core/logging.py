@@ -15,7 +15,7 @@ def configure_logging() -> None:
         handlers = [json_handler]
 
     logging.basicConfig(
-        level=os.environ.get("LOG_LEVEL", default=logging.INFO), handlers=handlers
+        level=os.environ.get("LOG_LEVEL", default=logging.DEBUG), handlers=handlers
     )
 
     logging.getLogger("uvicorn")
