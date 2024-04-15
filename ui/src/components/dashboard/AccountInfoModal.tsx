@@ -23,11 +23,32 @@ const AccountInfoModal: React.FC<AccountInfoModalProps> = ({ show, onHide }) => 
 
     return (
         <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    {auth?.username}
+            <Modal.Body closeButton>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div
+                        style={{
+                            width: '50px',
+                            height: '50px',
+                            borderRadius: '50%',
+                            backgroundColor: 'blue',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            fontSize: '20px',
+                        }}>
+                        {auth?.username ? auth.username.charAt(0).toUpperCase() : ''}
+                    </div>
+                    <p>
+                        <b> Role: </b>
+                        {auth?.role}
+                        <br />
+                        <b> Email: </b>
+                        {auth?.username}
+                    </p>
                 </div>
-            </Modal.Header>
+            </Modal.Body>
             <Modal.Footer>
                 <Button variant="primary" onClick={handleClose}>
                     Close
