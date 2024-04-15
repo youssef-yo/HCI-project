@@ -48,6 +48,8 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHi
                 console.error(`Errore durante l'upload del file`, error);
             }
         }
+
+        updateTable();
     };
 
     const handleClose = () => {

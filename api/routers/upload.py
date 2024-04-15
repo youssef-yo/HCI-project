@@ -78,6 +78,7 @@ async def upload(
             pdf = str(file.filename)
             pdf_name = Path(pdf).stem
             threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, file_data, db)).start()
+            # TODO: quando il thread si chiude bisognerebbe fare: updateTable();
         else:
             raise HTTPException(status_code=404, detail="File non trovato nel database")
 
