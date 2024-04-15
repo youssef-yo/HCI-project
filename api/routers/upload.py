@@ -59,29 +59,16 @@ async def upload(
     for file in files:
         file_ids.append(await save_file_to_database(file, db))
 
-    # Avvia il processo di elaborazione in background per ogni file
     for file, file_id in zip(files, file_ids):
-        # await process_uploaded_file.delay(file.filename, file_id, db)
-        # Recupera il file dal GridFS usando l'ID
         file_data = await find_document_by_id(db, file_id)
         if file_data:
             pdf = str(file.filename)
             pdf_name = Path(pdf).stem
             threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, file_data, db)).start()
-            # asyncio.create_task(upload_document_from_id(file.filename, file_id, file_data, db))
         else:
             raise HTTPException(status_code=404, detail="File non trovato nel database")
 
     return {"message": "Operazione di upload avviata in background."}
-
-# def between_callback(filename, file_id, file_data, db):
-#     async def run_upload():
-#         await upload_document_from_id(filename, file_id, file_data, db)
-
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
-#     loop.run_until_complete(run_upload())
-#     loop.close()
 
 
 async def find_document_by_id(db, file_id):
@@ -112,11 +99,6 @@ def upload_document_from_id(filename: str, file_id: PydanticObjectId, file_data,
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.submit(upload_sync)
     
-        
-# async def create_document(document):
-#     print('arrivo1')
-#     await document.create()
-#     print('Arrivo2')
 
 async def analyze(filename: str, file_id: PydanticObjectId, file_data):
     structure = preprocess("pdfplumber", file_data)
@@ -130,11 +112,8 @@ async def upload(filename: str, file_id: PydanticObjectId, structure, db: MongoC
         file_id=file_id,
         total_pages=npages,
     )
-    # task_document = asyncio.create_task(document.create())
-    # task_doc_structure = asyncio.create_task(doc_structure.create())
+    
     try:
-        print("pirma doc")
-        # await asyncio.wait_for(document.create(), timeout=5)
         await document.create()
     except Exception as e:
         pass
@@ -146,122 +125,56 @@ async def upload(filename: str, file_id: PydanticObjectId, structure, db: MongoC
         await doc_structure.create()
     except Exception as e:
         pass
-    print("Ale")
 
-@router.post("/upload_analyze")
-async def pre_upload(
-    user: UserDocument = Depends(get_current_admin),
-    file: UploadFile = File(...),
-    db: MongoClient = Depends(get_db)
-):
+# @router.post("/doc", response_model=DocumentOutResponse)
+# async def upload_document(
+#     user: UserDocument = Depends(get_current_admin),
+#     file: UploadFile = File(...),
+#     db: MongoClient = Depends(get_db)
+# ) -> DocumentOutResponse:
+#     """
+#     Uploads a PDF file.
+#     It also extracts the PDF structure (pages and tokens) for later use.
+#     """
+#     # TODO: Use transactions to ensure atomicity
+#     # TODO: Maybe implement a progress tracker... this operation can take long
+#     pdf = str(file.filename)
+#     pdf_name = Path(pdf).stem
 
-    def upload_analyze_document(
-        temp_file_path: str,  # Passa il percorso del file temporaneo anziché il file stesso
-        original_filename: str,  # Passa il nome del file originale
-        db: MongoClient
-    ):
-        # Apri il file temporaneo in modalità lettura binaria
-        with open(temp_file_path, 'rb') as temp_file:
-            pdf_name = Path(original_filename).stem
+#     print(f"File: {file.filename}")
+#     print(f"Content Type: {file.content_type}")
+#     print(f"Size: {file.size}")
+#     print(f"Headers: {file.headers}")
 
-            # Processa il file temporaneo
-            #TODO: PROBLEMA è qua
-            structure = preprocess("pdfplumber", temp_file)
+#     structure = preprocess("pdfplumber", file.file)
+#     npages = len(structure)
 
-            npages = len(structure)
+#     # Upload the document file with GridFS
+#     file.file.seek(0)
+#     file_id = await db.gridFS.upload_from_stream(
+#         file.filename,
+#         file.file,
+#         metadata={"contentType": file.content_type}
+#     )
 
-            # Resetta il puntatore del file all'inizio
-            temp_file.seek(0)
+#     # Upload the document data
+#     document = DocumentDocument(
+#         name=pdf_name,
+#         file_id=file_id,
+#         total_pages=npages,
+#     )
+#     await document.create()
 
-            # Ottieni il tipo di contenuto del file
-            content_type, _ = mimetypes.guess_type(original_filename)
+#     # Upload the PDF structure in a separate collection (maybe in future in GridFS).
+#     # This is because the structure can be quite large, and could hinder the
+#     # performance for simpler document queries that do not involve the structure itself.
+#     doc_structure = DocStructureDocument(
+#         doc_id=document.id,
+#         structure=structure
+#     )
+#     await doc_structure.create()
 
-            document = DocumentDocument(
-                name=pdf_name,
-                file_id=file_id,
-                total_pages=npages,
-            )
-            
-            # Upload del file dal file temporaneo
-            file_id = asyncio.run(db.gridFS.upload_from_stream(
-                original_filename,  # Usa il nome del file originale
-                temp_file,
-                metadata={"contentType": content_type}
-            ))
-
-            
-            asyncio.run(document.create())
-
-            doc_structure = DocStructureDocument(
-                doc_id=document.id,
-                structure=structure
-            )
-            asyncio.run(doc_structure.create())
-
-    # Utilizza threading per eseguire l'operazione in un thread separato
-    def run_upload_analyze_document(file: UploadFile, db: MongoClient):
-        # Crea una copia del file
-        copied_file_path = f"copy_{file.filename}"
-        with open(copied_file_path, 'wb') as copied_file:
-            copied_file.write(file.file.read())
-
-            # Esegui l'analisi del documento in un thread separato
-            threading.Thread(target=upload_analyze_document, args=(copied_file_path, file.filename, db)).start()
-
-    run_upload_analyze_document(file, db)
-    
-    # Ritorna una risposta immediata
-    return {"message": "Operazione di upload avviata in un thread separato."}
-
-@router.post("/doc", response_model=DocumentOutResponse)
-async def upload_document(
-    user: UserDocument = Depends(get_current_admin),
-    file: UploadFile = File(...),
-    db: MongoClient = Depends(get_db)
-) -> DocumentOutResponse:
-    """
-    Uploads a PDF file.
-    It also extracts the PDF structure (pages and tokens) for later use.
-    """
-    # TODO: Use transactions to ensure atomicity
-    # TODO: Maybe implement a progress tracker... this operation can take long
-    pdf = str(file.filename)
-    pdf_name = Path(pdf).stem
-
-    print(f"File: {file.filename}")
-    print(f"Content Type: {file.content_type}")
-    print(f"Size: {file.size}")
-    print(f"Headers: {file.headers}")
-
-    structure = preprocess("pdfplumber", file.file)
-    npages = len(structure)
-
-    # Upload the document file with GridFS
-    file.file.seek(0)
-    file_id = await db.gridFS.upload_from_stream(
-        file.filename,
-        file.file,
-        metadata={"contentType": file.content_type}
-    )
-
-    # Upload the document data
-    document = DocumentDocument(
-        name=pdf_name,
-        file_id=file_id,
-        total_pages=npages,
-    )
-    await document.create()
-
-    # Upload the PDF structure in a separate collection (maybe in future in GridFS).
-    # This is because the structure can be quite large, and could hinder the
-    # performance for simpler document queries that do not involve the structure itself.
-    doc_structure = DocStructureDocument(
-        doc_id=document.id,
-        structure=structure
-    )
-    await doc_structure.create()
-
-    return document
+#     return document
 
 
 @router.post("/ontology", response_model=OntologyData)
