@@ -107,7 +107,7 @@ def upload_document_from_id(filename: str, file_id: PydanticObjectId, file_data,
         asyncio.set_event_loop(loop)
 
         structure = loop.run_until_complete(analyze(filename, file_id, file_data))
-        loop.run_until_complete(upload(filename, file_id, structure))
+        loop.run_until_complete(upload(filename, file_id, structure, db))
         loop.close()
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.submit(upload_sync)
@@ -123,16 +123,8 @@ async def analyze(filename: str, file_id: PydanticObjectId, file_data):
 
     return structure
 
-async def upload(filename: str, file_id: PydanticObjectId, structure):
+async def upload(filename: str, file_id: PydanticObjectId, structure, db: MongoClient = Depends(get_db)):
     npages = len(structure)
-    print(filename)
-    print(file_id)
-    print(npages)
-    # file_data = find_document_by_id(db, file_id)
-    # if file_data:
-    #     print("Nice")
-    # else:
-    #     print("mae")
     document = DocumentDocument(
         name=filename,
         file_id=file_id,
@@ -141,15 +133,20 @@ async def upload(filename: str, file_id: PydanticObjectId, structure):
     # task_document = asyncio.create_task(document.create())
     # task_doc_structure = asyncio.create_task(doc_structure.create())
     try:
-        await asyncio.wait_for(document.create(), timeout=5)
+        print("pirma doc")
+        # await asyncio.wait_for(document.create(), timeout=5)
+        await document.create()
+    except Exception as e:
+        pass
+    try:
         doc_structure = DocStructureDocument(   
             doc_id=document.id,
             structure=structure
         )
-        await asyncio.wait_for(doc_structure.create(), timeout=5)
-    except asyncio.TimeoutError:
-        print("Timeout durante l'attesa del completamento dei task.")
-    
+        await doc_structure.create()
+    except Exception as e:
+        pass
+    print("Ale")
 
 @router.post("/upload_analyze")
 async def pre_upload(
