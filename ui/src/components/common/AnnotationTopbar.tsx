@@ -1,7 +1,8 @@
 import { MdOutlineHouse, MdAccountCircle, MdOutlineSave } from 'react-icons/md';
 import { StyledTopbar } from './Topbar.styled';
 import AccountInfoModal from '../../components/dashboard/AccountInfoModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { notification } from '@allenai/varnish';
 
 export type AnnotationTopbarProps = {
     height: string;
@@ -10,11 +11,21 @@ export type AnnotationTopbarProps = {
 
 const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset }) => {
     const [accountInfoModal, setAccountInfoModal] = useState<boolean>(false);
+    const [showSaveNotification, setSaveShowNotification] = useState<boolean>(false);
 
     const handleAccountInfoModalClose = () => {
         console.log('Closing account info modal');
         setAccountInfoModal(false);
     };
+
+    useEffect(() => {
+        if (showSaveNotification === true) {
+            notification.success({
+                message: 'Saved',
+            });
+        }
+        setSaveShowNotification(false);
+    });
 
     return (
         <>
@@ -26,7 +37,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                         justifyContent: 'center',
                         alignItems: 'center',
                     }}>
-                    <MdOutlineHouse style={{ fontSize: '25px' }} />
+                    <MdOutlineHouse style={{ color: 'black', fontSize: '25px' }} />
                 </div>
                 <div
                     style={{
@@ -35,7 +46,10 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                         justifyContent: 'center',
                         alignItems: 'center',
                     }}>
-                    <MdOutlineSave style={{ fontSize: '25px' }} />
+                    <MdOutlineSave
+                        onClick={() => setSaveShowNotification(true)}
+                        style={{ color: 'black', fontSize: '25px' }}
+                    />
                 </div>
                 <div
                     style={{
@@ -46,7 +60,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                     }}>
                     <MdAccountCircle
                         onClick={() => setAccountInfoModal(true)}
-                        style={{ fontSize: '25px' }}
+                        style={{ color: 'black', fontSize: '25px' }}
                     />
                 </div>
             </StyledTopbar>

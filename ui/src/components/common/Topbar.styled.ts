@@ -10,7 +10,7 @@ export const StyledTopbar = styled.div<TopbarProps>(
         display: flex;
         justify-content: space-between;
         height: ${height};
-        background: ${theme.color.N9};
+        background: white;
         color: #eee;
         padding: ${theme.spacing.md};
         z-index: 1000;
