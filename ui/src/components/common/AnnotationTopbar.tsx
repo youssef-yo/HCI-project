@@ -1,6 +1,5 @@
-import { MdOutlineHouse, MdAccountCircle } from 'react-icons/md';
+import { MdOutlineHouse, MdAccountCircle, MdOutlineSave } from 'react-icons/md';
 import { StyledTopbar } from './Topbar.styled';
-import IconButton from './IconButton';
 import AccountInfoModal from '../../components/dashboard/AccountInfoModal';
 import { useState } from 'react';
 
@@ -27,9 +26,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                         justifyContent: 'center',
                         alignItems: 'center',
                     }}>
-                    <IconButton title="Back">
-                        <MdOutlineHouse />
-                    </IconButton>
+                    <MdOutlineHouse style={{ fontSize: '25px' }} />
                 </div>
                 <div
                     style={{
@@ -38,7 +35,19 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                         justifyContent: 'center',
                         alignItems: 'center',
                     }}>
-                    <MdAccountCircle onClick={() => setAccountInfoModal(true)} />
+                    <MdOutlineSave style={{ fontSize: '25px' }} />
+                </div>
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                    <MdAccountCircle
+                        onClick={() => setAccountInfoModal(true)}
+                        style={{ fontSize: '25px' }}
+                    />
                 </div>
             </StyledTopbar>
 
