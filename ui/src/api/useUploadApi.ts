@@ -52,23 +52,17 @@ const useUploadApi = () => {
         }
     };
 
-    const uploadFile = async (files) => {
+    const uploadFile = async (files: []) => {
         const formData = new FormData();
         files.forEach((file) => {
             formData.append('files', file);
         });
-        try {
-            await axiosPrivate({
-                method: 'post',
-                url: '/api/upload/upload',
-                data: formData,
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            console.log('Upload avviato in background.');
-        } catch (error) {
-            console.error(`Errore durante l'upload del file`, error);
-            throw error;
-        }
+        await axiosPrivate({
+            method: 'post',
+            url: '/api/upload/upload',
+            data: formData,
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
     };
 
     return { uploadDocument, uploadOntology, uploadFile };

@@ -3,10 +3,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/styles/FileItem.scss';
 
-const FileItem = ({ file, deleteFile }: { file: File; deleteFile: any }) => {
-    console.log('file item: ', file.name);
+const FileItem = ({
+    file,
+    deleteFile,
+    hasDuplicate,
+}: {
+    file: File;
+    deleteFile: any;
+    hasDuplicate: boolean;
+}) => {
     return (
-        <li className="file-item" key={file.name}>
+        <li className={`file-item ${hasDuplicate ? 'duplicate' : ''}`} key={file.name}>
             <FontAwesomeIcon icon={faFileAlt} />
             <p>{file.name}</p>
             <div className="actions">
