@@ -11,7 +11,8 @@ type UploadDocModalProps = {
 
 const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHide }) => {
     const [files, setFiles] = useState<File[]>([]);
-    const [isUploading] = useState<boolean>(false);
+    const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [duplicateFiles, setDuplicateFiles] = useState<String[]>([]);
     const supportedFiles = 'PDF';
 
     const { uploadFile } = useUploadApi();
@@ -22,55 +23,36 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHi
 
     const removeFile = (_fileName: string) => {
         setFiles(files.filter((file: File) => file.name !== _fileName));
+        setDuplicateFiles(duplicateFiles.filter((name: string) => name !== _fileName));
     };
-
-    // const handleUploadAnalyze = () => {
-    //     if (files.length === 0) return;
-
-    //     // setIsUploading(true);
-    //     onHide();
-    //     try {
-    //         // Loop attraverso ogni file e esegui l'upload sul database
-    //         for (const file of files) {
-    //             uploadFile(file);
-    //         }
-    //         // setIsUploading(false);
-    //         // setAnyFileUploaded(true);
-    //         setFiles([]);
-    //         // onHide();
-    //         // window.location.reload(); // Ricarica la pagina dopo l'upload
-    //     } catch (error) {
-    //         console.error("Errore durante l'upload dei file:", error);
-    //         // setIsUploading(false);
-    //     }
-    // };
-
-    // const uploadFile = (file: File) => {
-    //     const formData = new FormData();
-    //     formData.append('file', file);
-
-    //     try {
-    //         // Effettua l'upload del file al backend per l'analisi
-    //         return uploadAnalyze(formData);
-    //     } catch (error) {
-    //         console.error(`Errore durante l'upload del file ${file}:`, error);
-    //         throw error; // Rilancia l'errore per gestirlo più avanti, se necessario
-    //     }
-    // };
 
     const handleUploadAnalyze = async () => {
         if (files.length === 0) return;
 
-        onHide();
+        setIsUploading(true);
+
         try {
             await uploadFile(files);
+            setIsUploading(false);
+            onHide();
             setFiles([]);
-        } catch (error) {
-            console.error("Errore durante l'upload dei file:", error);
+            setDuplicateFiles([]);
+        } catch (error: any) {
+            if (error.response.status === 409) {
+                setIsUploading(false);
+                const duplicateFiles = error.response.data.detail;
+                setDuplicateFiles(duplicateFiles);
+            } else if (error.response.status === 404) {
+                console.log('File non trovato');
+            } else {
+                console.error(`Errore durante l'upload del file`, error);
+            }
         }
     };
 
     const handleClose = () => {
+        setFiles([]);
+        setDuplicateFiles([]);
         onHide();
         updateTable();
     };
@@ -92,9 +74,14 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHi
                     // api={(doc: any) => uploadAnalyze(doc)}
                     // supportedFiles={supportedFiles}
                 ></InputFile>
+                {duplicateFiles.length > 0 && <p style={{ color: 'red' }}> Duplicate File </p>}
                 <Form>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                        <FileList files={files} removeFile={removeFile} />
+                        <FileList
+                            files={files}
+                            removeFile={removeFile}
+                            duplicateFiles={duplicateFiles}
+                        />
                     </Form.Group>
                 </Form>
             </Modal.Body>

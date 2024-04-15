@@ -56,9 +56,22 @@ async def upload(
 ):
     # Save the files in db and get their ID
     file_ids = []
+    files_duplicate = []
     for file in files:
-        file_ids.append(await save_file_to_database(file, db))
+        pdf = str(file.filename)
+        pdf_name = Path(pdf).stem
+        stored_onto = await DocumentDocument.find_one(DocumentDocument.name == pdf_name)
 
+        if stored_onto:
+            files_duplicate.append(file.filename)
+        else:
+            file_ids.append(await save_file_to_database(file, db))
+
+    if files_duplicate:
+        raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=files_duplicate
+            )
     for file, file_id in zip(files, file_ids):
         file_data = await find_document_by_id(db, file_id)
         if file_data:
