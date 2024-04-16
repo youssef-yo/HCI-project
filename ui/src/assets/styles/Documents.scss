@@ -1,0 +1,35 @@
+// .loading-text {
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     position: relative;
+//   }
+  
+//   .loading-text::after {
+//     content: 'LOADING...';
+//     position: absolute;
+//     animation: loading-dots 1s infinite steps(4);
+//   }
+  
+//   @keyframes loading-dots {
+//     from, to {
+//       opacity: 0;
+//     }
+//     50% {
+//       opacity: 1;
+//     }
+//   }
+  
+.loading {
+    animation: blink-animation 1s infinite;
+  }
+  
+  @keyframes blink-animation {
+    0% { background-color: transparent; }
+    50% { background-color: #edd810; }
+    100% { background-color: transparent; }
+  }
+  
+.standard {
+    background-color: white;
+}

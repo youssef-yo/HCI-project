@@ -1,51 +1,64 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { InputFile, FileList } from '../sidebar';
 import { useUploadApi } from '../../api';
 
 type UploadDocModalProps = {
+    updateTable: () => void;
     show: boolean;
     onHide: () => void;
 };
 
-const UploadDocModal: React.FC<UploadDocModalProps> = ({ show, onHide }) => {
-    const [files, setFiles] = useState<string[]>([]);
+const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHide }) => {
+    const [files, setFiles] = useState<File[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
-    const [anyFileUploaded, setAnyFileUploaded] = useState<boolean>(false);
+    const [duplicateFiles, setDuplicateFiles] = useState<String[]>([]);
+    const [errorText, setErrorText] = useState('');
     const supportedFiles = 'PDF';
 
-    const { uploadDocument } = useUploadApi();
+    const { uploadFile } = useUploadApi();
 
-    const changeStateFileIsUploading = (value: boolean) => {
-        setIsUploading(value);
-        console.log('File is uploding? ', isUploading);
-    };
-    const changeStateAnyFileUploaded = (value: boolean) => {
-        setAnyFileUploaded(value);
-        console.log('Any file was uploaded? ', isUploading);
-        // if no file was uploaded then there is no need to refreshh the page after the modal is closed.
-    };
-
-    const updateFiles = (_file: string) => {
+    const addFile = (_file: File) => {
         setFiles([...files, _file]);
-        console.log(files);
     };
 
-    const removeFile = (_file: string) => {
-        // For now it does nothing, when we'll load documents in MongoDB, we'll take care of this...
-        // deleteOntology(_file);
-        // setFiles(files.filter((file: any) => file.name !== _file));
-        console.log('Tried deleting file...');
+    const removeFile = (_fileName: string) => {
+        setFiles(files.filter((file: File) => file.name !== _fileName));
+        setDuplicateFiles(duplicateFiles.filter((name: string) => name !== _fileName));
+    };
+
+    const handleUploadAnalyze = async () => {
+        if (files.length === 0) return;
+
+        setIsUploading(true);
+
+        try {
+            await uploadFile(files);
+            setIsUploading(false);
+            onHide();
+            setFiles([]);
+            setDuplicateFiles([]);
+        } catch (error: any) {
+            if (error.response.status === 409) {
+                setIsUploading(false);
+                const duplicateFiles = error.response.data.detail;
+                setDuplicateFiles(duplicateFiles);
+                setErrorText('Duplicate Files');
+            } else if (error.response.status === 404) {
+                setErrorText('File not found');
+            } else {
+                setErrorText(`Error during the upload of the file`);
+            }
+        }
+
+        updateTable();
     };
 
     const handleClose = () => {
-        if (anyFileUploaded && !isUploading) {
-            onHide();
-            window.location.reload();
-        }
-        if (!anyFileUploaded && !isUploading) {
-            onHide();
-        }
+        setFiles([]);
+        setDuplicateFiles([]);
+        onHide();
+        updateTable();
     };
 
     return (
@@ -56,22 +69,34 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ show, onHide }) => {
             <Modal.Body>
                 <InputFile
                     files={files}
-                    updateFiles={updateFiles}
-                    changeStateFileIsUploading={changeStateFileIsUploading}
-                    changeStateAnyFileUploaded={changeStateAnyFileUploaded}
-                    api={(doc: any) => uploadDocument(doc)}
-                    supportedFiles={supportedFiles}></InputFile>
+                    addFile={addFile}
+                    supportedFiles={supportedFiles}
+                    // files={files}
+                    // updateFiles={updateFiles}
+                    // changeStateFileIsUploading={changeStateFileIsUploading}
+                    // changeStateAnyFileUploaded={changeStateAnyFileUploaded}
+                    // api={(doc: any) => uploadAnalyze(doc)}
+                    // supportedFiles={supportedFiles}
+                ></InputFile>
+                {duplicateFiles.length > 0 && <p style={{ color: 'red' }}> {errorText} </p>}
                 <Form>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                        <FileList files={files} removeFile={removeFile} />
+                        <FileList
+                            files={files}
+                            removeFile={removeFile}
+                            duplicateFiles={duplicateFiles}
+                        />
                     </Form.Group>
                 </Form>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="primary" onClick={handleClose}>
-                    Close
+                    Cancel
                 </Button>
-                <Button variant="primary" onClick={handleClose}>
+                <Button
+                    variant="primary"
+                    onClick={handleUploadAnalyze}
+                    disabled={isUploading || files.length === 0}>
                     Save Changes
                 </Button>
             </Modal.Footer>

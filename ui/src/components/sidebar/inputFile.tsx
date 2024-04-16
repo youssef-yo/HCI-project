@@ -5,21 +5,14 @@ import '../../assets/styles/InputFile.scss';
 
 const InputFile = ({
     files,
-    updateFiles,
-    changeStateFileIsUploading,
-    changeStateAnyFileUploaded,
-    api,
+    addFile,
     supportedFiles,
 }: {
-    files: any;
-    updateFiles: any;
-    changeStateFileIsUploading: any;
-    changeStateAnyFileUploaded: any;
-    api: any;
+    files: File[];
+    addFile: (file: File) => void;
     supportedFiles: string;
 }) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const formData = new FormData();
     const handleClick = () => {
         // open file input box on click of other element
         inputRef?.current?.click();
@@ -35,33 +28,31 @@ const InputFile = ({
             alert('File già caricato, seleziona un file con un nome diverso.');
             return;
         }
-        fileObj.isUploading = true;
-        changeStateFileIsUploading(true);
-        updateFiles(fileObj);
-        console.log('fileObj is', fileObj);
+        addFile(fileObj);
+        // console.log('fileObj is', fileObj);
         // reset file input
         event.target.value = null;
 
         // is now empty
         console.log(event.target.files);
 
-        // can still access file object here with  fileObj and fileObj.name
-        formData.append('file', fileObj, fileObj.name);
-        api(formData)
-            .then((result: any) => {
-                console.log('Response after the document was uploaded', result);
-                // TODO: Make the API return the ontology ID, and append it to the fileObj
-                updateFiles(fileObj);
-                fileObj.isUploading = false;
-                changeStateFileIsUploading(false);
-                changeStateAnyFileUploaded(true);
-            })
-            .catch((error: any) => {
-                console.log('An error occured after trying to upload a file:', error);
-                fileObj.isUploading = false;
-                changeStateFileIsUploading(false);
-            });
-        // da fare try catch (se uploadOntology ok => ... altrimenti catch errore)
+        // // can still access file object here with  fileObj and fileObj.name
+        // formData.append('file', fileObj, fileObj.name);
+        // api(formData)
+        //     .then((result: any) => {
+        //         console.log('Response after the document was uploaded', result);
+        //         // TODO: Make the API return the ontology ID, and append it to the fileObj
+        //         updateFiles(fileObj);
+        //         fileObj.isUploading = false;
+        //         changeStateFileIsUploading(false);
+        //         changeStateAnyFileUploaded(true);
+        //     })
+        //     .catch((error: any) => {
+        //         console.log('An error occured after trying to upload a file:', error);
+        //         fileObj.isUploading = false;
+        //         changeStateFileIsUploading(false);
+        //     });
+        // // da fare try catch (se uploadOntology ok => ... altrimenti catch errore)
     };
 
     return (

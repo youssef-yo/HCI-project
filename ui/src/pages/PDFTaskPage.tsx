@@ -7,7 +7,8 @@ import { useContext, useCallback, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { PDF, CenterOnPage, RelationModal } from '../components';
-import { WithSidebar, Sidebar, Topbar, WithTopbar } from '../components/common';
+import { WithSidebar, Sidebar, WithTopbar } from '../components/common';
+import AnnotationTopbar from '../components/common/AnnotationTopbar';
 import {
     Labels,
     Annotations,
@@ -289,7 +290,7 @@ const PDFTaskPage = () => {
                         <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
-                        <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <AnnotationTopbar height={topbarHeight} leftOffset={sidebarWidth} />
                         <CenterOnPage>
                             <Progress
                                 type="circle"
@@ -308,7 +309,7 @@ const PDFTaskPage = () => {
                         <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
-                        <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <AnnotationTopbar height={topbarHeight} leftOffset={sidebarWidth} />
                         <CenterOnPage>
                             <Result icon={<QuestionCircleOutlined />} title="PDF Not Found" />
                         </CenterOnPage>
@@ -374,7 +375,10 @@ const PDFTaskPage = () => {
                                     )}
                                 </Sidebar>
                                 <WithTopbar height={topbarHeight}>
-                                    <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
+                                    <AnnotationTopbar
+                                        height={topbarHeight}
+                                        leftOffset={sidebarWidth}
+                                    />
                                     <PDFContainer>
                                         {activeOntoProperty && (
                                             <RelationModal
@@ -404,7 +408,7 @@ const PDFTaskPage = () => {
                         <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
-                        <Topbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <AnnotationTopbar height={topbarHeight} leftOffset={sidebarWidth} />
                         <CenterOnPage>
                             <Result status="warning" title="Unable to Render Document" />
                         </CenterOnPage>
