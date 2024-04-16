@@ -56,15 +56,29 @@ async def upload(
 ):
     # Save the files in db and get their ID
     file_ids = []
+    files_duplicate = []
     for file in files:
-        file_ids.append(await save_file_to_database(file, db))
+        pdf = str(file.filename)
+        pdf_name = Path(pdf).stem
+        stored_onto = await DocumentDocument.find_one(DocumentDocument.name == pdf_name)
 
+        if stored_onto:
+            files_duplicate.append(file.filename)
+        else:
+            file_ids.append(await save_file_to_database(file, db))
+
+    if files_duplicate:
+        raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=files_duplicate
+            )
     for file, file_id in zip(files, file_ids):
         file_data = await find_document_by_id(db, file_id)
         if file_data:
             pdf = str(file.filename)
             pdf_name = Path(pdf).stem
             threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, file_data, db)).start()
+            # TODO: quando il thread si chiude bisognerebbe fare: updateTable();
         else:
             raise HTTPException(status_code=404, detail="File non trovato nel database")
 
