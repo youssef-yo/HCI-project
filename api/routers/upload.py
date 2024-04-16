@@ -66,6 +66,10 @@ async def upload(
             files_duplicate.append(file.filename)
         else:
             file_ids.append(await save_file_to_database(file, db))
+            #IDEA: salvare un file con lo stesso id e nel nome in fondo ha ".LOADING"
+            #TODO: il thread dovrà rimuovere il file ".LOADING" quando finisce
+            #TODO: periodicamente si potrebbero togliere i file ".LOADING" oppure potrebbero essere dei file temporanei(?)
+            await save_loading_document_to_database(file.filename)
 
     if files_duplicate:
         raise HTTPException(
@@ -98,6 +102,14 @@ async def save_file_to_database(file: UploadFile, db: MongoClient):
         metadata={"contentType": file.content_type}
     )
     return file_id
+async def save_loading_document_to_database(filename: str):
+    name = filename + '.LOADING'
+    document = DocumentDocument(
+        name=name,
+        file_id=file_id,
+        total_pages=0,
+    )
+    await document.create()
 
 def upload_document_from_id(filename: str, file_id: PydanticObjectId, file_data, db: MongoClient):
     """
