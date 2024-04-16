@@ -4,6 +4,7 @@ import { Button, Header, IconButton, Table } from '../../components/common';
 import { Doc, useDocumentApi } from '../../api';
 import { UploadDocModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
+import '../../assets/styles/Documents.scss';
 
 const DocumentsPage = () => {
     const [docs, setDocs] = useState<Doc[]>([]);
@@ -50,9 +51,12 @@ const DocumentsPage = () => {
                 </thead>
                 <tbody>
                     {docs.map((doc) => (
-                        <tr key={doc._id}>
+                         <tr
+                            key={doc._id}
+                            className={doc.name.endsWith('.LOADING') ? 'loading' : 'standard'}
+                        >
                             <td>{doc.name}</td>
-                            <td style={{ textAlign: 'center' }}>{doc.totalPages}</td>
+                            <td style={{ textAlign: 'center' }}>{doc.name.endsWith('.LOADING') ? '?' : doc.totalPages}</td>
                             <td
                                 style={{
                                     display: 'flex',
@@ -63,9 +67,11 @@ const DocumentsPage = () => {
                                 }}>
                                 <IconButton
                                     title="View Document"
-                                    onClick={() => navigate(`${doc._id}`)}>
+                                    onClick={() => navigate(`${doc._id}`)}
+                                    disabled={doc.name.endsWith('.LOADING')}>
                                     <MdOpenInNew />
                                 </IconButton>
+                                
                             </td>
                         </tr>
                     ))}
