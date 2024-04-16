@@ -44,6 +44,7 @@ const StyledButton = styled.button<ButtonProps>`
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    margin-left: auto;
 
     border: none;
     outline: none;

@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getApiError, useUserApi } from '../../api';
-import { Button, Header, Input, InputType, Option, Select } from '../../components/common';
+import { Header, Input, InputType, Option } from '../../components/common';
+import ChooseTypeUser from '../../components/common/ChooseTypeUser';
 import { ROLES } from '../../config/roles';
 
 const UserCreatePage = () => {
@@ -25,6 +26,7 @@ const UserCreatePage = () => {
     useEffect(() => {
         const options = buildRoleOptions([ROLES.Admin, ROLES.Annotator]);
         setRoleOptions(options);
+        console.log(roleOptions);
     }, []);
 
     const buildRoleOptions = (roles: string[]) => {
@@ -76,12 +78,14 @@ const UserCreatePage = () => {
             .catch((err) => setErrorMsg(getApiError(err)));
     };
 
+
+    
     return (
         <section>
             <Header>
-                <h1>User Form</h1>
+                <h1>Create user</h1>
             </Header>
-
+        
             <Form onSubmit={(e) => onCreateUser(e)}>
                 {errorMsg && (
                     <p className="errorMsg" ref={errorRef}>
@@ -89,62 +93,76 @@ const UserCreatePage = () => {
                     </p>
                 )}
 
+                <InputWrapper>
                 <Input
-                    type="text"
-                    variant={InputType.STANDARD}
-                    id="email"
-                    placeholder="Email"
-                    onChange={(e) => setEmail(e.target.value)}
-                    value={email}
-                    required
-                />
-
-                <Input
+                    color="#000000"
                     type="text"
                     variant={InputType.STANDARD}
                     id="fullName"
                     placeholder="Full Name"
+                    width="100%"
                     onChange={(e) => setFullName(e.target.value)}
                     value={fullName}
                     required
                 />
-
-                <Select
-                    placeHolder="Select Role"
-                    options={roleOptions}
-                    value={roleOption}
-                    onChange={(role) => setRoleOption(role)}
-                    isSearchable
-                />
-
                 <Input
+                    color="#000000"
+                    type="text"
+                    variant={InputType.STANDARD}
+                    id="email"
+                    placeholder="Email"
+                    width="100%"
+                    onChange={(e) => setEmail(e.target.value)}
+                    value={email}
+                    required
+                />
+                </InputWrapper>
+                <InputWrapper>
+                <Input
+                    color="#000000"
                     type="password"
                     variant={InputType.STANDARD}
                     id="password"
                     placeholder="Password"
+                    width="100%"
                     onChange={(e) => setPassword(e.target.value)}
                     value={password}
                     required
                 />
 
                 <Input
+                    color="#000000"
                     type="password"
                     variant={InputType.STANDARD}
                     id="confirmPassword"
                     placeholder="Confirm Password"
+                    width="100%"
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     value={confirmPassword}
                     required
                 />
-
-                <Button
+                </InputWrapper>
+                {/* <Select
+                    placeHolder="Select Role"
+                    options={roleOptions}
+                    value={roleOption}
+                    onChange={(role) => setRoleOption(role)}
+                    isSearchable
+                /> */}
+                <ChooseTypeUser
+                    options={roleOptions}
+                    onChange={(role) => setRoleOption(role)}
+                />
+                <StiledButtonCreateUser
                     type="submit"
-                    color="secondary"
-                    icon={<MdOutlinePersonAddAlt />}
-                    size="large"
+                    size="medium"
                     onClick={onCreateUser}>
-                    Create User
-                </Button>
+                        <span className="button__icon">{<MdOutlinePersonAddAlt />}</span>
+                        Create User
+                </StiledButtonCreateUser>
+                
+
+                
             </Form>
         </section>
     );
@@ -152,9 +170,57 @@ const UserCreatePage = () => {
 
 export default UserCreatePage;
 
-const Form = styled.form`
+
+const StiledButtonCreateUser = styled.button`
+
+    width: 20%;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+   
+    border: none;
+    outline: none;
+    border-radius: 4px;
+
+    font-weight: 600;
+    line-height: 1.75;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+
+    transition: 200ms ease-out;
+    cursor: pointer;
+
+    padding: 6px 18px;
+    font-size: 1em;
+
+    background: #00B4D8;
+    color: #eee;
+
+    &:hover {
+        background: #0077B6;
+    }
+    
+    & .button__icon {
+        display: inherit;
+        margin-left: -4px;
+        margin-right: 8px;
+    }
+`;
+
+const InputWrapper = styled.div`
     width: 100%;
     display: flex;
+    flex-direction: row;
+    gap: 10px; // Spazio tra gli input
+`;
+
+const Form = styled.form`
+
+    width: 80%;
+    padding-left: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
     gap: 25px;
 
