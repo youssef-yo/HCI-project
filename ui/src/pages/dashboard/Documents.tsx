@@ -1,9 +1,10 @@
-import { MdOpenInNew, MdOutlineEdit, MdOutlineNoteAdd } from 'react-icons/md';
+import { MdOpenInNew, MdOutlineNoteAdd } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { Doc, useDocumentApi } from '../../api';
 import { UploadDocModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
+import '../../assets/styles/Documents.scss';
 
 const DocumentsPage = () => {
     const [docs, setDocs] = useState<Doc[]>([]);
@@ -40,7 +41,7 @@ const DocumentsPage = () => {
                 </Button>
             </Header>
 
-            <Table color="#0096C7">
+            <Table color="#0077B6">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -54,12 +55,12 @@ const DocumentsPage = () => {
                             <td colSpan="3" style={{ textAlign: 'center' }}>Nothing to show</td>
                         </tr>
                     ) : (docs.map((doc) => (
-                        <tr
+                         <tr
                             key={doc._id}
                             className={doc.name.endsWith('.LOADING') ? 'loading' : 'standard'}
                         >
                             <td>{doc.name}</td>
-                            <td style={{ textAlign: 'center' }}>{doc.totalPages}</td>
+                            <td style={{ textAlign: 'center' }}>{doc.name.endsWith('.LOADING') ? '?' : doc.totalPages}</td>
                             <td
                                 style={{
                                     display: 'flex',
@@ -70,12 +71,11 @@ const DocumentsPage = () => {
                                 }}>
                                 <IconButton
                                     title="View Document"
-                                    onClick={() => navigate(`${doc._id}`)}>
+                                    onClick={() => navigate(`${doc._id}`)}
+                                    disabled={doc.name.endsWith('.LOADING')}>
                                     <MdOpenInNew />
                                 </IconButton>
-                                <IconButton title="Edit Document">
-                                    <MdOutlineEdit />
-                                </IconButton>
+                                
                             </td>
                         </tr>
                     ))
@@ -83,7 +83,11 @@ const DocumentsPage = () => {
                 </tbody>
             </Table>
 
-            <UploadDocModal show={uploadDocModal} onHide={handleUploadModalClose} />
+            <UploadDocModal
+                updateTable={loadDocs}
+                show={uploadDocModal}
+                onHide={handleUploadModalClose}
+            />
         </section>
     );
 };

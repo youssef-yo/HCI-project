@@ -67,7 +67,7 @@ const UsersPage = () => {
                     Create User
                 </Button>
             </Header>
-            <Table color="#0096C7">
+            <Table color="#0077B6">
                 <thead>
                     <tr>
                         <th>Email</th>
