@@ -290,7 +290,11 @@ const PDFTaskPage = () => {
                         <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
-                        <AnnotationTopbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <AnnotationTopbar
+                            _setRelationModalVisible={setRelationModalVisible}
+                            height={topbarHeight}
+                            leftOffset={sidebarWidth}
+                        />
                         <CenterOnPage>
                             <Progress
                                 type="circle"
@@ -309,7 +313,11 @@ const PDFTaskPage = () => {
                         <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
-                        <AnnotationTopbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <AnnotationTopbar
+                            _setRelationModalVisible={setRelationModalVisible}
+                            height={topbarHeight}
+                            leftOffset={sidebarWidth}
+                        />
                         <CenterOnPage>
                             <Result icon={<QuestionCircleOutlined />} title="PDF Not Found" />
                         </CenterOnPage>
@@ -408,7 +416,11 @@ const PDFTaskPage = () => {
                         <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
-                        <AnnotationTopbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <AnnotationTopbar
+                            _setRelationModalVisible={setRelationModalVisible}
+                            height={topbarHeight}
+                            leftOffset={sidebarWidth}
+                        />
                         <CenterOnPage>
                             <Result status="warning" title="Unable to Render Document" />
                         </CenterOnPage>

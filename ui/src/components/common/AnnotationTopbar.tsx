@@ -1,10 +1,13 @@
+import React, { useState, useEffect } from 'react';
 import { MdOutlineHouse, MdAccountCircle, MdOutlineSave } from 'react-icons/md';
 import { StyledTopbar } from './Topbar.styled';
 import AccountInfoModal from '../../components/dashboard/AccountInfoModal';
-import { useState, useEffect } from 'react';
 import { notification } from '@allenai/varnish';
 import ChoiceClass from './ChoiceClass';
 import FreeFormToggle from './FreeFormToggle';
+import RelationModeToggle from './RelationModeToggle';
+import AnnotationRelationModeTopbar from './AnnotationRelationModeTopbar';
+// import { AnnotationStore } from '../../context';
 
 export type AnnotationTopbarProps = {
     height: string;
@@ -12,14 +15,20 @@ export type AnnotationTopbarProps = {
 };
 
 const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset }) => {
+    // const annotationStore = useContext(AnnotationStore);
     const [accountInfoModal, setAccountInfoModal] = useState<boolean>(false);
     const [showSaveNotification, setSaveShowNotification] = useState<boolean>(false);
+    const [relationModeActive, setRelationModeActive] = useState<boolean>(false);
+
+    const handleToggleRelationMode = () => {
+        setRelationModeActive(!relationModeActive);
+    };
 
     const Divider = () => (
         <div
             style={{
                 height: '100%',
-                borderLeft: '2px solid black',
+                borderLeft: '1px solid black',
                 margin: '0 10px',
             }}
         />
@@ -56,6 +65,8 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                 <Divider />
                 <FreeFormToggle />
                 <Divider />
+                <RelationModeToggle onToggle={handleToggleRelationMode} />
+                <Divider />
                 <div
                     style={{
                         display: 'flex',
@@ -82,6 +93,10 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                     />
                 </div>
             </StyledTopbar>
+
+            {relationModeActive && (
+                <AnnotationRelationModeTopbar height={height} leftOffset={leftOffset} />
+            )}
 
             <AccountInfoModal show={accountInfoModal} onHide={handleAccountInfoModalClose} />
         </>
