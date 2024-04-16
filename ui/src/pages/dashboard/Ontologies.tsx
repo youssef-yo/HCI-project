@@ -69,7 +69,7 @@ const OntologiesPage = () => {
                 </Button>
             </Header>
 
-            <Table>
+            <Table color="#0077B6">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -77,7 +77,11 @@ const OntologiesPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {ontos.map((onto) => (
+                    {ontos.length === 0 ? (
+                        <tr>
+                            <td colSpan="2" style={{ textAlign: 'center' }}>Nothing to show</td>
+                        </tr>
+                    ) : (ontos.map((onto) => (
                         <tr key={onto._id}>
                             <td>{onto.name}</td>
                             <td
@@ -100,7 +104,8 @@ const OntologiesPage = () => {
                                 </IconButton>
                             </td>
                         </tr>
-                    ))}
+                    ))
+                )}
                 </tbody>
             </Table>
 
