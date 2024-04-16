@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TaskExtended, User, getApiError, useTaskApi, useUserApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
-import { useDialog } from '../../hooks';
+import { useDialog, useAuth } from '../../hooks';
 import { EditUserModal } from '../../components/dashboard';
 import { notification } from '@allenai/varnish';
 
@@ -20,6 +20,8 @@ const UserPage = () => {
 
     const dialog = useDialog();
     const navigate = useNavigate();
+
+    const { auth } = useAuth();
 
     useEffect(() => {
         if (!userId) {
@@ -72,10 +74,11 @@ const UserPage = () => {
                     <Button
                         color="secondary"
                         icon={<MdOutlineEdit />}
-                        onClick={() => setUserModal(true)}>
+                        onClick={() => setUserModal(true)}
+                        disabled={user?.role==='Administrator' && auth?.id!==user?._id}>
                         Edit User
                     </Button>
-                    <Button color="secondary" icon={<MdDeleteOutline />} onClick={onDeleteUser}>
+                    <Button color="secondary" icon={<MdDeleteOutline />} onClick={onDeleteUser} disabled={user?.role==='Administrator' && auth?.id!==user?._id}>
                         Delete User
                     </Button>
                 </div>
