@@ -40,7 +40,7 @@ const DocumentsPage = () => {
                 </Button>
             </Header>
 
-            <Table>
+            <Table color="#0096C7">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -49,11 +49,15 @@ const DocumentsPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {docs.map((doc) => (
+                    {docs.length === 0 ? (
+                        <tr>
+                            <td colSpan="3" style={{ textAlign: 'center' }}>Nothing to show</td>
+                        </tr>
+                    ) : (docs.map((doc) => (
                         <tr
                             key={doc._id}
                             className={doc.name.endsWith('.LOADING') ? 'loading' : 'standard'}
-                    >
+                        >
                             <td>{doc.name}</td>
                             <td style={{ textAlign: 'center' }}>{doc.totalPages}</td>
                             <td
@@ -74,7 +78,8 @@ const DocumentsPage = () => {
                                 </IconButton>
                             </td>
                         </tr>
-                    ))}
+                    ))
+                )}
                 </tbody>
             </Table>
 
