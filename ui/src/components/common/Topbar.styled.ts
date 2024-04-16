@@ -1,6 +1,19 @@
 import styled from 'styled-components';
 import { TopbarProps } from './Topbar';
 
+export const StyledAnnotationTopbar = styled.div<TopbarProps>(
+    ({ height }) => `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f0f0f0;
+        padding: 0 20px;
+        height: ${height};
+        position: relative;
+        z-index: 1000;
+    `
+);
+
 export const StyledTopbar = styled.div<TopbarProps>(
     ({ theme, height, leftOffset }) => `
         position: fixed;

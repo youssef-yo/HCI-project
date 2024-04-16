@@ -3,6 +3,7 @@ import { StyledTopbar } from './Topbar.styled';
 import AccountInfoModal from '../../components/dashboard/AccountInfoModal';
 import { useState, useEffect } from 'react';
 import { notification } from '@allenai/varnish';
+import ChoiceClass from './ChoiceClass';
 
 export type AnnotationTopbarProps = {
     height: string;
@@ -39,6 +40,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                     }}>
                     <MdOutlineHouse style={{ color: 'black', fontSize: '25px' }} />
                 </div>
+                <ChoiceClass />
                 <div
                     style={{
                         display: 'flex',
