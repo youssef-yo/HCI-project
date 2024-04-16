@@ -4,8 +4,9 @@ import { User, getApiError, useUserApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { EditUserModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
-import { useDialog } from '../../hooks';
+import { useDialog, useAuth } from '../../hooks';
 import { notification } from '@allenai/varnish';
+import '../../assets/styles/Users.scss';
 
 const UsersPage = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -17,6 +18,8 @@ const UsersPage = () => {
 
     const dialog = useDialog();
     const navigate = useNavigate();
+
+    const { auth } = useAuth();
 
     useEffect(() => {
         getUsers()
@@ -95,11 +98,11 @@ const UsersPage = () => {
                                     onClick={() => navigate(`${user._id}`)}>
                                     <MdOpenInNew />
                                 </IconButton>
-                                <IconButton title="Edit User" onClick={() => onEditUser(user._id)}>
-                                    <MdOutlineEdit />
+                                <IconButton title="Edit User" onClick={() => onEditUser(user._id)} disabled={user.role==='Administrator' && auth?.id!==user._id}>
+                                    <MdOutlineEdit className={user.role === 'Administrator' && auth?.id !== user._id ? 'icon-disabled' : ''} />
                                 </IconButton>
-                                <IconButton title="Delete User" onClick={() => onDeleteUser(user)}>
-                                    <MdDeleteOutline />
+                                <IconButton title="Delete User" onClick={() => onDeleteUser(user)} disabled={user.role==='Administrator' && auth?.id!==user._id}>
+                                    <MdDeleteOutline className={user.role === 'Administrator' && auth?.id !== user._id ? 'icon-disabled' : ''} />
                                 </IconButton>
                             </td>
                         </tr>
