@@ -1,4 +1,4 @@
-import { MdOpenInNew, MdOutlineNoteAdd } from 'react-icons/md';
+import { MdOpenInNew, MdOutlineEdit, MdOutlineNoteAdd } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { Doc, useDocumentApi } from '../../api';
@@ -40,7 +40,7 @@ const DocumentsPage = () => {
                 </Button>
             </Header>
 
-            <Table color="#0096C7">
+            <Table>
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -49,12 +49,11 @@ const DocumentsPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {docs.length === 0 ? (
-                        <tr>
-                            <td colSpan="3" style={{ textAlign: 'center' }}>Nothing to show</td>
-                        </tr>
-                    ) : (docs.map((doc) => (
-                        <tr key={doc._id}>
+                    {docs.map((doc) => (
+                        <tr
+                            key={doc._id}
+                            className={doc.name.endsWith('.LOADING') ? 'loading' : 'standard'}
+                    >
                             <td>{doc.name}</td>
                             <td style={{ textAlign: 'center' }}>{doc.totalPages}</td>
                             <td
@@ -70,18 +69,16 @@ const DocumentsPage = () => {
                                     onClick={() => navigate(`${doc._id}`)}>
                                     <MdOpenInNew />
                                 </IconButton>
+                                <IconButton title="Edit Document">
+                                    <MdOutlineEdit />
+                                </IconButton>
                             </td>
                         </tr>
-                    ))
-                )}
+                    ))}
                 </tbody>
             </Table>
 
-            <UploadDocModal
-                updateTable={loadDocs}
-                show={uploadDocModal}
-                onHide={handleUploadModalClose}
-            />
+            <UploadDocModal show={uploadDocModal} onHide={handleUploadModalClose} />
         </section>
     );
 };

@@ -43,7 +43,7 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHi
                 setIsUploading(false);
                 const duplicateFiles = error.response.data.detail;
                 setDuplicateFiles(duplicateFiles);
-                setErrorText(`I seguenti file sono già presenti: ${duplicateFiles.join(', ')}`);
+                setErrorText('Duplicate Files');
             } else if (error.response.status === 404) {
                 setErrorText('File not found');
             } else {

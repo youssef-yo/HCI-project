@@ -65,11 +65,12 @@ async def upload(
         if stored_onto:
             files_duplicate.append(file.filename)
         else:
-            file_ids.append(await save_file_to_database(file, db))
+            file_id = await save_file_to_database(file, db)
+            file_ids.append(file_id)
             # #IDEA: salvare un file con lo stesso id e nel nome in fondo ha ".LOADING"
             # #TODO: il thread dovrà rimuovere il file ".LOADING" quando finisce
             # #TODO: periodicamente si potrebbero togliere i file ".LOADING" oppure potrebbero essere dei file temporanei(?)
-            # await save_loading_document_to_database(file.filename, file_id)
+            await save_tmp_loading_document_to_database(file.filename, file_id)
 
     if files_duplicate:
         raise HTTPException(
@@ -81,7 +82,7 @@ async def upload(
         if file_data:
             pdf = str(file.filename)
             pdf_name = Path(pdf).stem
-            threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, file_data, db)).start()
+            threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, file_data, db, file.filename)).start()
             # TODO: quando il thread si chiude bisognerebbe fare: updateTable();
         else:
             raise HTTPException(status_code=404, detail="File non trovato nel database")
@@ -103,7 +104,7 @@ async def save_file_to_database(file: UploadFile, db: MongoClient):
     )
     return file_id
 
-async def save_loading_document_to_database(filename: str, file_id: PydanticObjectId):
+async def save_tmp_loading_document_to_database(filename: str, file_id: PydanticObjectId):
     name = filename + '.LOADING'
     document = DocumentDocument(
         name=name,
@@ -112,7 +113,7 @@ async def save_loading_document_to_database(filename: str, file_id: PydanticObje
     )
     await document.create()
 
-def upload_document_from_id(filename: str, file_id: PydanticObjectId, file_data, db: MongoClient):
+def upload_document_from_id(pdf_name: str, file_id: PydanticObjectId, file_data, db: MongoClient, filename: str):
     """
     Carica un documento dal database usando l'ID del file.
     """
@@ -120,12 +121,25 @@ def upload_document_from_id(filename: str, file_id: PydanticObjectId, file_data,
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
-        structure = loop.run_until_complete(analyze(filename, file_id, file_data))
-        loop.run_until_complete(upload(filename, file_id, structure, db))
+        structure = loop.run_until_complete(analyze(pdf_name, file_id, file_data))
+        loop.run_until_complete(upload(pdf_name, file_id, structure, db))
+        loop.run_until_complete(delete_tmp_loading_document(filename, db))
         loop.close()
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.submit(upload_sync)
     
+async def delete_tmp_loading_document(filename: str, db: MongoClient):
+    name = filename + '.LOADING'
+    try:
+        document = DocumentDocument.find_one(DocumentDocument.name == name)
+        if document:
+            try:
+                await document.delete()
+            except Exception as e:
+                pass
+    except Exception as e:
+        pass
+
 
 async def analyze(filename: str, file_id: PydanticObjectId, file_data):
     structure = preprocess("pdfplumber", file_data)
