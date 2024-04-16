@@ -67,7 +67,7 @@ const UsersPage = () => {
                     Create User
                 </Button>
             </Header>
-            <Table>
+            <Table color="#0096C7">
                 <thead>
                     <tr>
                         <th>Email</th>
@@ -77,7 +77,11 @@ const UsersPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map((user) => (
+                    {users.length === 0 ? (
+                        <tr>
+                            <td colSpan="4" style={{ textAlign: 'center' }}>Nothing to show</td>
+                        </tr>
+                    ) : (users.map((user) => (
                         <tr key={user._id}>
                             <td>{user.email}</td>
                             <td>{user.fullName}</td>
@@ -103,7 +107,8 @@ const UsersPage = () => {
                                 </IconButton>
                             </td>
                         </tr>
-                    ))}
+                    ))
+                )}
                 </tbody>
             </Table>
 

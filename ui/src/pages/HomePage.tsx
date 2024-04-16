@@ -55,6 +55,6 @@ const HomeContainer = styled.div(
     height: 100%;
     overflow-y: auto;
     padding: ${theme.spacing.md};
-    background: ${theme.color.N4};
+    background: #FFFFFF;
 `
 );

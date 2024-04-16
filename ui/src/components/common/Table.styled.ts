@@ -17,7 +17,8 @@ const COLOR = {
     `,
 };
 
-const StyledTable = styled.table<TableProps>`
+const StyledTable = styled.table<TableProps>(
+    ({ color }) =>`
     width: 100%;
     border-collapse: collapse;
     border-spacing: spacing;
@@ -28,11 +29,12 @@ const StyledTable = styled.table<TableProps>`
         font-size: 1.25rem;
         font-weight: 600;
         text-transform: uppercase;
+        background-color: ${color};
     }
 
     & tbody td {
         position: relative;
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: 400;
     }
 
@@ -42,6 +44,6 @@ const StyledTable = styled.table<TableProps>`
     }
 
     ${(props) => props.color && COLOR[props.color]}
-`;
+`);
 
 export default StyledTable;

@@ -29,7 +29,7 @@ const TasksPage = () => {
                 </Button>
             </Header>
 
-            <Table>
+            <Table color="#0096C7">
                 <thead>
                     <tr>
                         <th>Document</th>
@@ -41,7 +41,11 @@ const TasksPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {tasks.map((task) => (
+                    {tasks.length === 0 ? (
+                        <tr>
+                            <td colSpan="6" style={{ textAlign: 'center' }}>Nothing to show</td>
+                        </tr>
+                    ) : (tasks.map((task) => (
                         <tr key={task._id}>
                             <td>{task.document?.name}</td>
                             <td>{task.annotator?.email}</td>
@@ -65,7 +69,8 @@ const TasksPage = () => {
                                 </IconButton>
                             </td>
                         </tr>
-                    ))}
+                    ))
+                    )}
                 </tbody>
             </Table>
         </section>
