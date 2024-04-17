@@ -15,13 +15,13 @@ const App = ({ annotationStore }: { annotationStore: any }) => {
         setClasses(listLabels);
     }, [annotationStore.ontoClasses]);
     const colourStyles = {
-        control: (styles: any) => ({ ...styles, backgroundColor: 'white', width: '250px' }),
+        control: (styles: any) => ({ ...styles, backgroundColor: 'white', width: '350px' }),
         option: (styles: any) => {
             return {
                 ...styles,
                 color: 'black',
                 cursor: 'default',
-                zIndex: 100,
+                zIndex: 300,
             };
         },
     };

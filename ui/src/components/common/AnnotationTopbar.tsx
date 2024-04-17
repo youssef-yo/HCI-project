@@ -53,6 +53,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
             <StyledTopbar height={height} leftOffset={leftOffset}>
                 <div
                     style={{
+                        marginLeft: '20px',
                         display: 'flex',
                         flexDirection: 'row',
                         justifyContent: 'center',
@@ -63,9 +64,9 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                 <Divider />
                 <ChoiceClass />
                 <Divider />
-                <FreeFormToggle />
-                <Divider />
                 <RelationModeToggle onToggle={handleToggleRelationMode} />
+                <Divider />
+                <FreeFormToggle />
                 <Divider />
                 <div
                     style={{
@@ -82,6 +83,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                 <Divider />
                 <div
                     style={{
+                        marginRight: '20px',
                         display: 'flex',
                         flexDirection: 'row',
                         justifyContent: 'center',

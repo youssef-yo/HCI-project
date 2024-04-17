@@ -387,7 +387,7 @@ const PDFTaskPage = () => {
                                         height={topbarHeight}
                                         leftOffset={sidebarWidth}
                                     />
-                                    <PDFContainer>
+                                    <PDFContainer relationMode={relationMode}>
                                         {activeOntoProperty && (
                                             <RelationModal
                                                 visible={relationModalVisible}
@@ -433,8 +433,8 @@ const PDFTaskPage = () => {
 export default PDFTaskPage;
 
 const PDFContainer = styled.div(
-    ({ theme }) => `
+    ({ theme, relationMode }) => `
     background: ${theme.color.N4};
-    padding: ${theme.spacing.sm};
+    padding: ${relationMode ? '78px 20px 10px 10px' : '10px 20px 10px 10px'};
 `
 );

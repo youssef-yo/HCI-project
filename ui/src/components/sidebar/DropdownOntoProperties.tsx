@@ -17,7 +17,7 @@ const App = ({ ontoProperties }: DropdownPropertiesProps) => {
         setProperties(listLabels);
     }, [ontoProperties]);
     const colourStyles = {
-        control: (styles: any) => ({ ...styles, backgroundColor: 'white' }),
+        control: (styles: any) => ({ ...styles, backgroundColor: 'white', width: '350px' }),
         option: (styles: any) => {
             return {
                 ...styles,

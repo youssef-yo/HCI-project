@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { AnnotationStore } from '../../context';
-import { notification, Switch } from '@allenai/varnish';
+import { Switch } from '@allenai/varnish';
 import styled from 'styled-components';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 // import styled from 'styled-components';
@@ -14,28 +14,28 @@ interface RelationModeProps {
 
 const RelationModeToggle = ({ onToggle }: RelationModeProps) => {
     const annotationStore = useContext(AnnotationStore);
-    const [showNotification, setShowNotification] = useState<boolean>(false);
+    // const [showNotification, setShowNotification] = useState<boolean>(false);
 
     const handleChangeRelationMode = () => {
         annotationStore.setRelationMode(!annotationStore.relationMode);
-        setShowNotification(!showNotification);
+        // setShowNotification(!showNotification);
         onToggle();
     };
-    useEffect(() => {
-        if (showNotification === true) {
-            notification.info({
-                message: 'Relation Mode activated',
-                description:
-                    'Now you can select the annotations that you to want to be involved ' +
-                    'in the relation.' +
-                    ' Max annotations tha can be selected is 2.',
-            });
-        } else {
-            notification.info({
-                message: 'Relation Mode is disactivated',
-            });
-        }
-    }, [showNotification]);
+    // useEffect(() => {
+    //     if (showNotification === true) {
+    //         notification.info({
+    //             message: 'Relation Mode activated',
+    //             description:
+    //                 'Now you can select the annotations that you to want to be involved ' +
+    //                 'in the relation.' +
+    //                 ' Max annotations tha can be selected is 2.',
+    //         });
+    //     } else {
+    //         notification.info({
+    //             message: 'Relation Mode is disactivated',
+    //         });
+    //     }
+    // }, [showNotification]);
     // const annotationStore = useContext(AnnotationStore);
 
     // const onToggle = () => {

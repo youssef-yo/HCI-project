@@ -13,7 +13,7 @@ export const StyledRelationModeTopbar = styled.div<TopbarProps>(
         background: white;
         color: #eee;
         padding: ${theme.spacing.md};
-        z-index: 1000;
+        z-index: 999;
         border-bottom: 1px solid black;
 
         & div > button {
