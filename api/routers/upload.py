@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import BinaryIO
 import uuid
 from bson import ObjectId
+import random
+import string
 
 from owlready2 import *
 from rdflib import Graph
@@ -80,7 +82,6 @@ async def upload(
             pdf = str(file.filename)
             pdf_name = Path(pdf).stem
             threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, file_data, db, file.filename)).start()
-            # TODO: quando il thread si chiude bisognerebbe fare: updateTable();
         else:
             raise HTTPException(status_code=404, detail="File non trovato nel database")
 
@@ -119,7 +120,7 @@ def upload_document_from_id(pdf_name: str, file_id: PydanticObjectId, file_data,
         asyncio.set_event_loop(loop)
 
         structure = loop.run_until_complete(analyze(pdf_name, file_id, file_data))
-        loop.run_until_complete(upload(pdf_name, file_id, structure, db))
+        structure_id = loop.run_until_complete(upload(pdf_name, file_id, structure, db))
         loop.run_until_complete(delete_tmp_loading_document(pdf_name, db))
         loop.close()
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -143,26 +144,40 @@ async def analyze(filename: str, file_id: PydanticObjectId, file_data):
 
     return structure
 
+def generate_random_id(length=24):
+    characters = string.ascii_lowercase + string.digits
+    return ''.join(random.choice(characters) for _ in range(length))
+
 async def upload(filename: str, file_id: PydanticObjectId, structure, db: MongoClient = Depends(get_db)):
-    npages = len(structure)
-    document = DocumentDocument(
-        name=filename,
-        file_id=file_id,
-        total_pages=npages,
-    )
+    document_id = ObjectId()
     
+    npages = len(structure)
+    try:
+        document = DocumentDocument(
+            id = str(document_id),
+            name=filename,
+            file_id=file_id,
+            total_pages=npages,
+        )
+    except Exception as e:
+        print("ISISIISISI")
+        print(e)
+
     try:
         await document.create()
     except Exception as e:
         pass
     try:
         doc_structure = DocStructureDocument(   
-            doc_id=document.id,
+            doc_id=str(document_id),
             structure=structure
         )
         await doc_structure.create()
     except Exception as e:
         pass
+    
+
+    
 
 # @router.post("/doc", response_model=DocumentOutResponse)
 # async def upload_document(
