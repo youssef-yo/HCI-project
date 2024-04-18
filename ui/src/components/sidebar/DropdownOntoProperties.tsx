@@ -8,6 +8,7 @@ interface DropdownPropertiesProps {
 }
 const App = ({ ontoProperties }: DropdownPropertiesProps) => {
     const annotationStore = useContext(AnnotationStore);
+    const [selectedProperty, setSelectedProperty] = useState(null);
     const [properties, setProperties]: [properties: any, setProperties: any] = useState([]);
     useEffect(() => {
         const listLabels = ontoProperties.map((ontoProperty: OntoProperty) => ({
@@ -15,7 +16,17 @@ const App = ({ ontoProperties }: DropdownPropertiesProps) => {
             label: ontoProperty.text,
         }));
         setProperties(listLabels);
+        console.log('bbbbbbbbb', annotationStore.activeOntoProperty);
     }, [ontoProperties]);
+    useEffect(() => {
+        // Update selected property when annotationStore.activeOntoProperty changes
+        if (annotationStore.activeOntoProperty) {
+            setSelectedProperty({
+                value: annotationStore.activeOntoProperty.id,
+                label: annotationStore.activeOntoProperty.text,
+            });
+        }
+    }, [annotationStore.activeOntoProperty]);
     const colourStyles = {
         control: (styles: any) => ({ ...styles, backgroundColor: 'white', width: '350px' }),
         option: (styles: any) => {
@@ -36,6 +47,7 @@ const App = ({ ontoProperties }: DropdownPropertiesProps) => {
         <Select
             options={properties}
             styles={colourStyles}
+            value={selectedProperty}
             onChange={(choice: any) => {
                 const resultProperty: OntoProperty | undefined = ontoPropertyFromId(choice.value);
                 console.log('choice.label: ', choice.label);

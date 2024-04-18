@@ -42,7 +42,7 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({ height,
                         color: 'lightgray',
                         width: '225px',
                     }}>
-                    ctrl+shift+click to select
+                    Ctrl+shift+click to select
                 </div>
                 <label style={{ marginRight: '20px', color: 'black' }}>Destination:</label>
                 <div
@@ -53,7 +53,7 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({ height,
                         color: 'lightgray',
                         width: '225px',
                     }}>
-                    ctrl+shift+click to select
+                    Ctrl+shift+click to select
                 </div>
                 <Button variant="success" className="btn m-1" onClick={handelCreationRelation}>
                     create

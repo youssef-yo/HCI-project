@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { MdOutlineHouse, MdAccountCircle, MdOutlineSave } from 'react-icons/md';
 import { StyledTopbar } from './Topbar.styled';
 import AccountInfoModal from '../../components/dashboard/AccountInfoModal';
@@ -7,7 +7,7 @@ import ChoiceClass from './ChoiceClass';
 import FreeFormToggle from './FreeFormToggle';
 import RelationModeToggle from './RelationModeToggle';
 import AnnotationRelationModeTopbar from './AnnotationRelationModeTopbar';
-// import { AnnotationStore } from '../../context';
+import { AnnotationStore } from '../../context';
 
 export type AnnotationTopbarProps = {
     height: string;
@@ -15,13 +15,16 @@ export type AnnotationTopbarProps = {
 };
 
 const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset }) => {
-    // const annotationStore = useContext(AnnotationStore);
+    const annotationStore = useContext(AnnotationStore);
     const [accountInfoModal, setAccountInfoModal] = useState<boolean>(false);
     const [showSaveNotification, setSaveShowNotification] = useState<boolean>(false);
     const [relationModeActive, setRelationModeActive] = useState<boolean>(false);
 
     const handleToggleRelationMode = () => {
         setRelationModeActive(!relationModeActive);
+        if (!relationModeActive) {
+            annotationStore.setSelectedAnnotations([]);
+        }
     };
 
     const Divider = () => (
