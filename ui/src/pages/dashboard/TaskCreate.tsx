@@ -29,7 +29,9 @@ const TaskCreatePage = () => {
     useEffect(() => {
         getAllDocs()
             .then((docs) => {
-                const options = buildDocumentOptions(docs);
+                const filteredDocs = docs.filter((doc) => !doc.name.endsWith('.LOADING'));
+                
+                const options = buildDocumentOptions(filteredDocs);
                 setDocOptions(options);
 
                 if (location.state?.docId) {
@@ -38,6 +40,7 @@ const TaskCreatePage = () => {
                 }
             })
             .catch((err) => console.error(err));
+
 
         getUsers()
             .then((users) => {
@@ -63,12 +66,15 @@ const TaskCreatePage = () => {
     };
 
     const buildUserOptions = (users: User[]) => {
-        const userOptions: Option<User>[] = users.map((user) => {
+        const annotatorUsers = users.filter((user) => user.role === 'Annotator');
+    
+        const userOptions: Option<User>[] = annotatorUsers.map((user) => {
             return {
                 label: `${user.fullName} | ${user.email}`,
                 value: user,
             };
         });
+    
         return userOptions;
     };
 
