@@ -10,12 +10,13 @@ const COLOR = {
             background: #f10e0e;
         }
     `,
+    // secondary: button create top right in each section
     secondary: css`
-        background: #e04545;
-        color: #eee;
+        background: #48CAE4;
+        color: #000;
 
         &:hover {
-            background: #cd2323;
+            background: #ADE8F4;
         }
     `,
 };

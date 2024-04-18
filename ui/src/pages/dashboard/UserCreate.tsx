@@ -193,11 +193,11 @@ const StiledButtonCreateUser = styled.button`
     padding: 6px 18px;
     font-size: 1em;
 
-    background: #00B4D8;
-    color: #eee;
+    background: #48CAE4;
+    color: #000;
 
     &:hover {
-        background: #0077B6;
+        background: #ADE8F4;
     }
     
     & .button__icon {
