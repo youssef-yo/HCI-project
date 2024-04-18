@@ -19,6 +19,7 @@ export type InputBoxProps = {
 const Input: React.FC<InputProps> = ({
     type = 'text',
     placeholder,
+    width,
     variant = InputType.STANDARD,
     color = 'primary',
     ...rest
@@ -27,7 +28,7 @@ const Input: React.FC<InputProps> = ({
         case InputType.STANDARD:
             return (
                 <InputBox variant={variant} color={color}>
-                    <StyledInput type={type} variant={variant} color={color} {...rest} />
+                    <StyledInput width={width} type={type} variant={variant} color={color} {...rest} />
                     <i>{placeholder}</i>
                 </InputBox>
             );

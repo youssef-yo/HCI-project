@@ -1,7 +1,7 @@
 import { MdAddTask } from 'react-icons/md';
 import styled from 'styled-components';
 import { FormEvent, useEffect, useRef, useState } from 'react';
-import { Button, Header, Input, InputType, Option, Select } from '../../components/common';
+import { Header, Input, InputType, Option, Select } from '../../components/common';
 import { Doc, User, getApiError, useDocumentApi, useTaskApi, useUserApi } from '../../api';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -60,6 +60,7 @@ const TaskCreatePage = () => {
             return {
                 label: doc.name,
                 value: doc,
+                totalPages: doc.totalPages
             };
         });
         return docOptions;
@@ -119,7 +120,7 @@ const TaskCreatePage = () => {
     return (
         <section>
             <Header>
-                <h1>Task Form</h1>
+                <h1>Create Task</h1>
             </Header>
 
             <Form>
@@ -136,23 +137,26 @@ const TaskCreatePage = () => {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         gap: '25px',
+                        width:"100%"
                     }}>
-                    <Select
-                        style={{ flex: 1 }}
-                        placeHolder="Select User"
-                        options={userOptions}
-                        value={userOption}
-                        onChange={(user) => setUserOption(user)}
-                        isSearchable
-                    />
-                    <Select
-                        style={{ flex: 1 }}
-                        placeHolder="Select Document"
-                        options={docOptions}
-                        value={docOption}
-                        onChange={(doc) => setDocOption(doc)}
-                        isSearchable
-                    />
+                    <InputWrapper> 
+                        <Select
+                            style={{ flex: 1, backgroundColor: "white", width:"100%" }}
+                            placeHolder="Select User"
+                            options={userOptions}
+                            value={userOption}
+                            onChange={(user) => setUserOption(user)}
+                            isSearchable
+                        />
+                        <Select
+                            style={{ flex: 1, backgroundColor: "white", width:"100%" }}
+                            placeHolder="Select Document"
+                            options={docOptions}
+                            value={docOption}
+                            onChange={(doc) => setDocOption(doc)}
+                            isSearchable
+                        />
+                    </InputWrapper>
                 </div>
 
                 <Input
@@ -162,37 +166,47 @@ const TaskCreatePage = () => {
                     placeholder="Task Description"
                     onChange={(e) => setDescription(e.target.value)}
                     value={description}
+                    width="100%"
                     required
                 />
+                {docOption && (
+                    <InputWrapper>         
+                        <Input
+                            type="number"
+                            min="1"
+                            max={docOption.totalPages}
+                            variant={InputType.STANDARD}
+                            id="startPage"
+                            placeholder="Start Page"
+                            onChange={(e) => setStartPage(Number(e.target.value))}
+                            value={startPage}
+                            width="100%"
+                            required
+                        />
 
-                <Input
-                    type="number"
-                    variant={InputType.STANDARD}
-                    id="startPage"
-                    placeholder="Start Page"
-                    onChange={(e) => setStartPage(Number(e.target.value))}
-                    value={startPage}
-                    required
-                />
+                        <Input
+                            type="number"
+                            min="1"
+                            max={docOption.totalPages}
+                            variant={InputType.STANDARD}
+                            id="endPage"
+                            placeholder={`Final Page - max=${docOption.totalPages}`}
+                            onChange={(e) => setEndPage(Number(e.target.value))}
+                            value={endPage}
+                            width="100%"
+                            required
+                        />
+                    </InputWrapper>
+                )}
 
-                <Input
-                    type="number"
-                    variant={InputType.STANDARD}
-                    id="endPage"
-                    placeholder="Final Page"
-                    onChange={(e) => setEndPage(Number(e.target.value))}
-                    value={endPage}
-                    required
-                />
-
-                <Button
+                <StiledButtonCreateUser
                     type="submit"
                     color="secondary"
-                    icon={<MdAddTask />}
                     size="large"
                     onClick={onCreateTask}>
-                    Create Task
-                </Button>
+                        <span className="button__icon">{<MdAddTask />}</span>
+                        Create Task
+                </StiledButtonCreateUser>
             </Form>
         </section>
     );
@@ -201,8 +215,12 @@ const TaskCreatePage = () => {
 export default TaskCreatePage;
 
 const Form = styled.form`
-    width: 100%;
+
+    width: 80%;
+    padding-left: 20%;
     display: flex;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
     gap: 25px;
 
@@ -217,4 +235,48 @@ const Form = styled.form`
         color: #bf3f3f;
         font-size: 0.8em;
     }
+`;
+
+const StiledButtonCreateUser = styled.button`
+
+    width: 20%;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+   
+    border: none;
+    outline: none;
+    border-radius: 4px;
+
+    font-weight: 600;
+    line-height: 1.75;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+
+    transition: 200ms ease-out;
+    cursor: pointer;
+
+    padding: 6px 18px;
+    font-size: 1em;
+
+    background: #48CAE4;
+    color: #000;
+
+    &:hover {
+        background: #ADE8F4;
+    }
+    
+    & .button__icon {
+        display: inherit;
+        margin-left: -4px;
+        margin-right: 8px;
+    }
+`;
+
+const InputWrapper = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px; // Spazio tra gli input
+    align-items: center;
 `;

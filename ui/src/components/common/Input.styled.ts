@@ -12,18 +12,19 @@ const INPUT_COLOR = {
     `,
 };
 
-export const StyledInput = styled.input<InputProps>`
+export const StyledInput = styled.input<InputProps>(
+    ({ width }) =>`
     position: relative;
-    width: 100%;
-    border: none;
+    width: ${width};
+    border: 1px solid black;
+    border-radius: 8px;
     outline: none;
     padding: 25px 10px 7.5px;
-    border-radius: 4px;
     font-weight: 500;
     font-size: 1em;
 
     ${(props) => props.color && INPUT_COLOR[props.color]}
-`;
+`);
 
 const BOX_COLOR = {
     primary: css`

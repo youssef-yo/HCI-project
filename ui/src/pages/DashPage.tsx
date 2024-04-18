@@ -4,7 +4,6 @@ import {
     MdOutlineDescription,
     MdOutlineGroup,
     MdOutlineHub,
-    MdOutlinePersonAddAlt,
 } from 'react-icons/md';
 import { NavLink, Outlet, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
@@ -54,10 +53,6 @@ const DashPage = () => {
                         <NavLink className="navGroup__link" to={'users'} end>
                             <MdOutlineGroup style={iconStyle} />
                             <span>Users</span>
-                        </NavLink>
-                        <NavLink className="navGroup__link" to={'users/new'} end>
-                            <MdOutlinePersonAddAlt style={iconStyle} />
-                            <span>Create User</span>
                         </NavLink>
                     </div>
                     <ColoredLine color="white" />
