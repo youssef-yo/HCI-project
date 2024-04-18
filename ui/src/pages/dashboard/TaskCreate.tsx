@@ -29,7 +29,9 @@ const TaskCreatePage = () => {
     useEffect(() => {
         getAllDocs()
             .then((docs) => {
-                const options = buildDocumentOptions(docs);
+                const filteredDocs = docs.filter((doc) => !doc.name.endsWith('.LOADING'));
+                
+                const options = buildDocumentOptions(filteredDocs);
                 setDocOptions(options);
 
                 if (location.state?.docId) {
@@ -38,6 +40,7 @@ const TaskCreatePage = () => {
                 }
             })
             .catch((err) => console.error(err));
+
 
         getUsers()
             .then((users) => {
