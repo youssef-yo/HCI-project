@@ -67,10 +67,7 @@ async def upload(
         else:
             file_id = await save_file_to_database(file, db)
             file_ids.append(file_id)
-            # #IDEA: salvare un file con lo stesso id e nel nome in fondo ha ".LOADING"
-            # #TODO: il thread dovrà rimuovere il file ".LOADING" quando finisce
-            # #TODO: periodicamente si potrebbero togliere i file ".LOADING" oppure potrebbero essere dei file temporanei(?)
-            await save_tmp_loading_document_to_database(file.filename, file_id)
+            await save_tmp_loading_document_to_database(pdf_name, file_id)
 
     if files_duplicate:
         raise HTTPException(
@@ -104,8 +101,8 @@ async def save_file_to_database(file: UploadFile, db: MongoClient):
     )
     return file_id
 
-async def save_tmp_loading_document_to_database(filename: str, file_id: PydanticObjectId):
-    name = filename + '.LOADING'
+async def save_tmp_loading_document_to_database(pdf_name: str, file_id: PydanticObjectId):
+    name = pdf_name + '.LOADING'
     document = DocumentDocument(
         name=name,
         file_id=file_id,
@@ -123,13 +120,13 @@ def upload_document_from_id(pdf_name: str, file_id: PydanticObjectId, file_data,
 
         structure = loop.run_until_complete(analyze(pdf_name, file_id, file_data))
         loop.run_until_complete(upload(pdf_name, file_id, structure, db))
-        loop.run_until_complete(delete_tmp_loading_document(filename, db))
+        loop.run_until_complete(delete_tmp_loading_document(pdf_name, db))
         loop.close()
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.submit(upload_sync)
     
-async def delete_tmp_loading_document(filename: str, db: MongoClient):
-    name = filename + '.LOADING'
+async def delete_tmp_loading_document(pdf_name: str, db: MongoClient):
+    name = pdf_name + '.LOADING'
     try:
         document = DocumentDocument.find_one(DocumentDocument.name == name)
         if document:

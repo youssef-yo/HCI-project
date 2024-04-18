@@ -29,6 +29,12 @@ const DocumentsPage = () => {
         loadDocs();
     }, []);
 
+    useEffect(() => {
+        if (docs.some(doc => doc.name.endsWith('.LOADING'))) {
+            loadDocs();
+        }
+    }, [docs]);
+
     return (
         <section>
             <Header>
@@ -44,6 +50,7 @@ const DocumentsPage = () => {
             <Table color="#0077B6">
                 <thead>
                     <tr>
+                        <th>Status</th>
                         <th>Name</th>
                         <th style={{ textAlign: 'center' }}>Pages</th>
                         <th style={{ textAlign: 'center' }}>Actions</th>
@@ -57,9 +64,12 @@ const DocumentsPage = () => {
                     ) : (docs.map((doc) => (
                          <tr
                             key={doc._id}
-                            className={doc.name.endsWith('.LOADING') ? 'loading' : 'standard'}
+                            // className={doc.name.endsWith('.LOADING') ? 'loading' : 'standard'}
                         >
-                            <td>{doc.name}</td>
+                            <td style={{ textAlign: 'center' }}>
+                                <div className={doc.name.endsWith('.LOADING') ? 'status-dot load' : 'status-dot'} style={{ backgroundColor: doc.name.endsWith('.LOADING') ? 'yellow' : 'green' }}></div>
+                            </td>
+                            <td>{doc.name.endsWith('.LOADING') ? doc.name.replace('.LOADING', '') : doc.name}</td>
                             <td style={{ textAlign: 'center' }}>{doc.name.endsWith('.LOADING') ? '?' : doc.totalPages}</td>
                             <td
                                 style={{
