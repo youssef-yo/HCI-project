@@ -33,3 +33,25 @@
 .standard {
     background-color: white;
 }
+
+.status-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.load{
+  animation: blink-animation 3s infinite;
+}
+
+@keyframes pulse-animation {
+  0% {
+      transform: scale(1);
+  }
+  50% {
+      transform: scale(1.2);
+  }
+  100% {
+      transform: scale(1);
+  }
+}
