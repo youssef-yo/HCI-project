@@ -63,12 +63,15 @@ const TaskCreatePage = () => {
     };
 
     const buildUserOptions = (users: User[]) => {
-        const userOptions: Option<User>[] = users.map((user) => {
+        const annotatorUsers = users.filter((user) => user.role === 'Annotator');
+    
+        const userOptions: Option<User>[] = annotatorUsers.map((user) => {
             return {
                 label: `${user.fullName} | ${user.email}`,
                 value: user,
             };
         });
+    
         return userOptions;
     };
 
