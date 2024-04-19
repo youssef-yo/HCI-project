@@ -23,7 +23,7 @@ const FileList = ({
                         key={f.name}
                         file={f}
                         deleteFile={deleteFileHandler}
-                        hasDuplicate={duplicateFiles.includes(f.name)}
+                        hasDuplicate={duplicateFiles?.includes(f.name)}
                     />
                 ))}
         </ul>

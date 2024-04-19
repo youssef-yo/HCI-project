@@ -160,7 +160,6 @@ async def upload(filename: str, file_id: PydanticObjectId, structure, db: MongoC
             total_pages=npages,
         )
     except Exception as e:
-        print("ISISIISISI")
         print(e)
 
     try:
@@ -233,47 +232,50 @@ async def upload(filename: str, file_id: PydanticObjectId, structure, db: MongoC
 @router.post("/ontology", response_model=OntologyData)
 async def upload_ontology(
     user: UserDocument = Depends(get_current_admin),
-    file: UploadFile = File(...),
+    files: List[UploadFile] = File(...),
     db: MongoClient = Depends(get_db)
 ) -> OntologyData:
     """
     Uploads an ontology file.
     It also extracts the ontology data (classes and properties) for later use.
     """
-    # TODO: Use transactions to ensure atomicity
-    onto = str(file.filename)
-    onto_name = Path(onto).stem
-    stored_onto = await OntologyDocument.find_one(OntologyDocument.name == onto_name)
+    files_duplicate = []
+    for file in files:
+        onto = str(file.filename)
+        onto_name = Path(onto).stem
+        stored_onto = await OntologyDocument.find_one(OntologyDocument.name == onto_name)
 
-    if stored_onto:
+        if stored_onto:
+            files_duplicate.append(file.filename)
+
+    if files_duplicate:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Ontology {onto_name} already exists."
+                status_code=status.HTTP_409_CONFLICT,
+                detail=files_duplicate
+            )
+
+    for file in files:
+        onto = str(file.filename)
+        onto_name = Path(onto).stem
+        
+        # Analyzing the contents of the uploaded ontology file
+        result = analyze_ontology(file.file)
+
+        # Upload the ontology file with GridFS
+        file.file.seek(0)
+        file_id = await db.gridFS.upload_from_stream(
+            file.filename,
+            file.file,
+            metadata={"contentType": file.content_type}
         )
 
-    print(f"File: {file.filename}")
-    print(f"Content Type: {file.content_type}")
-    print(f"Size: {file.size}")
-    print(f"Headers: {file.headers}")
-
-    # Analyzing the contents of the uploaded ontology file
-    result = analyze_ontology(file.file)
-
-    # Upload the ontology file with GridFS
-    file.file.seek(0)
-    file_id = await db.gridFS.upload_from_stream(
-        file.filename,
-        file.file,
-        metadata={"contentType": file.content_type}
-    )
-
-    # Store the ontology document in the database
-    ontology = OntologyDocument(
-        name=onto_name,
-        file_id=ObjectId(file_id),
-        data=result
-    )
-    await ontology.create()
+        # Store the ontology document in the database
+        ontology = OntologyDocument(
+            name=onto_name,
+            file_id=ObjectId(file_id),
+            data=result
+        )
+        await ontology.create()
 
     return result
 
