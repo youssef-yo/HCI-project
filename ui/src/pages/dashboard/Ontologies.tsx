@@ -19,6 +19,10 @@ const OntologiesPage = () => {
         loadOntologies();
     }, []);
 
+    // useEffect(() => {
+    //     loadOntologies();
+    // }, [ontos]);
+
     const loadOntologies = () => {
         getOntologiesList()
             .then((ontos) => setOntos(ontos))
@@ -31,9 +35,7 @@ const OntologiesPage = () => {
     };
 
     const handleUploadModalClose = () => {
-        console.log('Closing upload modal');
         setUploadOntoModal(false);
-        loadOntologies();
     };
 
     const onEditOntology = (id: string) => {
@@ -115,7 +117,10 @@ const OntologiesPage = () => {
                 ontoID={editedOnto}
                 onUpdate={onOntoUpdated}
             />
-            <UploadOntoModal show={uploadOntoModal} onHide={handleUploadModalClose} />
+            <UploadOntoModal
+                updateTable={loadOntologies}
+                show={uploadOntoModal}
+                onHide={handleUploadModalClose} />
         </section>
     );
 };
