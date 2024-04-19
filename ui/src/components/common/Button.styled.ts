@@ -19,6 +19,42 @@ const COLOR = {
             background: #ADE8F4;
         }
     `,
+
+    export: css`
+        background: #80ED99;
+        color: #000;
+
+        &:hover {
+            background: #C7F9CC;
+        }
+    `,
+
+    commit: css`
+        background: #80ED99;
+        color: #000;
+
+        &:hover {
+            background: #C7F9CC;
+        }
+    `,
+
+    edit: css`
+        background: #ffe07a;
+        color: #000;
+
+        &:hover {
+            background: #ffedb3;
+        }
+    `,
+
+    delete: css`
+        background: #f2433d;
+        color: #000;
+
+        &:hover {
+            background: #fcb1ae;
+        }
+    `,
 };
 
 const SIZE = {
@@ -40,12 +76,17 @@ const DISABLED = css`
     cursor: not-allowed;
 `;
 
+const MARGIN_LEFT = {
+    auto: css`
+        margin-left: auto;
+    `,
+};
+
 const StyledButton = styled.button<ButtonProps>`
     position: relative;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    margin-left: auto;
 
     border: none;
     outline: none;
@@ -68,6 +109,7 @@ const StyledButton = styled.button<ButtonProps>`
     ${(props) => props.color && COLOR[props.color]}
     ${(props) => props.size && SIZE[props.size]}
     ${(props) => props.disabled && DISABLED}
+    ${(props) => props.marginLeft && MARGIN_LEFT[props.marginLeft]}
 `;
 
 export default StyledButton;

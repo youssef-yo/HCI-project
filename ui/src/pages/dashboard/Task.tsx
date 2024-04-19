@@ -14,6 +14,7 @@ import {
 } from '../../api';
 import { useDialog } from '../../hooks';
 import { notification } from '@allenai/varnish';
+import styled from 'styled-components';
 
 const TaskPage = () => {
     const { taskId } = useParams<{ taskId: string }>();
@@ -113,24 +114,22 @@ const TaskPage = () => {
         <section>
             <Header>
                 <h1>Task Information</h1>
-
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '8px',
-                    }}>
+                <ButtonContainer>
                     {task?.status === TaskStatus.ACTIVE && (
                         <Button
-                            color="secondary"
+                            marginLeft="auto"
+                            color="delete"
                             icon={<MdDeleteOutline />}
-                            onClick={onDismissTask}>
-                            Dismiss
-                        </Button>
-                    )}
+                                onClick={onDismissTask}>
+                                Dismiss
+                            </Button>
+                        )}
                     {task?.status === TaskStatus.ACTIVE && (
-                        <Button color="secondary" icon={<MdMergeType />} onClick={onCommitTask}>
+                        <Button
+                            color="commit"
+                            icon={<MdMergeType />} 
+                            onClick={onCommitTask}>
+                            
                             Commit
                         </Button>
                     )}
@@ -140,14 +139,12 @@ const TaskPage = () => {
                         onClick={() => navigate(`/pdf-task/${task?._id}`)}>
                         View document annotations
                     </Button>
-                </div>
-            </Header>
+                </ButtonContainer>
+                
+                </Header>
 
             <div className="taskInfo">
                 <h3>Task</h3>
-                <p>
-                    <b>ID:</b> {task?._id}
-                </p>
                 <p>
                     <b>Pages:</b> {task?.pageRange.start} - {task?.pageRange.end}
                 </p>
@@ -168,9 +165,6 @@ const TaskPage = () => {
             <div className="docInfo">
                 <h3>Document</h3>
                 <p>
-                    <b>ID:</b> {doc?._id}
-                </p>
-                <p>
                     <b>Name:</b> {doc?.name}
                 </p>
                 <p>
@@ -183,9 +177,6 @@ const TaskPage = () => {
             <div className="userInfo">
                 <h3>User</h3>
                 <p>
-                    <b>ID:</b> {user?._id}
-                </p>
-                <p>
                     <b>Email:</b> {user?.email}
                 </p>
                 <p>
@@ -197,3 +188,9 @@ const TaskPage = () => {
 };
 
 export default TaskPage;
+
+const ButtonContainer = styled.div`
+    margin-left: auto;
+    display: flex;
+    gap: 8px; 
+`;

@@ -63,6 +63,7 @@ const OntologiesPage = () => {
                 <h1>Ontologies</h1>
                 <Button
                     color="secondary"
+                    marginLeft="auto"
                     icon={<MdOutlineNoteAdd />}
                     onClick={() => setUploadOntoModal(true)}>
                     Upload Ontology

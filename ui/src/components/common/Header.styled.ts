@@ -1,9 +1,14 @@
 import styled from 'styled-components';
 
-const Header = styled.div`
+type HeaderProps = {
+    justifyContent: string;
+}
+
+const Header = styled.div<HeaderProps>(
+    ({ justifyContent }) =>`
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: ${justifyContent};
     align-items: center;
     text-align: center;
     
@@ -13,6 +18,6 @@ const Header = styled.div`
     & h1 {
         margin: 0px;
     }
-`;
+`);
 
 export default Header;

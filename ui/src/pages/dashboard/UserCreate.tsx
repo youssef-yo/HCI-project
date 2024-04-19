@@ -82,7 +82,7 @@ const UserCreatePage = () => {
     
     return (
         <section>
-            <Header>
+            <Header justifyContent="center">
                 <h1>Create user</h1>
             </Header>
         

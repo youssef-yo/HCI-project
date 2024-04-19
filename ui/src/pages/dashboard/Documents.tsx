@@ -41,6 +41,7 @@ const DocumentsPage = () => {
                 <h1>Documents</h1>
                 <Button
                     color="secondary"
+                    marginLeft="auto"
                     icon={<MdOutlineNoteAdd />}
                     onClick={() => setUploadDocModal(true)}>
                     Upload Document

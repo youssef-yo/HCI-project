@@ -119,7 +119,7 @@ const TaskCreatePage = () => {
 
     return (
         <section>
-            <Header>
+            <Header justifyContent="center">
                 <h1>Create Task</h1>
             </Header>
 

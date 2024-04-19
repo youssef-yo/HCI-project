@@ -24,7 +24,11 @@ const TasksPage = () => {
         <section>
             <Header>
                 <h1>Tasks</h1>
-                <Button color="secondary" icon={<MdAddTask />} onClick={() => navigate('new')}>
+                <Button
+                    color="secondary"
+                    marginLeft="auto"
+                    icon={<MdAddTask />}
+                    onClick={() => navigate('new')}>
                     Create Task
                 </Button>
             </Header>
