@@ -57,7 +57,6 @@ async def upload(
     db: MongoClient = Depends(get_db)
 ):
     # Save the files in db and get their ID
-    file_ids = []
     files_duplicate = []
     for file in files:
         pdf = str(file.filename)
@@ -66,16 +65,22 @@ async def upload(
 
         if stored_onto:
             files_duplicate.append(file.filename)
-        else:
-            file_id = await save_file_to_database(file, db)
-            file_ids.append(file_id)
-            await save_tmp_loading_document_to_database(pdf_name, file_id)
 
     if files_duplicate:
         raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=files_duplicate
             )
+
+    file_ids = []
+    for file in files:
+        pdf = str(file.filename)
+        pdf_name = Path(pdf).stem
+        file_id = await save_file_to_database(file, db)
+        file_ids.append(file_id)
+        await save_tmp_loading_document_to_database(pdf_name, file_id)
+            
+
     for file, file_id in zip(files, file_ids):
         file_data = await find_document_by_id(db, file_id)
         if file_data:
@@ -255,9 +260,6 @@ async def upload_ontology(
             )
 
     for file in files:
-        onto = str(file.filename)
-        onto_name = Path(onto).stem
-        
         # Analyzing the contents of the uploaded ontology file
         result = analyze_ontology(file.file)
 

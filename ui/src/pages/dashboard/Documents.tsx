@@ -4,6 +4,8 @@ import { Button, Header, IconButton, Table } from '../../components/common';
 import { Doc, useDocumentApi } from '../../api';
 import { UploadDocModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/styles/Documents.scss';
 
 const DocumentsPage = () => {
@@ -34,6 +36,10 @@ const DocumentsPage = () => {
             loadDocs();
         }
     }, [docs]);
+
+    const deleteDoc = (id) => {
+        console.log(id);
+    }
 
     return (
         <section>
@@ -85,6 +91,7 @@ const DocumentsPage = () => {
                                     disabled={doc.name.endsWith('.LOADING')}>
                                     <MdOpenInNew />
                                 </IconButton>
+                                <FontAwesomeIcon icon={faTrash} onClick={() => deleteDoc(doc._id)} disabled={doc.name.endsWith('.LOADING')} />
                                 
                             </td>
                         </tr>
