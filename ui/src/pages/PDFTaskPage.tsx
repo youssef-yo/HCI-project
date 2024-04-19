@@ -82,6 +82,9 @@ const PDFTaskPage = () => {
 
     const [relationMode, setRelationMode] = useState<boolean>(false);
 
+    const [src, setSrc] = useState<Annotation>();
+    const [dst, setDst] = useState<Annotation>();
+
     const { auth } = useAuth();
 
     const { getTokens } = useDocumentApi();
@@ -110,9 +113,12 @@ const PDFTaskPage = () => {
     const theme = useContext(ThemeContext);
 
     const onRelationModalOk = (group: RelationGroup) => {
+        console.log('ok');
         setPdfAnnotations(pdfAnnotations.withNewRelation(group));
         setRelationModalVisible(false);
         setSelectedAnnotations([]);
+        setSrc(null);
+        setDst(null);
     };
 
     const onRelationModalCancel = () => {
@@ -291,7 +297,7 @@ const PDFTaskPage = () => {
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
                         <AnnotationTopbar
-                            _setRelationModalVisible={setRelationModalVisible}
+                            onCreate={onRelationModalOk}
                             height={topbarHeight}
                             leftOffset={sidebarWidth}
                         />
@@ -314,7 +320,7 @@ const PDFTaskPage = () => {
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
                         <AnnotationTopbar
-                            _setRelationModalVisible={setRelationModalVisible}
+                            onCreate={onRelationModalOk}
                             height={topbarHeight}
                             leftOffset={sidebarWidth}
                         />
@@ -355,6 +361,10 @@ const PDFTaskPage = () => {
                                 setHideLabels,
                                 relationMode,
                                 setRelationMode,
+                                src,
+                                setSrc,
+                                dst,
+                                setDst,
                             }}>
                             {/* <listeners.UndoAnnotation /> */}
                             {canAnnotate && <listeners.SaveWithTimeout taskId={taskId} />}
@@ -384,6 +394,7 @@ const PDFTaskPage = () => {
                                 </Sidebar>
                                 <WithTopbar height={topbarHeight}>
                                     <AnnotationTopbar
+                                        onCreate={onRelationModalOk}
                                         height={topbarHeight}
                                         leftOffset={sidebarWidth}
                                     />
@@ -417,7 +428,7 @@ const PDFTaskPage = () => {
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
                         <AnnotationTopbar
-                            _setRelationModalVisible={setRelationModalVisible}
+                            onCreate={onRelationModalOk}
                             height={topbarHeight}
                             leftOffset={sidebarWidth}
                         />

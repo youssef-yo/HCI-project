@@ -75,7 +75,6 @@ const ToggleSwitch = styled(Switch)`
 const Container = styled.div`
     display: flex;
     align-items: center;
-    margin-top: ${({ theme }) => theme.spacing.sm};
 `;
 
 const ToggleLabel = styled.label`

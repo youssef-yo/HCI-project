@@ -21,7 +21,6 @@ export default ChoiceClass;
 const Container = styled.div`
     display: flex;
     align-items: center;
-    margin-top: ${({ theme }) => theme.spacing.sm};
 `;
 
 const LabelWrapper = styled.div`

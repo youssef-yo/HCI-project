@@ -16,7 +16,6 @@ const App = ({ ontoProperties }: DropdownPropertiesProps) => {
             label: ontoProperty.text,
         }));
         setProperties(listLabels);
-        console.log('bbbbbbbbb', annotationStore.activeOntoProperty);
     }, [ontoProperties]);
     useEffect(() => {
         // Update selected property when annotationStore.activeOntoProperty changes

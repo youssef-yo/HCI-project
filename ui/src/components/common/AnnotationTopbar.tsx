@@ -1,22 +1,23 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { MdOutlineHouse, MdAccountCircle, MdOutlineSave } from 'react-icons/md';
+import { MdOutlineHouse, MdOutlineSave } from 'react-icons/md';
 import { StyledTopbar } from './Topbar.styled';
-import AccountInfoModal from '../../components/dashboard/AccountInfoModal';
+import AccountInfoPopover from '../../components/dashboard/AccountInfoPopover';
 import { notification } from '@allenai/varnish';
 import ChoiceClass from './ChoiceClass';
 import FreeFormToggle from './FreeFormToggle';
 import RelationModeToggle from './RelationModeToggle';
 import AnnotationRelationModeTopbar from './AnnotationRelationModeTopbar';
-import { AnnotationStore } from '../../context';
+import { AnnotationStore, RelationGroup } from '../../context';
 
 export type AnnotationTopbarProps = {
+    onCreate: (group: RelationGroup) => void;
     height: string;
     leftOffset?: string;
 };
 
-const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset }) => {
+const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, leftOffset }) => {
     const annotationStore = useContext(AnnotationStore);
-    const [accountInfoModal, setAccountInfoModal] = useState<boolean>(false);
+    const [accountInfoPopoverShow, setAccountInfoPopoverShow] = useState<boolean>(false);
     const [showSaveNotification, setSaveShowNotification] = useState<boolean>(false);
     const [relationModeActive, setRelationModeActive] = useState<boolean>(false);
 
@@ -24,6 +25,8 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
         setRelationModeActive(!relationModeActive);
         if (!relationModeActive) {
             annotationStore.setSelectedAnnotations([]);
+            annotationStore.setSrc(null);
+            annotationStore.setDst(null);
         }
     };
 
@@ -39,7 +42,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
 
     const handleAccountInfoModalClose = () => {
         console.log('Closing account info modal');
-        setAccountInfoModal(false);
+        setAccountInfoPopoverShow(false);
     };
 
     useEffect(() => {
@@ -50,7 +53,6 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
         }
         setSaveShowNotification(false);
     });
-
     return (
         <>
             <StyledTopbar height={height} leftOffset={leftOffset}>
@@ -65,11 +67,33 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                     <MdOutlineHouse style={{ color: 'black', fontSize: '25px' }} />
                 </div>
                 <Divider />
-                <ChoiceClass />
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                    <ChoiceClass />
+                </div>
                 <Divider />
-                <RelationModeToggle onToggle={handleToggleRelationMode} />
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                    <RelationModeToggle onToggle={handleToggleRelationMode} />
+                </div>
                 <Divider />
-                <FreeFormToggle />
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                    <FreeFormToggle />
+                </div>
                 <Divider />
                 <div
                     style={{
@@ -92,18 +116,21 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ height, leftOffset 
                         justifyContent: 'center',
                         alignItems: 'center',
                     }}>
-                    <MdAccountCircle
-                        onClick={() => setAccountInfoModal(true)}
-                        style={{ color: 'black', fontSize: '25px' }}
+                    <AccountInfoPopover
+                        show={accountInfoPopoverShow}
+                        onHide={handleAccountInfoModalClose}
+                        setAccountInfoPopoverShow={setAccountInfoPopoverShow}
                     />
                 </div>
             </StyledTopbar>
 
             {relationModeActive && (
-                <AnnotationRelationModeTopbar height={height} leftOffset={leftOffset} />
+                <AnnotationRelationModeTopbar
+                    onCreate={onCreate}
+                    height={height}
+                    leftOffset={leftOffset}
+                />
             )}
-
-            <AccountInfoModal show={accountInfoModal} onHide={handleAccountInfoModalClose} />
         </>
     );
 };
