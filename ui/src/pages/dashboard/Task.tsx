@@ -130,7 +130,7 @@ const TaskPage = () => {
                         </Button>
                     )}
                     {task?.status === TaskStatus.ACTIVE && (
-                        <Button color="secondary" icon={<MdMergeType />} onClick={onCommitTask}>
+                        <Button color="secondary" icon={<MdMergeType />} onClick={onCommitTask} disabled={!task.markedComplete}>
                             Commit
                         </Button>
                     )}
