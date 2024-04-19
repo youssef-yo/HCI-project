@@ -25,22 +25,33 @@ const ChooseTypeUser = <T,>({
 
     return (
         <Form>
-            <div>Select user role</div>
-            <div key={`inline-radio`} className="mb-3">
-                {options.map((option, _) => (
-                    <Form.Check
-                        inline
-                        name="userRole"
-                        value={option.label}
-                        label={option.label}
-                        type="radio"
-                        checked={selectedOption?.value === option.value}
-                        onChange={() => handleChange(option)}
-                        id={`check-type-${option.label}-user`}
-                    />                  
-                ))}
+            <div style={{
+                textAlign: 'left', 
+                marginBottom: '1rem'
+             }}>
+                <span style={{ 
+                        fontWeight: 'bold',
+                        fontSize: '1.2rem',
+                    }}>Select user role</span>
+                <div key={`inline-radio`} className="mb-3">
+                    {options.map((option, _) => (
+                        <Form.Check
+                            inline
+                            name="userRole"
+                            value={option.label}
+                            label={option.label}
+                            type="radio"
+                            checked={selectedOption?.value === option.value}
+                            onChange={() => handleChange(option)}
+                            id={`check-type-${option.label}-user`}
+                            style={{
+                                marginLeft: '0',
+                                fontSize: '1.1rem',
+                            }}
+                        />                  
+                    ))}
+                </div>
             </div>
-
         </Form>
     );
 }
