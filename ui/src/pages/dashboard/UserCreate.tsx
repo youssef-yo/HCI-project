@@ -64,10 +64,16 @@ const UserCreatePage = () => {
         }
 
         if (password.length < 4 || password.length > 12) {
-            setErrorMsg('Password must be between 4 and 12 characters"."');
+            setErrorMsg('Password must be between 4 and 12 characters.');
             return;
         }
 
+        const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        if (!isValidEmail) {
+            setErrorMsg('Use a valid email!');
+            return;
+        }
         const newUser = {
             email: email,
             fullName: fullName,
@@ -82,8 +88,6 @@ const UserCreatePage = () => {
             })
             .catch((err) => setErrorMsg(getApiError(err)));
     };
-
-
     
     return (
         <section>

@@ -18,6 +18,10 @@ const Header = styled.div<HeaderProps>(
     & h1 {
         margin: 0px;
     }
+
+    & h5 {
+        margin-left: 20%;
+    }
 `);
 
 export default Header;

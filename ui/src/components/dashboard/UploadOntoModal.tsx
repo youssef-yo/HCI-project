@@ -70,10 +70,13 @@ const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ show, onHide }) => {
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="primary" onClick={handleClose}>
+                <Button variant="secondary" onClick={handleClose}>
                     Close
                 </Button>
-                <Button variant="primary" onClick={handleClose}>
+                <Button
+                    variant="primary"
+                    onClick={handleClose}
+                    disabled={isUploading || files.length === 0}>
                     Save Changes
                 </Button>
             </Modal.Footer>

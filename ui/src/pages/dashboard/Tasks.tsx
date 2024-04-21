@@ -37,6 +37,7 @@ const TasksPage = () => {
                 <thead>
                     <tr>
                         <th>Document</th>
+                        <th>Description</th>
                         <th>Annotator</th>
                         <th>Created At</th>
                         <th style={{ textAlign: 'center' }}>Pages</th>
@@ -47,11 +48,12 @@ const TasksPage = () => {
                 <tbody>
                     {tasks.length === 0 ? (
                         <tr>
-                            <td colSpan="6" style={{ textAlign: 'center' }}>Nothing to show</td>
+                            <td colSpan="7" style={{ textAlign: 'center' }}>Nothing to show</td>
                         </tr>
                     ) : (tasks.map((task) => (
                         <tr key={task._id}>
                             <td>{task.document?.name}</td>
+                            <td>{task.description}</td>
                             <td>{task.annotator?.email}</td>
                             <td>{new Date(task.createdAt).toUTCString()}</td>
                             <td style={{ textAlign: 'center' }}>
