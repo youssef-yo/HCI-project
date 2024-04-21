@@ -1,46 +1,52 @@
 import styled from 'styled-components';
 import { Link, Button } from '@allenai/varnish';
 
-interface HasWidth {
-    width: string;
-}
+// interface HasWidth {
+//     width: string;
+// }
 
-export const SidebarContainer = styled.div<HasWidth>(
-    ({ theme, width }) => `
-    width: ${width};
-    position: fixed;
-    left: 0;
-    overflow-y: scroll;
-    background: ${theme.color.N10};
-    color: ${theme.color.N2};
-    padding: ${theme.spacing.md} ${theme.spacing.md};
-    height: 100vh;
-    * {
-        color: ${theme.color.N2};
-    }
-`
-);
+// export const SidebarContainer = styled.div<HasWidth>(
+//     ({ theme, width }) => `
+//     width: ${width};
+//     position: fixed;
+//     left: 0;
+//     overflow-y: scroll;
+//     background: ${theme.color.N10};
+//     color: ${theme.color.N2};
+//     padding: ${theme.spacing.md} ${theme.spacing.md};
+//     height: 100vh;
+//     * {
+//         color: ${theme.color.N2};
+//     }
+// `
+// );
 
 export const SidebarItem = styled.div(
     ({ theme }) => `
-    min-height: 200px;
-    max-height: 400px;
-    overflow-y: scroll;
-    background: ${theme.color.N9};
-    margin-bottom: ${theme.spacing.md};
-    padding: ${theme.spacing.xxs} ${theme.spacing.sm};
-    border-radius: 5px;
-
+    overflow-y: auto;
+    background: white;
+    color: black;
+    width: ${theme.sidebarWidth};
+    border-bottom: 1px solid black;
+    min-height: 267px;
+    max-height: 268px;
+    padding: 10px;
 `
 );
 
 // text-transform is necessary because h5 is all caps in antd/varnish.
 export const SidebarItemTitle = styled.h5(
     ({ theme }) => `
-    margin: ${theme.spacing.xs} 0;
     text-transform: capitalize;
+    padding-top: ${theme.spacing.xs};
     padding-bottom: ${theme.spacing.xs};
-    border-bottom: 2px solid ${theme.color.N8};
+    border-bottom: 1px solid black;
+    width: 100%;
+    display: flex;
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra orizzontalmente */
+    word-break: break-all;
+    color: black;
 `
 );
 

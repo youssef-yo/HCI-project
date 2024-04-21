@@ -10,10 +10,11 @@ export const StyledSidebar = styled.div<SidebarProps>(
     position: fixed;
     left: 0;
     overflow-y: auto;
-    background: ${theme.color.N10};
-    color: ${theme.color.N2};
-    padding: ${theme.spacing.md} ${theme.spacing.md};
-    height: 100vh;
+    background: white;
+    border-right: 1px solid black;
+    color: black;
+    padding: 0;
+    height: 100%;
     * {
         color: ${theme.color.N2};
     }
@@ -27,5 +28,6 @@ export const WithSidebar = styled.div<SidebarProps>(({ width }) => {
     flex-grow: 1;
     grid-template-columns: minmax(0, 1fr);
     padding-left: ${width};
+    color: black;
 `;
 });

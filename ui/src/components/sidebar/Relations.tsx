@@ -20,22 +20,24 @@ const Relations: React.FC<RelationProps> = ({ annotations, relations }) => {
     // );
 
     return (
-        <SidebarItem>
+        <>
             <SidebarItemTitle>Relations</SidebarItemTitle>
-            <div>
-                {relations.length === 0 ? (
-                    <>None</>
-                ) : (
-                    <div>
-                        {relations.map((relation) => (
-                            <ModalPopupRelationInfo
-                                key={relation.id}
-                                relation={relation}></ModalPopupRelationInfo>
-                        ))}
-                    </div>
-                )}
-            </div>
-        </SidebarItem>
+            <SidebarItem>
+                <div>
+                    {relations.length === 0 ? (
+                        <>None</>
+                    ) : (
+                        <div>
+                            {relations.map((relation) => (
+                                <ModalPopupRelationInfo
+                                    key={relation.id}
+                                    relation={relation}></ModalPopupRelationInfo>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </SidebarItem>
+        </>
     );
 };
 

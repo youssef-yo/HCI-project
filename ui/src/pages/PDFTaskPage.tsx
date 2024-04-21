@@ -10,12 +10,12 @@ import { PDF, CenterOnPage, RelationModal } from '../components';
 import { WithSidebar, Sidebar, WithTopbar } from '../components/common';
 import AnnotationTopbar from '../components/common/AnnotationTopbar';
 import {
-    Labels,
+    // Labels,
     Annotations,
     Relations,
     AssignedTaskList,
-    Logo,
-    Comment,
+    // Logo,
+    // Comment,
 } from '../components/sidebar';
 import {
     pdfURL,
@@ -292,7 +292,7 @@ const PDFTaskPage = () => {
             return (
                 <WithSidebar width={sidebarWidth}>
                     <Sidebar width={sidebarWidth}>
-                        <Logo />
+                        {/* <Logo /> */}
                         <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
@@ -315,7 +315,7 @@ const PDFTaskPage = () => {
             return (
                 <WithSidebar width={sidebarWidth}>
                     <Sidebar width={sidebarWidth}>
-                        <Logo />
+                        {/* <Logo /> */}
                         <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
@@ -372,9 +372,9 @@ const PDFTaskPage = () => {
                             <listeners.HideAnnotationLabels />
                             <WithSidebar width={sidebarWidth}>
                                 <Sidebar width={sidebarWidth}>
-                                    <Logo />
-                                    <Labels _setRelationModalVisible={setRelationModalVisible} />
-                                    <AssignedTaskList tasks={assignedTasks} />
+                                    {/* <Logo /> */}
+                                    {/* <Labels _setRelationModalVisible={setRelationModalVisible} /> */}
+                                    {/* <AssignedTaskList tasks={assignedTasks} /> */}
                                     {activeTask && (
                                         <Annotations
                                             taskId={taskId}
@@ -388,9 +388,9 @@ const PDFTaskPage = () => {
                                             relations={pdfAnnotations.docAnnotations.relations}
                                         />
                                     )}
-                                    {activeTask && (
+                                    {/* {activeTask && (
                                         <Comment taskId={taskId} activeTask={activeTask} />
-                                    )}
+                                    )} */}
                                 </Sidebar>
                                 <WithTopbar height={topbarHeight}>
                                     <AnnotationTopbar
@@ -423,7 +423,7 @@ const PDFTaskPage = () => {
             return (
                 <WithSidebar width={sidebarWidth}>
                     <Sidebar width={sidebarWidth}>
-                        <Logo />
+                        {/* <Logo /> */}
                         <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>

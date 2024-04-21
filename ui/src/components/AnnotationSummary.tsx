@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import { Annotation, PDFStore, AnnotationStore } from '../context';
-import { Tag } from '@allenai/varnish';
 import styled from 'styled-components';
 import { DeleteFilled, RightCircleOutlined } from '@ant-design/icons';
 
@@ -38,9 +37,6 @@ export const AnnotationSummary = ({ annotation }: AnnotationSummaryProps) => {
     return (
         <PaddedRow>
             <Overflow title={text}>{text}</Overflow>
-            <SmallTag title={annotation.ontoClass.text} color={annotation.ontoClass.color}>
-                {annotation.ontoClass.text}
-            </SmallTag>
             <DeleteFilled onClick={onDelete} />
             <RightCircleOutlined onClick={handleScrolling} />
         </PaddedRow>
@@ -52,23 +48,15 @@ const PaddedRow = styled.div`
     border-radius: 2px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) min-content min-content min-content;
+    color: black;
 `;
 
-const SmallTag = styled(Tag)`
-    font-size: 0.65rem;
-    padding: 2px 2px;
-    border-radius: 4px;
-    color: black;
-    line-height: 1;
-    max-width: 14ch;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-`;
 const Overflow = styled.span`
     line-height: 1;
     font-size: 0.8rem;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    color: black;
+    margin-left: 10px;
 `;
