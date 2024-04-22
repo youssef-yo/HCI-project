@@ -107,6 +107,10 @@ const useDocumentApi = () => {
         });
     };
 
+    const deleteDocument : (docId: string) => Promise<any> = (docId: string) => {
+        return axiosPrivate.delete(`/api/docs/${docId}`);
+    };
+
     return {
         getAllDocs,
         getDocumentCommits,
@@ -115,6 +119,7 @@ const useDocumentApi = () => {
         getDocumentByID,
         getTokens,
         updateDocumentInformation,
+        deleteDocument,
     };
 };
 

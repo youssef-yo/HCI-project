@@ -21,7 +21,8 @@ from models.domain import (
     DocCommitDocument,
     DocumentDocument,
     DocStructureDocument,
-    UserDocument
+    UserDocument,
+    TaskDocument
 )
 
 from services.doc import (
@@ -132,3 +133,21 @@ async def update_documents(
                 raise HTTPException(status_code=404, detail=f"Structure not found for document with id {doc_id}")
         except Exception as e:
             print(f"Error updating document with id {doc_id}: {e}")
+
+@router.delete("/{doc_id}")
+async def delete_doc(doc_id: PydanticObjectId):
+    try:
+        document = await DocumentDocument.get(doc_id)
+        if document:
+            
+            structures = await DocStructureDocument.find({"doc_id": doc_id}).to_list()
+            for structure in structures:
+                await structure.delete()
+
+            tasks = await TaskDocument.find({"doc_id": doc_id}).to_list()
+            for task in tasks:
+                await task.delete()
+            
+            await document.delete()
+    except Exception as e:
+        raise e

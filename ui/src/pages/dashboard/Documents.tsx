@@ -1,20 +1,21 @@
-import { MdOpenInNew, MdOutlineNoteAdd } from 'react-icons/md';
+import { MdDeleteOutline, MdOpenInNew, MdOutlineNoteAdd } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { Doc, useDocumentApi } from '../../api';
 import { UploadDocModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/styles/Documents.scss';
+import { useDialog } from '../../hooks';
+
 
 const DocumentsPage = () => {
     const [docs, setDocs] = useState<Doc[]>([]);
     const [polling, setPolling] = useState<boolean>(false); 
     const [uploadDocModal, setUploadDocModal] = useState<boolean>(false);
-
-    const { getAllDocs, updateDocumentInformation } = useDocumentApi();
+    
+    const { getAllDocs, updateDocumentInformation, deleteDocument } = useDocumentApi();
     const navigate = useNavigate();
+    const dialog = useDialog();
 
     const loadDocs = () => {
         getAllDocs()
@@ -58,8 +59,17 @@ const DocumentsPage = () => {
         checkAnalyzed();   
     }, [docs]);
 
-    const deleteDoc = (id) => {
-        console.log(id);
+    // TODO: aggiungi modal dove dici "sei sicuro di ..."
+    const onDeleteDoc = async (doc: Doc) => {
+        const confirm = await dialog.showConfirmation(
+            'Deleting Doc',
+            `Are you sure you want to delete the document ${doc.name}? All tasks related to this document will also be eliminated. This action cannot be undone.`
+        );
+        if (!confirm) return;
+
+        await deleteDocument(doc._id)
+            .then((_) => loadDocs())
+            .catch((err) => console.log(err));
     }
 
     return (
@@ -111,8 +121,9 @@ const DocumentsPage = () => {
                                     disabled={!doc.analyzed}>
                                     <MdOpenInNew />
                                 </IconButton>
-                                <FontAwesomeIcon icon={faTrash} onClick={() => deleteDoc(doc._id)} disabled={!doc.analyzed} />
-                                
+                                <IconButton title="Delete Doc" onClick={() => onDeleteDoc(doc)} disabled={!doc.analyzed}>
+                                    <MdDeleteOutline/>
+                                </IconButton>                                
                             </td>
                         </tr>
                     ))
