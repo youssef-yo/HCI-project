@@ -59,11 +59,9 @@ async def upload(
     # Save the files in db and get their ID
     files_duplicate = []
     for file in files:
-        pdf = str(file.filename)
-        pdf_name = Path(pdf).stem
-        stored_onto = await DocumentDocument.find_one(DocumentDocument.name == pdf_name)
+        stored_doc = await DocumentDocument.find_one(DocumentDocument.name == file.filename)
 
-        if stored_onto:
+        if stored_doc:
             files_duplicate.append(file.filename)
 
     if files_duplicate:
@@ -76,9 +74,9 @@ async def upload(
     for file in files:
         pdf = str(file.filename)
         pdf_name = Path(pdf).stem
-        file_id = await save_file_to_database(file, db)
+        file_id, doc_id = await save_file_to_database(file, db)
         file_ids.append(file_id)
-        await save_tmp_loading_document_to_database(pdf_name, file_id)
+        # await save_tmp_loading_document_to_database(pdf_name, file_id)
             
 
     for file, file_id in zip(files, file_ids):
@@ -86,7 +84,7 @@ async def upload(
         if file_data:
             pdf = str(file.filename)
             pdf_name = Path(pdf).stem
-            threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, file_data, db, file.filename)).start()
+            threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, doc_id, file_data, db, file.filename)).start()
         else:
             raise HTTPException(status_code=404, detail="File non trovato nel database")
 
@@ -105,18 +103,25 @@ async def save_file_to_database(file: UploadFile, db: MongoClient):
         file.file,
         metadata={"contentType": file.content_type}
     )
-    return file_id
 
-async def save_tmp_loading_document_to_database(pdf_name: str, file_id: PydanticObjectId):
-    name = pdf_name + '.LOADING'
     document = DocumentDocument(
-        name=name,
-        file_id=file_id,
-        total_pages=0,
-    )
+            name=file.filename,
+            file_id=file_id,
+            total_pages=0,
+        )
     await document.create()
+    return file_id, document.id
 
-def upload_document_from_id(pdf_name: str, file_id: PydanticObjectId, file_data, db: MongoClient, filename: str):
+# async def save_tmp_loading_document_to_database(pdf_name: str, file_id: PydanticObjectId):
+#     name = pdf_name + '.LOADING'
+#     document = DocumentDocument(
+#         name=name,
+#         file_id=file_id,
+#         total_pages=0,
+#     )
+#     await document.create()
+
+def upload_document_from_id(pdf_name: str, file_id: PydanticObjectId, doc_id: PydanticObjectId, file_data, db: MongoClient, filename: str):
     """
     Carica un documento dal database usando l'ID del file.
     """
@@ -125,23 +130,23 @@ def upload_document_from_id(pdf_name: str, file_id: PydanticObjectId, file_data,
         asyncio.set_event_loop(loop)
 
         structure = loop.run_until_complete(analyze(pdf_name, file_id, file_data))
-        structure_id = loop.run_until_complete(upload(pdf_name, file_id, structure, db))
-        loop.run_until_complete(delete_tmp_loading_document(pdf_name, db))
+        structure_id = loop.run_until_complete(upload(pdf_name, file_id, doc_id, structure, db))
+        # loop.run_until_complete(delete_tmp_loading_document(pdf_name, db))
         loop.close()
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.submit(upload_sync)
     
-async def delete_tmp_loading_document(pdf_name: str, db: MongoClient):
-    name = pdf_name + '.LOADING'
-    try:
-        document = DocumentDocument.find_one(DocumentDocument.name == name)
-        if document:
-            try:
-                await document.delete()
-            except Exception as e:
-                pass
-    except Exception as e:
-        pass
+# async def delete_tmp_loading_document(pdf_name: str, db: MongoClient):
+#     name = pdf_name + '.LOADING'
+#     try:
+#         document = DocumentDocument.find_one(DocumentDocument.name == name)
+#         if document:
+#             try:
+#                 await document.delete()
+#             except Exception as e:
+#                 pass
+#     except Exception as e:
+#         pass
 
 
 async def analyze(filename: str, file_id: PydanticObjectId, file_data):
@@ -149,31 +154,49 @@ async def analyze(filename: str, file_id: PydanticObjectId, file_data):
 
     return structure
 
-def generate_random_id(length=24):
-    characters = string.ascii_lowercase + string.digits
-    return ''.join(random.choice(characters) for _ in range(length))
-
-async def upload(filename: str, file_id: PydanticObjectId, structure, db: MongoClient = Depends(get_db)):
-    document_id = ObjectId()
+async def upload(filename: str, file_id: PydanticObjectId, doc_id: PydanticObjectId, structure, db: MongoClient = Depends(get_db)):
+    # document_id = ObjectId()
     
-    npages = len(structure)
-    try:
-        document = DocumentDocument(
-            id = str(document_id),
-            name=filename,
-            file_id=file_id,
-            total_pages=npages,
-        )
-    except Exception as e:
-        print(e)
+    # npages = len(structure)
+    # try:
+    #     document = DocumentDocument(
+    #         id = str(document_id),
+    #         name=filename,
+    #         file_id=file_id,
+    #         total_pages=npages,
+    #     )
+    # except Exception as e:
+    #     print(e)
 
-    try:
-        await document.create()
-    except Exception as e:
-        pass
+    # try:
+    #     await document.create()
+    # except Exception as e:
+    #     pass
+
+    # npages = len(structure)
+
+    # try:
+    #     document = await DocumentDocument.find_one(DocumentDocument.id == file_id)
+    # except Exception as e:
+    #     print("SAE 1")
+    #     print(e)
+    # try:
+    #     document.total_pages = npages    
+    #     await document.save()
+    # except Exception as e:
+    #     print("SAE 2")
+    #     print(e)
+    # try:
+    #     npages = len(structure)
+    #     await DocumentDocument.get(doc_id).update(Set({DocumentDocument.total_pages: npages}))
+    # except Exception as e:
+    #     print("ase")
+    #     print(e)
+
+
     try:
         doc_structure = DocStructureDocument(   
-            doc_id=str(document_id),
+            doc_id=str(doc_id),
             structure=structure
         )
         await doc_structure.create()

@@ -10,9 +10,10 @@ import '../../assets/styles/Documents.scss';
 
 const DocumentsPage = () => {
     const [docs, setDocs] = useState<Doc[]>([]);
+    const [polling, setPolling] = useState<boolean>(false); 
     const [uploadDocModal, setUploadDocModal] = useState<boolean>(false);
 
-    const { getAllDocs } = useDocumentApi();
+    const { getAllDocs, updateDocumentInformation } = useDocumentApi();
     const navigate = useNavigate();
 
     const loadDocs = () => {
@@ -22,19 +23,39 @@ const DocumentsPage = () => {
     };
 
     const handleUploadModalClose = () => {
-        console.log('Closing upload modal');
         setUploadDocModal(false);
         loadDocs();
     };
 
-    useEffect(() => {
-        loadDocs();
-    }, []);
+    const checkAnalyzed = () => {
+        if (docs.some(doc => !doc.analyzed) && !polling) {
+            setPolling(true);
+            const intervalId = setInterval(() => {
+                const uncheckedDocumentIds = docs.filter(doc => !doc.analyzed).map(doc => doc._id);
+                try {
+                    updateDocumentInformation(uncheckedDocumentIds);
+                    loadDocs();
+                    clearInterval(intervalId);
+                    setPolling(false);
+                } catch (error) {
+                    console.log(error);
+                    // TODO: manage error
+                }
+            }, 5000);
+            
+            return () =>  {
+                clearInterval(intervalId);
+                setPolling(false);
+            };
+        }
+    }
 
     useEffect(() => {
-        if (docs.some(doc => doc.name.endsWith('.LOADING'))) {
-            loadDocs();
-        }
+        loadDocs();   
+    }, []);
+    
+    useEffect(() => {
+        checkAnalyzed();   
     }, [docs]);
 
     const deleteDoc = (id) => {
@@ -70,13 +91,12 @@ const DocumentsPage = () => {
                     ) : (docs.map((doc) => (
                          <tr
                             key={doc._id}
-                            // className={doc.name.endsWith('.LOADING') ? 'loading' : 'standard'}
                         >
                             <td style={{ textAlign: 'center' }}>
-                                <div className={doc.name.endsWith('.LOADING') ? 'status-dot load' : 'status-dot'} style={{ backgroundColor: doc.name.endsWith('.LOADING') ? 'yellow' : 'green' }}></div>
+                                <div className={!doc.analyzed ? 'status-dot load' : 'status-dot'} style={{ backgroundColor: !doc.analyzed ? 'yellow' : 'green' }}></div>
                             </td>
-                            <td>{doc.name.endsWith('.LOADING') ? doc.name.replace('.LOADING', '') : doc.name}</td>
-                            <td style={{ textAlign: 'center' }}>{doc.name.endsWith('.LOADING') ? '?' : doc.totalPages}</td>
+                            <td>{doc.name}</td>
+                            <td style={{ textAlign: 'center' }}>{!doc.analyzed ? 'LOADING' : doc.totalPages}</td>
                             <td
                                 style={{
                                     display: 'flex',
@@ -88,10 +108,10 @@ const DocumentsPage = () => {
                                 <IconButton
                                     title="View Document"
                                     onClick={() => navigate(`${doc._id}`)}
-                                    disabled={doc.name.endsWith('.LOADING')}>
+                                    disabled={!doc.analyzed}>
                                     <MdOpenInNew />
                                 </IconButton>
-                                <FontAwesomeIcon icon={faTrash} onClick={() => deleteDoc(doc._id)} disabled={doc.name.endsWith('.LOADING')} />
+                                <FontAwesomeIcon icon={faTrash} onClick={() => deleteDoc(doc._id)} disabled={!doc.analyzed} />
                                 
                             </td>
                         </tr>
@@ -102,6 +122,7 @@ const DocumentsPage = () => {
 
             <UploadDocModal
                 updateTable={loadDocs}
+                checkAnalyzed={checkAnalyzed}
                 show={uploadDocModal}
                 onHide={handleUploadModalClose}
             />

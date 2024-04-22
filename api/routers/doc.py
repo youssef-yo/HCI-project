@@ -2,7 +2,8 @@ from typing import List
 
 from fastapi import (
     APIRouter,
-    Depends
+    Depends,
+    HTTPException
 )
 from fastapi.responses import Response
 
@@ -19,6 +20,7 @@ from models.schemas import (
 from models.domain import (
     DocCommitDocument,
     DocumentDocument,
+    DocStructureDocument,
     UserDocument
 )
 
@@ -111,3 +113,22 @@ async def get_commit_annotations(
     """
     commit_annotations = await get_document_commit_annotations(commit_id)
     return commit_annotations
+
+
+@router.post("/updateDocs")
+async def update_documents(
+    ids: List[str] = []
+):
+    for doc_id in ids:
+        try:
+            document = await DocumentDocument.get(doc_id)
+            structure = await DocStructureDocument.find_one(DocStructureDocument.doc_id == PydanticObjectId(doc_id))
+            if structure:
+                npages = len(structure.structure)
+                document.total_pages = npages
+                document.analyzed = True
+                await document.save()
+            else:
+                raise HTTPException(status_code=404, detail=f"Structure not found for document with id {doc_id}")
+        except Exception as e:
+            print(f"Error updating document with id {doc_id}: {e}")
