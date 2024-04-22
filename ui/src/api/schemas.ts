@@ -49,6 +49,7 @@ export interface Doc {
     _id: string;
     name: string;
     totalPages: number;
+    analyzed: boolean;
 }
 
 export interface DocCommit {

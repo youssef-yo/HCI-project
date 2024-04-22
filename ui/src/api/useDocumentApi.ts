@@ -99,6 +99,18 @@ const useDocumentApi = () => {
         return axios.get(`${docURL(sha)}/tokens`).then((r) => r.data);
     };
 
+    const updateDocumentInformation = async (docIds: string[]) => {
+        await axiosPrivate({
+            method: 'post',
+            url: '/api/docs/updateDocs',
+            data: docIds,
+        });
+    };
+
+    const deleteDocument : (docId: string) => Promise<any> = (docId: string) => {
+        return axiosPrivate.delete(`/api/docs/${docId}`);
+    };
+
     return {
         getAllDocs,
         getDocumentCommits,
@@ -106,6 +118,8 @@ const useDocumentApi = () => {
         getCommitAnnotations,
         getDocumentByID,
         getTokens,
+        updateDocumentInformation,
+        deleteDocument,
     };
 };
 

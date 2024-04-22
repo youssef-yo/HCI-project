@@ -9,7 +9,7 @@ type UploadDocModalProps = {
     onHide: () => void;
 };
 
-const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHide }) => {
+const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, checkAnalyzed, show, onHide }) => {
     const [files, setFiles] = useState<File[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [duplicateFiles, setDuplicateFiles] = useState<String[]>([]);
@@ -52,6 +52,7 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHi
         }
 
         updateTable();
+        checkAnalyzed();
     };
 
     const handleClose = () => {
