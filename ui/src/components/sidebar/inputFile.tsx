@@ -29,8 +29,6 @@ const InputFile = ({
         }
 
         const fileExtension = fileObj.name.split('.').pop();
-        console.log(fileExtension);
-        console.log(supportedFiles);
         // Check if the file extension is supported
         const isSupported = supportedFiles.map(fileType => fileType.toLowerCase().includes(fileExtension.toLowerCase()));
         if (!isSupported.some(Boolean)) {
