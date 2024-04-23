@@ -50,7 +50,7 @@ const OntologiesPage = () => {
 
     const onDeleteOntology = async (onto: Ontology) => {
         const confirm = await dialog.showConfirmation(
-            'Deleting Ontology',
+            'Delete Ontology',
             `Are you sure you want to delete the loaded ontology ${onto.name}? This action cannot be undone.`
         );
         if (!confirm) return;

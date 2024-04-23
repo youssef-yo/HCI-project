@@ -74,7 +74,17 @@ const TaskPage = () => {
         if (!confirm) return;
 
         commitTask(task!!._id)
-            .then((_) => window.location.reload())
+            .then((_) => {
+                task.status = TaskStatus.COMMITTED;
+                setTask(task);
+                loadDocument(task.docId);
+                loadUser(task.userId);
+
+                notification.success({
+                    message: 'Task committed!',
+                    placement: 'bottomRight',
+                });
+            })
             .catch((err) =>
                 notification.error({
                     message: 'Could not commit task!',
@@ -101,7 +111,17 @@ const TaskPage = () => {
         if (!confirm) return;
 
         dismissTask(task!!._id)
-            .then((_) => window.location.reload())
+            .then((_) => {
+                task.status = TaskStatus.DISMISSED;
+                setTask(task);
+                loadDocument(task.docId);
+                loadUser(task.userId);
+
+                notification.success({
+                    message: 'Task dismissed!',
+                    placement: 'bottomRight',
+                });
+            })
             .catch((err) =>
                 notification.error({
                     message: 'Could not dismiss task!',
