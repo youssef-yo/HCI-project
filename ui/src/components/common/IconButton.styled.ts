@@ -17,7 +17,7 @@ const StyledIconButton = styled.button`
     transition: 200ms ease-in;
     cursor: pointer;
 
-    &:hover {
+    &:not([disabled]):hover {
         background: rgba(0, 0, 0, 0.2);
     }
 `;
