@@ -1,34 +1,39 @@
-import { MdOutlineAssignment, MdOutlineDashboard } from 'react-icons/md';
+import { MdOutlineAssignment, MdOutlineHome } from 'react-icons/md';
 import { NavLink, Outlet, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 import { Sidebar, Topbar, WithSidebar, WithTopbar } from '../components/common';
-import { Logo, NavLinks } from '../components/sidebar';
+import { NavLinks } from '../components/sidebar';
 import { HomeSummary, TaskPage, TasksPage } from './home';
 
 const HomePage = () => {
     const topbarHeight = '68px';
     const sidebarWidth = '300px';
+    const color = "white";
+
+    const iconStyle = { fill: {color},
+                    fontSize: "1.4rem"}
 
     return (
         <WithSidebar width={sidebarWidth}>
             <Sidebar width={sidebarWidth}>
-                <Logo />
 
                 <NavLinks>
+                    <p className="navGroup__title">ONTO-PAWLS</p>
+                    <ColoredLine color={color} />
                     <div>
-                        <p className="navGroup__title">Home Page</p>
                         <NavLink className="navGroup__link" to={''} end>
-                            <MdOutlineDashboard />
-                            <span>Home Page</span>
+                            <MdOutlineHome style={iconStyle}/>
+                            <span>Dashboard</span>
                         </NavLink>
                     </div>
+                    <ColoredLine color="white" />
                     <div>
-                        <p className="navGroup__title">Tasks</p>
                         <NavLink className="navGroup__link" to={'tasks'} end>
                             <MdOutlineAssignment />
                             <span>Assigned Tasks</span>
                         </NavLink>
                     </div>
+                    <ColoredLine color="white" />
                 </NavLinks>
             </Sidebar>
 
@@ -57,4 +62,14 @@ const HomeContainer = styled.div(
     padding: ${theme.spacing.md};
     background: #FFFFFF;
 `
+);
+
+const ColoredLine = ({ color }) => (
+    <hr
+        style={{
+            color: color,
+            backgroundColor: color,
+            height: 3
+        }}
+    />
 );
