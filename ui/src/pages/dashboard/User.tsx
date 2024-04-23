@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TaskExtended, User, getApiError, useTaskApi, useUserApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
-import { useDialog } from '../../hooks';
+import { useDialog, useAuth } from '../../hooks';
 import { EditUserModal } from '../../components/dashboard';
 import { notification } from '@allenai/varnish';
 
@@ -20,6 +20,8 @@ const UserPage = () => {
 
     const dialog = useDialog();
     const navigate = useNavigate();
+
+    const { auth } = useAuth();
 
     useEffect(() => {
         if (!userId) {
@@ -41,7 +43,7 @@ const UserPage = () => {
 
     const onDeleteUser = async () => {
         const confirm = await dialog.showConfirmation(
-            'Deleting User',
+            'Delete User',
             `Are you sure you want to delete the user ${user?.email}? This action cannot be undone.`
         );
 
@@ -62,29 +64,25 @@ const UserPage = () => {
             <Header>
                 <h1>User Information</h1>
 
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '8px',
-                    }}>
-                    <Button
-                        color="secondary"
-                        icon={<MdOutlineEdit />}
-                        onClick={() => setUserModal(true)}>
-                        Edit User
-                    </Button>
-                    <Button color="secondary" icon={<MdDeleteOutline />} onClick={onDeleteUser}>
-                        Delete User
-                    </Button>
-                </div>
+                <Button
+                    color="edit"
+                    icon={<MdOutlineEdit />}
+                    marginLeft="auto"
+                    onClick={() => setUserModal(true)}
+                    disabled={user?.role==='Administrator' && auth?.id!==user?._id}>
+                    Edit User
+                </Button>
+                <Button
+                    color="delete"
+                    style={{ marginLeft: '8px' }}
+                    icon={<MdDeleteOutline />}
+                    onClick={onDeleteUser} 
+                    disabled={user?.role==='Administrator' && auth?.id!==user?._id}>
+                    Delete User
+                </Button>
             </Header>
 
             <div className="userInfo">
-                <p>
-                    <b>ID:</b> {user?._id}
-                </p>
                 <p>
                     <b>Email:</b> {user?.email}
                 </p>
@@ -102,17 +100,18 @@ const UserPage = () => {
                 <h3>User Tasks</h3>
                 <Button
                     color="secondary"
+                    marginLeft="auto"
                     icon={<MdAddTask />}
                     onClick={() =>
                         navigate(`/dash/tasks/new`, {
                             state: { userId: user?._id },
                         })
                     }>
-                    Create User Task
+                    Create Task
                 </Button>
             </Header>
 
-            <Table>
+            <Table color="#0077B6">
                 <thead>
                     <tr>
                         <th>Document</th>
@@ -123,30 +122,35 @@ const UserPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {tasks.map((task) => (
-                        <tr key={task._id}>
-                            <td>{task.document?.name}</td>
-                            <td>{new Date(task.createdAt).toUTCString()}</td>
-                            <td style={{ textAlign: 'center' }}>
-                                {task.pageRange.start} - {task.pageRange.end}
-                            </td>
-                            <td style={{ textAlign: 'center' }}>{task.status}</td>
-                            <td
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                }}>
-                                <IconButton
-                                    title="View Task"
-                                    onClick={() => navigate(`/dash/tasks/${task._id}`)}>
-                                    <MdOpenInNew />
-                                </IconButton>
-                            </td>
+                    {tasks.length === 0 ? (
+                        <tr>
+                            <td colSpan="5" style={{ textAlign: 'center' }}>Nothing to show</td>
                         </tr>
-                    ))}
+                    ) : (tasks.map((task) => (
+                            <tr key={task._id}>
+                                <td>{task.document?.name}</td>
+                                <td>{new Date(task.createdAt).toUTCString()}</td>
+                                <td style={{ textAlign: 'center' }}>
+                                    {task.pageRange.start} - {task.pageRange.end}
+                                </td>
+                                <td style={{ textAlign: 'center' }}>{task.status}</td>
+                                <td
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                    }}>
+                                    <IconButton
+                                        title="View Task"
+                                        onClick={() => navigate(`/dash/tasks/${task._id}`)}>
+                                        <MdOpenInNew />
+                                    </IconButton>
+                                </td>
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </Table>
 

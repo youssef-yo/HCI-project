@@ -68,6 +68,7 @@ const LoginPage = () => {
                         <Input
                             type="text"
                             variant={InputType.STANDARD}
+                            width="100%"
                             id="username"
                             placeholder="Username"
                             onChange={(e) => setUsername(e.target.value)}
@@ -78,6 +79,7 @@ const LoginPage = () => {
                         <Input
                             type="password"
                             variant={InputType.STANDARD}
+                            width="100%"
                             id="password"
                             placeholder="Password"
                             onChange={(e) => setPassword(e.target.value)}
@@ -86,7 +88,7 @@ const LoginPage = () => {
                         />
 
                         <Button
-                            color="primary"
+                            color="login"
                             icon={<MdLogin />}
                             size="large"
                             onClick={handleSubmit}>

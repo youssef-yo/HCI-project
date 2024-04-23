@@ -10,10 +10,10 @@ export const StyledSidebar = styled.div<SidebarProps>(
     position: fixed;
     left: 0;
     overflow-y: auto;
-    background: white;
-    border-right: 1px solid black;
-    padding: 0;
-    height: 100%;
+    background: #023E8A;
+    color: ${theme.color.N2};
+    padding: ${theme.spacing.md} ${theme.spacing.md};
+    height: 100vh;
     * {
         color: black;
     }

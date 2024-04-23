@@ -1,17 +1,19 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { InputFile, FileList } from '../sidebar';
 import { useUploadApi } from '../../api';
 
 type UploadOntoModalProps = {
+    updateTable: () => void;
     show: boolean;
     onHide: () => void;
 };
 
-const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ show, onHide }) => {
+const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ updateTable, show, onHide }) => {
     const [files, setFiles] = useState<string[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
-    const [anyFileUploaded, setAnyFileUploaded] = useState<boolean>(false);
+    const [duplicateFiles, setDuplicateFiles] = useState<String[]>([]);
+    const [errorText, setErrorText] = useState('');
     const supportedFiles = 'N-Triples, RDF/XML, OWL/XML';
 
     // const { deleteOntology } = useOntologyApi();
@@ -19,35 +21,50 @@ const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ show, onHide }) => {
 
     const changeStateFileIsUploading = (value: boolean) => {
         setIsUploading(value);
-        console.log('File is uploding? ', isUploading);
     };
 
-    const changeStateAnyFileUploaded = (value: boolean) => {
-        setAnyFileUploaded(value);
-        console.log('Any file was uploaded? ', isUploading);
-        // if no file was uploaded then there is no need to refreshh the page after the modal is closed.
-    };
 
-    const updateFiles = (_file: string) => {
+    const addFile = (_file: string) => {
         setFiles([...files, _file]);
-        console.log(files);
     };
 
-    const removeFile = (_file: string) => {
-        // For now it does nothing, when we'll load documents in MongoDB, we'll take care of this...
-        // deleteOntology(_file);
-        // setFiles(files.filter((file: any) => file.name !== _file));
-        console.log('Tried deleting file...');
+
+    const removeFile = (_filename: string) => {
+        setFiles(files.filter((file: any) => file.name !== _filename));
+        setDuplicateFiles(duplicateFiles.filter((name: string) => name !== _filename));
     };
 
+    const handleUploadOnto = async () => {
+        if (files.length === 0) return;
+
+        changeStateFileIsUploading(true);
+        try {
+            await uploadOntology(files);
+            changeStateFileIsUploading(false);
+            onHide();
+            setFiles([]);
+            setDuplicateFiles([]);
+        } catch (error: any) {
+            if (error.response.status === 409) {
+                setIsUploading(false);
+                const duplicateFiles = error.response.data.detail;
+                setDuplicateFiles(duplicateFiles);
+                setErrorText('Duplicate Ontology');
+            } else if (error.response.status === 404) {
+                setErrorText('Ontology not found');
+            } else {
+                setErrorText(`Error during the upload of the Ontology`);
+            }
+        }
+
+        updateTable();
+    }
+    
     const handleClose = () => {
-        if (anyFileUploaded && !isUploading) {
-            onHide();
-            window.location.reload();
-        }
-        if (!anyFileUploaded && !isUploading) {
-            onHide();
-        }
+        setFiles([]);
+        setDuplicateFiles([]);
+        onHide();
+        updateTable();
     };
 
     return (
@@ -58,22 +75,27 @@ const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ show, onHide }) => {
             <Modal.Body>
                 <InputFile
                     files={files}
-                    updateFiles={updateFiles}
-                    changeStateFileIsUploading={changeStateFileIsUploading}
-                    changeStateAnyFileUploaded={changeStateAnyFileUploaded}
-                    api={(onto: any) => uploadOntology(onto)}
+                    addFile={addFile}
                     supportedFiles={supportedFiles}></InputFile>
+                {duplicateFiles.length > 0 && <p style={{ color: 'red' }}> {errorText} </p>}
                 <Form>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                        <FileList files={files} removeFile={removeFile} />
+                        <FileList
+                            files={files}
+                            removeFile={removeFile}
+                            duplicateFiles={duplicateFiles}
+                        />
                     </Form.Group>
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="primary" onClick={handleClose}>
+                <Button variant="secondary" onClick={handleClose}>
                     Close
                 </Button>
-                <Button variant="primary" onClick={handleClose}>
+                <Button 
+                    variant="primary"
+                    onClick={handleUploadOnto}
+                    disabled={isUploading || files.length === 0}>
                     Save Changes
                 </Button>
             </Modal.Footer>

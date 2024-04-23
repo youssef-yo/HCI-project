@@ -9,10 +9,11 @@ type UploadDocModalProps = {
     onHide: () => void;
 };
 
-const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHide }) => {
+const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, checkAnalyzed, show, onHide }) => {
     const [files, setFiles] = useState<File[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [duplicateFiles, setDuplicateFiles] = useState<String[]>([]);
+    const [errorText, setErrorText] = useState('');
     const supportedFiles = 'PDF';
 
     const { uploadFile } = useUploadApi();
@@ -42,14 +43,16 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHi
                 setIsUploading(false);
                 const duplicateFiles = error.response.data.detail;
                 setDuplicateFiles(duplicateFiles);
+                setErrorText('Duplicate Files');
             } else if (error.response.status === 404) {
-                console.log('File non trovato');
+                setErrorText('File not found');
             } else {
-                console.error(`Errore durante l'upload del file`, error);
+                setErrorText(`Error during the upload of the file`);
             }
         }
 
         updateTable();
+        checkAnalyzed();
     };
 
     const handleClose = () => {
@@ -76,7 +79,7 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHi
                     // api={(doc: any) => uploadAnalyze(doc)}
                     // supportedFiles={supportedFiles}
                 ></InputFile>
-                {duplicateFiles.length > 0 && <p style={{ color: 'red' }}> Duplicate File </p>}
+                {duplicateFiles.length > 0 && <p style={{ color: 'red' }}> {errorText} </p>}
                 <Form>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                         <FileList
@@ -88,8 +91,8 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, show, onHi
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="primary" onClick={handleClose}>
-                    Cancel
+                <Button variant="secondary" onClick={handleClose}>
+                    Close
                 </Button>
                 <Button
                     variant="primary"

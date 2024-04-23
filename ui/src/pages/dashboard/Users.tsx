@@ -4,8 +4,9 @@ import { User, getApiError, useUserApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { EditUserModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
-import { useDialog } from '../../hooks';
+import { useDialog, useAuth } from '../../hooks';
 import { notification } from '@allenai/varnish';
+import '../../assets/styles/Users.scss';
 
 const UsersPage = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -17,6 +18,8 @@ const UsersPage = () => {
 
     const dialog = useDialog();
     const navigate = useNavigate();
+
+    const { auth } = useAuth();
 
     useEffect(() => {
         getUsers()
@@ -41,7 +44,7 @@ const UsersPage = () => {
 
     const onDeleteUser = async (user: User) => {
         const confirm = await dialog.showConfirmation(
-            'Deleting User',
+            'Delete User',
             `Are you sure you want to delete the user ${user.email}? This action cannot be undone.`
         );
         if (!confirm) return;
@@ -62,12 +65,13 @@ const UsersPage = () => {
                 <h1>Users</h1>
                 <Button
                     color="secondary"
+                    marginLeft="auto"
                     icon={<MdOutlinePersonAddAlt />}
                     onClick={() => navigate('new')}>
                     Create User
                 </Button>
             </Header>
-            <Table>
+            <Table color="#0077B6">
                 <thead>
                     <tr>
                         <th>Email</th>
@@ -77,7 +81,11 @@ const UsersPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map((user) => (
+                    {users.length === 0 ? (
+                        <tr>
+                            <td colSpan="4" style={{ textAlign: 'center' }}>Nothing to show</td>
+                        </tr>
+                    ) : (users.map((user) => (
                         <tr key={user._id}>
                             <td>{user.email}</td>
                             <td>{user.fullName}</td>
@@ -95,15 +103,16 @@ const UsersPage = () => {
                                     onClick={() => navigate(`${user._id}`)}>
                                     <MdOpenInNew />
                                 </IconButton>
-                                <IconButton title="Edit User" onClick={() => onEditUser(user._id)}>
-                                    <MdOutlineEdit />
+                                <IconButton title="Edit User" onClick={() => onEditUser(user._id)} disabled={user.role==='Administrator' && auth?.id!==user._id}>
+                                    <MdOutlineEdit className={user.role === 'Administrator' && auth?.id !== user._id ? 'icon-disabled' : ''} />
                                 </IconButton>
-                                <IconButton title="Delete User" onClick={() => onDeleteUser(user)}>
-                                    <MdDeleteOutline />
+                                <IconButton title="Delete User" onClick={() => onDeleteUser(user)} disabled={user.role==='Administrator' && auth?.id!==user._id}>
+                                    <MdDeleteOutline className={user.role === 'Administrator' && auth?.id !== user._id ? 'icon-disabled' : ''} />
                                 </IconButton>
                             </td>
                         </tr>
-                    ))}
+                    ))
+                )}
                 </tbody>
             </Table>
 

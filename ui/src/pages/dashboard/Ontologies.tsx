@@ -19,6 +19,10 @@ const OntologiesPage = () => {
         loadOntologies();
     }, []);
 
+    // useEffect(() => {
+    //     loadOntologies();
+    // }, [ontos]);
+
     const loadOntologies = () => {
         getOntologiesList()
             .then((ontos) => setOntos(ontos))
@@ -31,9 +35,7 @@ const OntologiesPage = () => {
     };
 
     const handleUploadModalClose = () => {
-        console.log('Closing upload modal');
         setUploadOntoModal(false);
-        loadOntologies();
     };
 
     const onEditOntology = (id: string) => {
@@ -48,7 +50,7 @@ const OntologiesPage = () => {
 
     const onDeleteOntology = async (onto: Ontology) => {
         const confirm = await dialog.showConfirmation(
-            'Deleting Ontology',
+            'Delete Ontology',
             `Are you sure you want to delete the loaded ontology ${onto.name}? This action cannot be undone.`
         );
         if (!confirm) return;
@@ -63,13 +65,14 @@ const OntologiesPage = () => {
                 <h1>Ontologies</h1>
                 <Button
                     color="secondary"
+                    marginLeft="auto"
                     icon={<MdOutlineNoteAdd />}
                     onClick={() => setUploadOntoModal(true)}>
                     Upload Ontology
                 </Button>
             </Header>
 
-            <Table>
+            <Table color="#0077B6">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -77,7 +80,11 @@ const OntologiesPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {ontos.map((onto) => (
+                    {ontos.length === 0 ? (
+                        <tr>
+                            <td colSpan="2" style={{ textAlign: 'center' }}>Nothing to show</td>
+                        </tr>
+                    ) : (ontos.map((onto) => (
                         <tr key={onto._id}>
                             <td>{onto.name}</td>
                             <td
@@ -100,7 +107,8 @@ const OntologiesPage = () => {
                                 </IconButton>
                             </td>
                         </tr>
-                    ))}
+                    ))
+                )}
                 </tbody>
             </Table>
 
@@ -110,7 +118,10 @@ const OntologiesPage = () => {
                 ontoID={editedOnto}
                 onUpdate={onOntoUpdated}
             />
-            <UploadOntoModal show={uploadOntoModal} onHide={handleUploadModalClose} />
+            <UploadOntoModal
+                updateTable={loadOntologies}
+                show={uploadOntoModal}
+                onHide={handleUploadModalClose} />
         </section>
     );
 };

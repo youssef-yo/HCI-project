@@ -1,0 +1,57 @@
+// .loading-text {
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     position: relative;
+//   }
+  
+//   .loading-text::after {
+//     content: 'LOADING...';
+//     position: absolute;
+//     animation: loading-dots 1s infinite steps(4);
+//   }
+  
+//   @keyframes loading-dots {
+//     from, to {
+//       opacity: 0;
+//     }
+//     50% {
+//       opacity: 1;
+//     }
+//   }
+  
+.loading {
+    animation: blink-animation 3s infinite;
+  }
+  
+  @keyframes blink-animation {
+    0% { background-color: transparent; }
+    50% { background-color: #edd810; }
+    100% { background-color: transparent; }
+  }
+  
+.standard {
+    background-color: white;
+}
+
+.status-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.load{
+  animation: blink-animation 3s infinite;
+}
+
+@keyframes pulse-animation {
+  0% {
+      transform: scale(1);
+  }
+  50% {
+      transform: scale(1.2);
+  }
+  100% {
+      transform: scale(1);
+  }
+}

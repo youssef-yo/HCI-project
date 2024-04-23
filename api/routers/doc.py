@@ -2,7 +2,8 @@ from typing import List
 
 from fastapi import (
     APIRouter,
-    Depends
+    Depends,
+    HTTPException
 )
 from fastapi.responses import Response
 
@@ -19,7 +20,9 @@ from models.schemas import (
 from models.domain import (
     DocCommitDocument,
     DocumentDocument,
-    UserDocument
+    DocStructureDocument,
+    UserDocument,
+    TaskDocument
 )
 
 from services.doc import (
@@ -111,3 +114,40 @@ async def get_commit_annotations(
     """
     commit_annotations = await get_document_commit_annotations(commit_id)
     return commit_annotations
+
+
+@router.post("/updateDocs")
+async def update_documents(
+    ids: List[str] = []
+):
+    for doc_id in ids:
+        try:
+            document = await DocumentDocument.get(doc_id)
+            structure = await DocStructureDocument.find_one(DocStructureDocument.doc_id == PydanticObjectId(doc_id))
+            if structure:
+                npages = len(structure.structure)
+                document.total_pages = npages
+                document.analyzed = True
+                await document.save()
+            else:
+                raise HTTPException(status_code=404, detail=f"Structure not found for document with id {doc_id}")
+        except Exception as e:
+            print(f"Error updating document with id {doc_id}: {e}")
+
+@router.delete("/{doc_id}")
+async def delete_doc(doc_id: PydanticObjectId):
+    try:
+        document = await DocumentDocument.get(doc_id)
+        if document:
+            
+            structures = await DocStructureDocument.find({"doc_id": doc_id}).to_list()
+            for structure in structures:
+                await structure.delete()
+
+            tasks = await TaskDocument.find({"doc_id": doc_id}).to_list()
+            for task in tasks:
+                await task.delete()
+            
+            await document.delete()
+    except Exception as e:
+        raise e

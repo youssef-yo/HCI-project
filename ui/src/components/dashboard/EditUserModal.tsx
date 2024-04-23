@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { Input, InputType, Option, Select } from '../common';
+import { Input, InputType, Option } from '../common';
 import { User, getApiError, useUserApi } from '../../api';
 import { ROLES } from '../../config/roles';
 
@@ -17,7 +17,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
     const [fullName, setFullName] = useState<string>('');
 
     const [roleOption, setRoleOption] = useState<Option<string>>();
-    const [roleOptions, setRoleOptions] = useState<Option<string>[]>([]);
 
     const [errorMsg, setErrorMsg] = useState<string>('');
     const errorRef = useRef<HTMLParagraphElement>(null);
@@ -28,7 +27,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
         if (!show || !userID) return;
 
         const options = buildRoleOptions([ROLES.Admin, ROLES.Annotator]);
-        setRoleOptions(options);
 
         getUserByID(userID)
             .then((user) => {
@@ -106,18 +104,19 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
                         color="secondary"
                         id="fullName"
                         placeholder="Full Name"
+                        width="100%"
                         onChange={(e) => setFullName(e.target.value)}
                         value={fullName}
                         required
                     />
 
-                    <Select
+                    {/* <Select
                         placeHolder="Select Role"
                         options={roleOptions}
                         value={roleOption}
                         onChange={(role) => setRoleOption(role)}
                         isSearchable
-                    />
+                    /> */}
                 </Form>
             </Modal.Body>
             <Modal.Footer>

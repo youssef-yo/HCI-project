@@ -35,6 +35,7 @@ class Page(BaseModel):
 class DocumentBase(RWSchema):
     name: str
     total_pages: int
+    analyzed: bool
 
 
 class DocumentOutResponse(DocumentBase, MongoBase):

@@ -10,12 +10,58 @@ const COLOR = {
             background: #f10e0e;
         }
     `,
+    // secondary: button create top right in each section
     secondary: css`
-        background: #e04545;
-        color: #eee;
+        background: #48CAE4;
+        color: #000;
 
         &:hover {
-            background: #cd2323;
+            background: #ADE8F4;
+        }
+    `,
+
+    export: css`
+        background: #80ED99;
+        color: #000;
+
+        &:hover {
+            background: #C7F9CC;
+        }
+    `,
+
+    commit: css`
+        background: #80ED99;
+        color: #000;
+
+        &:hover {
+            background: #C7F9CC;
+        }
+    `,
+
+    edit: css`
+        background: #ffe07a;
+        color: #000;
+
+        &:hover {
+            background: #ffedb3;
+        }
+    `,
+
+    delete: css`
+        background: #f2433d;
+        color: #000;
+
+        &:hover {
+            background: #fcb1ae;
+        }
+    `,
+
+    login: css`
+        background: #48CAE4;
+        color: #000;
+
+        &:hover {
+            background: #ADE8F4;
         }
     `,
 };
@@ -38,6 +84,12 @@ const SIZE = {
 const DISABLED = css`
     cursor: not-allowed;
 `;
+
+const MARGIN_LEFT = {
+    auto: css`
+        margin-left: auto;
+    `,
+};
 
 const StyledButton = styled.button<ButtonProps>`
     position: relative;
@@ -66,6 +118,7 @@ const StyledButton = styled.button<ButtonProps>`
     ${(props) => props.color && COLOR[props.color]}
     ${(props) => props.size && SIZE[props.size]}
     ${(props) => props.disabled && DISABLED}
+    ${(props) => props.marginLeft && MARGIN_LEFT[props.marginLeft]}
 `;
 
 export default StyledButton;

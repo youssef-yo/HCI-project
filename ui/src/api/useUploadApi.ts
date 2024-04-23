@@ -14,20 +14,17 @@ const useUploadApi = () => {
      * @param file Ontology file
      * @returns Promise
      */
-    const uploadOntology = async (file: FormData) => {
-        console.log('File in uploadOntology: ', file);
-        try {
-            const response = await axiosPrivate({
-                method: 'post',
-                url: '/api/upload/ontology',
-                data: file,
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            // console.log('response: ', response);
-            return response;
-        } catch (error) {
-            console.log(error);
-        }
+    const uploadOntology = async (files: []) => {
+        const formData = new FormData();
+        files.forEach((file) => {
+            formData.append('files', file);
+        });
+        await axiosPrivate({
+            method: 'post',
+            url: '/api/upload/ontology',
+            data: formData,
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
     };
 
     /**
