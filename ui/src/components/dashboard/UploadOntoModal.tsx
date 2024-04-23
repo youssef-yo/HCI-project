@@ -67,6 +67,10 @@ const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ updateTable, show, on
         updateTable();
     };
 
+    const updateText = (msg: string) => {
+        setErrorText(msg);
+    }
+
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -76,8 +80,10 @@ const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ updateTable, show, on
                 <InputFile
                     files={files}
                     addFile={addFile}
-                    supportedFiles={supportedFiles}></InputFile>
-                {duplicateFiles.length > 0 && <p style={{ color: 'red' }}> {errorText} </p>}
+                    supportedFiles={supportedFiles}
+                    updateText={updateText}>
+                </InputFile>
+                {<p style={{ color: 'red' }}> {errorText} </p>}
                 <Form>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                         <FileList
