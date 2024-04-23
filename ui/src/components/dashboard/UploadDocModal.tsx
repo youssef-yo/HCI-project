@@ -91,7 +91,7 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, checkAnaly
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="primary" onClick={handleClose}>
+                <Button variant="secondary" onClick={handleClose}>
                     Cancel
                 </Button>
                 <Button

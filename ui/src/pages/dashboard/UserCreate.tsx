@@ -63,6 +63,17 @@ const UserCreatePage = () => {
             return;
         }
 
+        if (password.length < 4 || password.length > 12) {
+            setErrorMsg('Password must be between 4 and 12 characters.');
+            return;
+        }
+
+        const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        if (!isValidEmail) {
+            setErrorMsg('Use a valid email!');
+            return;
+        }
         const newUser = {
             email: email,
             fullName: fullName,
@@ -77,12 +88,10 @@ const UserCreatePage = () => {
             })
             .catch((err) => setErrorMsg(getApiError(err)));
     };
-
-
     
     return (
         <section>
-            <Header>
+            <Header justifyContent="center">
                 <h1>Create user</h1>
             </Header>
         
@@ -118,30 +127,43 @@ const UserCreatePage = () => {
                 />
                 </InputWrapper>
                 <InputWrapper>
-                <Input
-                    color="#000000"
-                    type="password"
-                    variant={InputType.STANDARD}
-                    id="password"
-                    placeholder="Password"
-                    width="100%"
-                    onChange={(e) => setPassword(e.target.value)}
-                    value={password}
-                    required
-                />
-
-                <Input
-                    color="#000000"
-                    type="password"
-                    variant={InputType.STANDARD}
-                    id="confirmPassword"
-                    placeholder="Confirm Password"
-                    width="100%"
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    value={confirmPassword}
-                    required
-                />
+                    <div style={{ width: "100%" }}>
+                        <Input
+                            color="#000000"
+                            type="password"
+                            pattern=".{4,12}"
+                            minlength="4"
+                            variant={InputType.STANDARD}
+                            id="password"
+                            placeholder="Password"
+                            width="100%"
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}
+                            required
+                        />
+                        <PasswordConstraints>
+                            Your password needs to be between 4 and 12 characters.
+                        </PasswordConstraints>
+                    </div>
+                    <div style={{ width: "100%" }}>
+                        <Input
+                            color="#000000"
+                            type="password"
+                            pattern=".{4,12}"
+                            variant={InputType.STANDARD}
+                            id="confirmPassword"
+                            placeholder="Confirm Password"
+                            width="100%"
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            value={confirmPassword}
+                            required
+                        />
+                        <PasswordConstraints>
+                            Your password needs to be between 4 and 12 characters.
+                        </PasswordConstraints>  
+                    </div>                            
                 </InputWrapper>
+                
                 {/* <Select
                     placeHolder="Select Role"
                     options={roleOptions}
@@ -177,6 +199,7 @@ const StiledButtonCreateUser = styled.button`
     position: relative;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
    
     border: none;
     outline: none;
@@ -190,8 +213,8 @@ const StiledButtonCreateUser = styled.button`
     transition: 200ms ease-out;
     cursor: pointer;
 
-    padding: 6px 18px;
-    font-size: 1em;
+    padding: 0.75em 1.5em;
+    font-size: 0.9em;
 
     background: #48CAE4;
     color: #000;
@@ -202,8 +225,25 @@ const StiledButtonCreateUser = styled.button`
     
     & .button__icon {
         display: inherit;
-        margin-left: -4px;
-        margin-right: 8px;
+        margin-left: -0.25em;
+        margin-right: 0.5em;
+    }
+
+    span {
+        max-width: calc(100% - 1.5em);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @media screen and (max-width: 768px) {
+        padding: 4px 12px;
+        font-size: 0.9em;
+    }
+    
+    @media screen and (max-width: 480px) {
+        padding: 3px 10px;
+        font-size: 0.8em;
     }
 `;
 
@@ -235,4 +275,11 @@ const Form = styled.form`
         color: #bf3f3f;
         font-size: 0.8em;
     }
+`;
+
+const PasswordConstraints = styled.div`
+    text-align: left;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #777;
 `;

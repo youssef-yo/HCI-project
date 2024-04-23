@@ -85,11 +85,11 @@ const DocumentPage = () => {
 
     return (
         <section>
-            <Header>
+            <Header justifyContent="space-between">
                 <h1>Document Information</h1>
 
                 <Button
-                    color="secondary"
+                    color="export"
                     icon={<MdOutlineFileDownload />}
                     onClick={() => downloadAnnotations()}>
                     Export Annotations
@@ -98,13 +98,10 @@ const DocumentPage = () => {
 
             <div className="docInfo">
                 <p>
-                    <b>ID:</b> {doc?._id}
-                </p>
-                <p>
                     <b>Name:</b> {doc?.name}
                 </p>
                 <p>
-                    <b>Pages:</b> {doc?.totalPages}
+                    <b>Total numner of pages:</b> {doc?.totalPages}
                 </p>
             </div>
 
@@ -114,17 +111,18 @@ const DocumentPage = () => {
                 <h3>Document Tasks</h3>
                 <Button
                     color="secondary"
+                    marginLeft="auto"
                     icon={<MdAddTask />}
                     onClick={() =>
                         navigate(`/dash/tasks/new`, {
                             state: { docId: doc?._id },
                         })
                     }>
-                    Create Document Task
+                    Create Task
                 </Button>
             </Header>
 
-            <Table>
+            <Table color="#0077B6">
                 <thead>
                     <tr>
                         <th>Annotator</th>
@@ -135,7 +133,11 @@ const DocumentPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {tasks.map((task) => (
+                    {tasks.length === 0 ? (
+                        <tr>
+                            <td colSpan="5" style={{ textAlign: 'center' }}>Nothing to show</td>
+                        </tr>
+                    ) : (tasks.map((task) => (
                         <tr key={task._id}>
                             <td>{task.annotator?.email}</td>
                             <td>{new Date(task.createdAt).toUTCString()}</td>
@@ -158,7 +160,8 @@ const DocumentPage = () => {
                                 </IconButton>
                             </td>
                         </tr>
-                    ))}
+                    ))
+                )}
                 </tbody>
             </Table>
 
@@ -168,7 +171,7 @@ const DocumentPage = () => {
                 <h3>Document Commits</h3>
             </Header>
 
-            <Table>
+            <Table color="#0077B6">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -177,7 +180,11 @@ const DocumentPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {commits.map((commit) => (
+                    {commits.length === 0 ? (
+                        <tr>
+                            <td colSpan="3" style={{ textAlign: 'center' }}>Nothing to show</td>
+                        </tr>
+                    ) : (commits.map((commit) => (
                         <tr key={commit._id}>
                             <td>{commit._id}</td>
                             <td>{new Date(commit.createdAt).toUTCString()}</td>
@@ -201,7 +208,8 @@ const DocumentPage = () => {
                                 </IconButton>
                             </td>
                         </tr>
-                    ))}
+                    ))
+                )}
                 </tbody>
             </Table>
         </section>

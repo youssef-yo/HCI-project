@@ -89,7 +89,7 @@ const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ updateTable, show, on
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="primary" onClick={handleClose}>
+                <Button variant="secondary" onClick={handleClose}>
                     Close
                 </Button>
                 <Button 

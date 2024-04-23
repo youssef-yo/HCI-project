@@ -104,6 +104,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ show, onHide, userID, onU
                         color="secondary"
                         id="fullName"
                         placeholder="Full Name"
+                        width="100%"
                         onChange={(e) => setFullName(e.target.value)}
                         value={fullName}
                         required

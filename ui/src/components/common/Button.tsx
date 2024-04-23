@@ -4,7 +4,8 @@ import StyledButton from './Button.styled';
 export type ButtonProps = {
     color?: 'primary' | 'secondary';
     size?: 'small' | 'medium' | 'large';
-    icon?: JSX.Element;
+    icon?: JSX.Element,
+    marginLeft: 'auto';
 } & Omit<React.ComponentProps<'button'>, 'ref' | 'color'>;
 
 const Button: React.FC<ButtonProps> = ({
@@ -12,10 +13,11 @@ const Button: React.FC<ButtonProps> = ({
     color = 'primary',
     size = 'medium',
     icon,
+    marginLeft,
     ...rest
 }) => {
     return (
-        <StyledButton color={color} size={size} {...rest}>
+        <StyledButton color={color} size={size} marginLeft={marginLeft} {...rest}>
             {icon && <span className="button__icon">{icon}</span>}
             {children}
         </StyledButton>

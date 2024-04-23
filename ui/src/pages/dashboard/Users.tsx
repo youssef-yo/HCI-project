@@ -65,6 +65,7 @@ const UsersPage = () => {
                 <h1>Users</h1>
                 <Button
                     color="secondary"
+                    marginLeft="auto"
                     icon={<MdOutlinePersonAddAlt />}
                     onClick={() => navigate('new')}>
                     Create User
