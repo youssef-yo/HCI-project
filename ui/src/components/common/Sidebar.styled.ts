@@ -15,7 +15,7 @@ export const StyledSidebar = styled.div<SidebarProps>(
     padding: ${theme.spacing.md} ${theme.spacing.md};
     height: 100vh;
     * {
-        color: ${theme.color.N2};
+        color: black;
     }
 `
 );
@@ -27,5 +27,6 @@ export const WithSidebar = styled.div<SidebarProps>(({ width }) => {
     flex-grow: 1;
     grid-template-columns: minmax(0, 1fr);
     padding-left: ${width};
+    color: black;
 `;
 });

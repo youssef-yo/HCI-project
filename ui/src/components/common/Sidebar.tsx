@@ -7,7 +7,7 @@ export type SidebarProps = {
 };
 
 const Sidebar: React.FC<SidebarProps> = ({ width, children }) => {
-    return <StyledSidebar width={width}>{children}</StyledSidebar>;
+    return <StyledSidebar width={width}> {children} </StyledSidebar>;
 };
 
 export default Sidebar;

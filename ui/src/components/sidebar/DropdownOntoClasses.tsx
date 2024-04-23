@@ -4,6 +4,7 @@ import { OntoClass } from '../../api';
 
 const App = ({ annotationStore }: { annotationStore: any }) => {
     const [classes, setClasses]: [classes: any, setClasses: any] = useState([]);
+    const [selectedClass, setSelectedClass] = useState(null);
 
     useEffect(() => {
         console.log('useEffect - AnnotationStore.ontoClasses: ', annotationStore.ontoClasses);
@@ -14,14 +15,23 @@ const App = ({ annotationStore }: { annotationStore: any }) => {
         }));
         setClasses(listLabels);
     }, [annotationStore.ontoClasses]);
+    useEffect(() => {
+        // Update selected class when annotationStore.activeOntoClass changes
+        if (annotationStore.activeOntoClass) {
+            setSelectedClass({
+                value: annotationStore.activeOntoClass.id,
+                label: annotationStore.activeOntoClass.text,
+            });
+        }
+    }, [annotationStore.activeOntoClass]);
     const colourStyles = {
-        control: (styles: any) => ({ ...styles, backgroundColor: 'white' }),
+        control: (styles: any) => ({ ...styles, backgroundColor: 'white', width: '350px' }),
         option: (styles: any) => {
             return {
                 ...styles,
                 color: 'black',
                 cursor: 'default',
-                zIndex: 100,
+                zIndex: 300,
             };
         },
     };
@@ -34,6 +44,7 @@ const App = ({ annotationStore }: { annotationStore: any }) => {
         <Select
             options={classes}
             styles={colourStyles}
+            value={selectedClass}
             onChange={(choice: any) => {
                 const resultClass: OntoClass | undefined = ontoClassFromId(choice.value);
                 // setUserChoice(choice.label);

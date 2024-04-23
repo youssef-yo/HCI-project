@@ -248,6 +248,11 @@ export const Selection = ({ pageInfo, annotation, showInfo = true }: SelectionPr
 
             // Current contains this annotation, so we remove it.
             if (current.some((other) => other.id === annotation.id)) {
+                if (annotationStore.src && annotationStore.src.id === annotation.id) {
+                    annotationStore.setSrc(null);
+                } else if (annotationStore.dst && annotationStore.dst.id === annotation.id) {
+                    annotationStore.setDst(null);
+                }
                 const next = current.filter((other) => other.id !== annotation.id);
                 annotationStore.setSelectedAnnotations(next);
                 notification.warning({
@@ -258,6 +263,11 @@ export const Selection = ({ pageInfo, annotation, showInfo = true }: SelectionPr
                 // Otherwise we add it.
             } else {
                 current.push(annotation);
+                if (annotationStore.src == null) {
+                    annotationStore.setSrc(annotation);
+                } else if (annotationStore.src != null && annotationStore.dst == null) {
+                    annotationStore.setDst(annotation);
+                }
                 annotationStore.setSelectedAnnotations(current);
                 console.log('Aggiunta annotazione ', current);
                 notification.info({

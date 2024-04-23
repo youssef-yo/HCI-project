@@ -10,12 +10,12 @@ import { PDF, CenterOnPage, RelationModal } from '../components';
 import { WithSidebar, Sidebar, WithTopbar } from '../components/common';
 import AnnotationTopbar from '../components/common/AnnotationTopbar';
 import {
-    Labels,
+    // Labels,
     Annotations,
     Relations,
     AssignedTaskList,
-    Logo,
-    Comment,
+    // Logo,
+    // Comment,
 } from '../components/sidebar';
 import {
     pdfURL,
@@ -82,6 +82,9 @@ const PDFTaskPage = () => {
 
     const [relationMode, setRelationMode] = useState<boolean>(false);
 
+    const [src, setSrc] = useState<Annotation>();
+    const [dst, setDst] = useState<Annotation>();
+
     const { auth } = useAuth();
 
     const { getTokens } = useDocumentApi();
@@ -110,9 +113,12 @@ const PDFTaskPage = () => {
     const theme = useContext(ThemeContext);
 
     const onRelationModalOk = (group: RelationGroup) => {
+        console.log('ok');
         setPdfAnnotations(pdfAnnotations.withNewRelation(group));
         setRelationModalVisible(false);
         setSelectedAnnotations([]);
+        setSrc(null);
+        setDst(null);
     };
 
     const onRelationModalCancel = () => {
@@ -286,11 +292,15 @@ const PDFTaskPage = () => {
             return (
                 <WithSidebar width={sidebarWidth}>
                     <Sidebar width={sidebarWidth}>
-                        <Logo />
-                        <AssignedTaskList tasks={assignedTasks} />
+                        {/* <Logo /> */}
+                        {/* <AssignedTaskList tasks={assignedTasks} /> */}
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
-                        <AnnotationTopbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <AnnotationTopbar
+                            onCreate={onRelationModalOk}
+                            height={topbarHeight}
+                            leftOffset={sidebarWidth}
+                        />
                         <CenterOnPage>
                             <Progress
                                 type="circle"
@@ -305,11 +315,15 @@ const PDFTaskPage = () => {
             return (
                 <WithSidebar width={sidebarWidth}>
                     <Sidebar width={sidebarWidth}>
-                        <Logo />
-                        <AssignedTaskList tasks={assignedTasks} />
+                        {/* <Logo /> */}
+                        {/* <AssignedTaskList tasks={assignedTasks} /> */}
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
-                        <AnnotationTopbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <AnnotationTopbar
+                            onCreate={onRelationModalOk}
+                            height={topbarHeight}
+                            leftOffset={sidebarWidth}
+                        />
                         <CenterOnPage>
                             <Result icon={<QuestionCircleOutlined />} title="PDF Not Found" />
                         </CenterOnPage>
@@ -347,6 +361,10 @@ const PDFTaskPage = () => {
                                 setHideLabels,
                                 relationMode,
                                 setRelationMode,
+                                src,
+                                setSrc,
+                                dst,
+                                setDst,
                             }}>
                             {/* <listeners.UndoAnnotation /> */}
                             {canAnnotate && <listeners.SaveWithTimeout taskId={taskId} />}
@@ -354,9 +372,8 @@ const PDFTaskPage = () => {
                             <listeners.HideAnnotationLabels />
                             <WithSidebar width={sidebarWidth}>
                                 <Sidebar width={sidebarWidth}>
-                                    <Logo />
-                                    <Labels _setRelationModalVisible={setRelationModalVisible} />
-                                    <AssignedTaskList tasks={assignedTasks} />
+                                    {/* <Labels _setRelationModalVisible={setRelationModalVisible} /> */}
+                                    {/* <AssignedTaskList tasks={assignedTasks} /> */}
                                     {activeTask && (
                                         <Annotations
                                             taskId={taskId}
@@ -370,16 +387,17 @@ const PDFTaskPage = () => {
                                             relations={pdfAnnotations.docAnnotations.relations}
                                         />
                                     )}
-                                    {activeTask && (
+                                    {/* {activeTask && (
                                         <Comment taskId={taskId} activeTask={activeTask} />
-                                    )}
+                                    )} */}
                                 </Sidebar>
                                 <WithTopbar height={topbarHeight}>
                                     <AnnotationTopbar
+                                        onCreate={onRelationModalOk}
                                         height={topbarHeight}
                                         leftOffset={sidebarWidth}
                                     />
-                                    <PDFContainer>
+                                    <PDFContainer relationMode={relationMode}>
                                         {activeOntoProperty && (
                                             <RelationModal
                                                 visible={relationModalVisible}
@@ -404,11 +422,15 @@ const PDFTaskPage = () => {
             return (
                 <WithSidebar width={sidebarWidth}>
                     <Sidebar width={sidebarWidth}>
-                        <Logo />
+                        {/* <Logo /> */}
                         <AssignedTaskList tasks={assignedTasks} />
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
-                        <AnnotationTopbar height={topbarHeight} leftOffset={sidebarWidth} />
+                        <AnnotationTopbar
+                            onCreate={onRelationModalOk}
+                            height={topbarHeight}
+                            leftOffset={sidebarWidth}
+                        />
                         <CenterOnPage>
                             <Result status="warning" title="Unable to Render Document" />
                         </CenterOnPage>
@@ -421,8 +443,8 @@ const PDFTaskPage = () => {
 export default PDFTaskPage;
 
 const PDFContainer = styled.div(
-    ({ theme }) => `
+    ({ theme, relationMode }) => `
     background: ${theme.color.N4};
-    padding: ${theme.spacing.sm};
+    padding: ${relationMode ? '78px 20px 10px 10px' : '10px 20px 10px 10px'};
 `
 );

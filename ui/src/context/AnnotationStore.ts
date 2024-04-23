@@ -680,6 +680,12 @@ interface _AnnotationStore {
 
     relationMode: boolean;
     setRelationMode: (state: boolean) => void;
+
+    src?: Annotation | null;
+    setSrc: (annotation: Annotation | null) => void;
+
+    dst?: Annotation | null;
+    setDst: (annotation: Annotation | null) => void;
 }
 
 export const AnnotationStore = createContext<_AnnotationStore>({
@@ -721,6 +727,14 @@ export const AnnotationStore = createContext<_AnnotationStore>({
     },
     relationMode: false,
     setRelationMode: (_: boolean) => {
+        throw new Error('Unimplemented');
+    },
+    src: null,
+    setSrc: (_?: Annotation | null) => {
+        throw new Error('Unimplemented');
+    },
+    dst: null,
+    setDst: (_?: Annotation | null) => {
         throw new Error('Unimplemented');
     },
 });
