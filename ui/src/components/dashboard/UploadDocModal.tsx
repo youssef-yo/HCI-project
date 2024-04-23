@@ -60,7 +60,12 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, checkAnaly
         setDuplicateFiles([]);
         onHide();
         updateTable();
+        setErrorText('');
     };
+
+    const updateText = (msg: string) => {
+        setErrorText(msg);
+    }
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -72,14 +77,9 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, checkAnaly
                     files={files}
                     addFile={addFile}
                     supportedFiles={supportedFiles}
-                    // files={files}
-                    // updateFiles={updateFiles}
-                    // changeStateFileIsUploading={changeStateFileIsUploading}
-                    // changeStateAnyFileUploaded={changeStateAnyFileUploaded}
-                    // api={(doc: any) => uploadAnalyze(doc)}
-                    // supportedFiles={supportedFiles}
+                    updateText={updateText}
                 ></InputFile>
-                {duplicateFiles.length > 0 && <p style={{ color: 'red' }}> {errorText} </p>}
+                {<p style={{ color: 'red' }}> {errorText} </p>}
                 <Form>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                         <FileList
