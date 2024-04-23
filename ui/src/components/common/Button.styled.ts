@@ -55,6 +55,15 @@ const COLOR = {
             background: #fcb1ae;
         }
     `,
+
+    login: css`
+        background: #023E8A;
+        color: #eee;
+
+        &:hover {
+            background: #0077B6;
+        }
+    `,
 };
 
 const SIZE = {
