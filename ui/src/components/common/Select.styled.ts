@@ -22,6 +22,7 @@ const StyledSelect = styled.div`
         align-items: center;
         justify-content: space-between;
         user-select: none;
+        white-space: nowrap;
     }
 
     .select-menu {
@@ -86,6 +87,11 @@ const StyledSelect = styled.div`
         padding: 4px 12px;
         border: 1px solid #ccc;
         border-radius: 4px;
+    }
+
+    .select-selected-value {
+        overflow-x: hidden;
+        white-space: nowrap;
     }
 `;
 

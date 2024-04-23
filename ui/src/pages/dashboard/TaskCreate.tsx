@@ -1,9 +1,10 @@
 import { MdAddTask } from 'react-icons/md';
 import styled from 'styled-components';
 import { FormEvent, useEffect, useRef, useState } from 'react';
-import { Header, Input, InputType, Option, Select, Table } from '../../components/common';
+import { Header, Input, InputType, Option, Table } from '../../components/common';
 import { Doc, User, getApiError, useDocumentApi, useTaskApi, useUserApi, TaskExtended, TaskStatus } from '../../api';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Select from "react-select";
 
 const TaskCreatePage = () => {
     const [description, setDescription] = useState<string>('');
@@ -161,16 +162,28 @@ const TaskCreatePage = () => {
                     }}>
                     <InputWrapper> 
                         <Select
-                            style={{ flex: 1, backgroundColor: "white", width:"100%" }}
-                            placeHolder="Select User"
+                            styles={{
+                                control: (provided) => ({ ...provided, width: '100%' }),
+                                container: base => ({
+                                    ...base,
+                                    flex: 1
+                                })
+                            }}
+                            placeholder="Select User"
                             options={userOptions}
                             value={userOption}
                             onChange={(user) => setUserOption(user)}
                             isSearchable
                         />
                         <Select
-                            style={{ flex: 1, backgroundColor: "white", width:"100%" }}
-                            placeHolder="Select Document"
+                            styles={{
+                                control: (provided) => ({ ...provided, width: '100%' }),
+                                container: base => ({
+                                    ...base,
+                                    flex: 1
+                                })
+                            }}
+                            placeholder="Select Document"
                             options={docOptions}
                             value={docOption}
                             onChange={(doc) => selectDoc(doc)}
@@ -267,7 +280,7 @@ const TaskCreatePage = () => {
 export default TaskCreatePage;
 
 const Form = styled.form`
-
+    max-width: 80%;
     width: 80%;
     padding-left: 20%;
     display: flex;

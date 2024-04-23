@@ -15,7 +15,7 @@ export const StyledSidebar = styled.div<SidebarProps>(
     padding: ${theme.spacing.md} ${theme.spacing.md};
     height: 100vh;
     * {
-        color: black;
+        color: white;
     }
 `
 );
