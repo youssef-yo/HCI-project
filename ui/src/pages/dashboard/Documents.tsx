@@ -59,10 +59,9 @@ const DocumentsPage = () => {
         checkAnalyzed();   
     }, [docs]);
 
-    // TODO: aggiungi modal dove dici "sei sicuro di ..."
     const onDeleteDoc = async (doc: Doc) => {
         const confirm = await dialog.showConfirmation(
-            'Deleting Doc',
+            'Delete Document',
             `Are you sure you want to delete the document ${doc.name}? All tasks related to this document will also be eliminated. This action cannot be undone.`
         );
         if (!confirm) return;

@@ -43,7 +43,7 @@ const UserPage = () => {
 
     const onDeleteUser = async () => {
         const confirm = await dialog.showConfirmation(
-            'Deleting User',
+            'Delete User',
             `Are you sure you want to delete the user ${user?.email}? This action cannot be undone.`
         );
 
