@@ -14,7 +14,8 @@ const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ updateTable, show, on
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [duplicateFiles, setDuplicateFiles] = useState<String[]>([]);
     const [errorText, setErrorText] = useState('');
-    const supportedFiles = 'N-Triples, RDF/XML, OWL/XML';
+    // const supportedFiles = 'N-Triples, RDF/XML, OWL/XML';
+    const supportedFiles = ['nt', 'rdf', 'xml', 'owl'];
 
     // const { deleteOntology } = useOntologyApi();
     const { uploadOntology } = useUploadApi();
@@ -65,6 +66,7 @@ const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ updateTable, show, on
         setDuplicateFiles([]);
         onHide();
         updateTable();
+        updateText('');
     };
 
     const updateText = (msg: string) => {

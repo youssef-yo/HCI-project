@@ -28,7 +28,12 @@ const InputFile = ({
             return;
         }
 
-        if (supportedFiles.includes(fileObj.type)) {
+        const fileExtension = fileObj.name.split('.').pop();
+        console.log(fileExtension);
+        console.log(supportedFiles);
+        // Check if the file extension is supported
+        const isSupported = supportedFiles.map(fileType => fileType.toLowerCase().includes(fileExtension.toLowerCase()));
+        if (!isSupported.some(Boolean)) {
             updateText('Unsupported File Type');
             return;
         }
@@ -79,7 +84,8 @@ const InputFile = ({
                     </button>
                 </div>
                 <p className="main">Supported files</p>
-                <p className="info">{supportedFiles}</p>
+                <p className="info">{supportedFiles.join(', ')}</p>
+                
             </div>
         </>
     );

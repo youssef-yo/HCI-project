@@ -14,7 +14,7 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, checkAnaly
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [duplicateFiles, setDuplicateFiles] = useState<String[]>([]);
     const [errorText, setErrorText] = useState('');
-    const supportedFiles = 'PDF';
+    const supportedFiles = ['pdf'];
 
     const { uploadFile } = useUploadApi();
 
