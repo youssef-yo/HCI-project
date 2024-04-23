@@ -64,7 +64,7 @@ const SmallTag = styled(Tag)`
     border-radius: 4px;
     color: black;
     line-height: 1;
-    max-width: 14ch;
+    max-width: 40ch;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;

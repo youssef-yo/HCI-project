@@ -48,7 +48,6 @@ const PaddedRow = styled.div`
     border-radius: 2px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) min-content min-content min-content;
-    color: black;
 `;
 
 const Overflow = styled.span`
@@ -58,5 +57,5 @@ const Overflow = styled.span`
     text-overflow: ellipsis;
     overflow: hidden;
     color: black;
-    margin-left: 10px;
+    margin-left: 20px;
 `;

@@ -293,7 +293,7 @@ const PDFTaskPage = () => {
                 <WithSidebar width={sidebarWidth}>
                     <Sidebar width={sidebarWidth}>
                         {/* <Logo /> */}
-                        <AssignedTaskList tasks={assignedTasks} />
+                        {/* <AssignedTaskList tasks={assignedTasks} /> */}
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
                         <AnnotationTopbar
@@ -316,7 +316,7 @@ const PDFTaskPage = () => {
                 <WithSidebar width={sidebarWidth}>
                     <Sidebar width={sidebarWidth}>
                         {/* <Logo /> */}
-                        <AssignedTaskList tasks={assignedTasks} />
+                        {/* <AssignedTaskList tasks={assignedTasks} /> */}
                     </Sidebar>
                     <WithTopbar height={topbarHeight}>
                         <AnnotationTopbar
@@ -372,7 +372,6 @@ const PDFTaskPage = () => {
                             <listeners.HideAnnotationLabels />
                             <WithSidebar width={sidebarWidth}>
                                 <Sidebar width={sidebarWidth}>
-                                    {/* <Logo /> */}
                                     {/* <Labels _setRelationModalVisible={setRelationModalVisible} /> */}
                                     {/* <AssignedTaskList tasks={assignedTasks} /> */}
                                     {activeTask && (

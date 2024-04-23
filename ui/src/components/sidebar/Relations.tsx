@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { SidebarItem, SidebarItemTitle } from './common';
 import { Annotation, RelationGroup, AnnotationStore } from '../../context';
-import ModalPopupRelationInfo from './ModalPopupRelationInfo';
+import RelationList from '../RelationsByProperty';
 
 interface RelationProps {
     annotations: Annotation[];
@@ -28,11 +28,7 @@ const Relations: React.FC<RelationProps> = ({ annotations, relations }) => {
                         <>None</>
                     ) : (
                         <div>
-                            {relations.map((relation) => (
-                                <ModalPopupRelationInfo
-                                    key={relation.id}
-                                    relation={relation}></ModalPopupRelationInfo>
-                            ))}
+                            return <RelationList relations={relations} />
                         </div>
                     )}
                 </div>

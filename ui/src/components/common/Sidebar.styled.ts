@@ -12,11 +12,10 @@ export const StyledSidebar = styled.div<SidebarProps>(
     overflow-y: auto;
     background: white;
     border-right: 1px solid black;
-    color: black;
     padding: 0;
     height: 100%;
     * {
-        color: ${theme.color.N2};
+        color: black;
     }
 `
 );
