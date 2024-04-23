@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import BinaryIO
 import uuid
 from bson import ObjectId
+import random
+import string
 
 from owlready2 import *
 from rdflib import Graph
@@ -55,32 +57,34 @@ async def upload(
     db: MongoClient = Depends(get_db)
 ):
     # Save the files in db and get their ID
-    file_ids = []
     files_duplicate = []
     for file in files:
-        pdf = str(file.filename)
-        pdf_name = Path(pdf).stem
-        stored_onto = await DocumentDocument.find_one(DocumentDocument.name == pdf_name)
+        stored_doc = await DocumentDocument.find_one(DocumentDocument.name == file.filename)
 
-        if stored_onto:
+        if stored_doc:
             files_duplicate.append(file.filename)
-        else:
-            file_id = await save_file_to_database(file, db)
-            file_ids.append(file_id)
-            await save_tmp_loading_document_to_database(pdf_name, file_id)
 
     if files_duplicate:
         raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=files_duplicate
             )
+
+    file_ids = []
+    for file in files:
+        pdf = str(file.filename)
+        pdf_name = Path(pdf).stem
+        file_id, doc_id = await save_file_to_database(file, db)
+        file_ids.append(file_id)
+        # await save_tmp_loading_document_to_database(pdf_name, file_id)
+            
+
     for file, file_id in zip(files, file_ids):
         file_data = await find_document_by_id(db, file_id)
         if file_data:
             pdf = str(file.filename)
             pdf_name = Path(pdf).stem
-            threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, file_data, db, file.filename)).start()
-            # TODO: quando il thread si chiude bisognerebbe fare: updateTable();
+            threading.Thread(target=upload_document_from_id, args=(pdf_name, file_id, doc_id, file_data, db, file.filename)).start()
         else:
             raise HTTPException(status_code=404, detail="File non trovato nel database")
 
@@ -99,18 +103,25 @@ async def save_file_to_database(file: UploadFile, db: MongoClient):
         file.file,
         metadata={"contentType": file.content_type}
     )
-    return file_id
 
-async def save_tmp_loading_document_to_database(pdf_name: str, file_id: PydanticObjectId):
-    name = pdf_name + '.LOADING'
     document = DocumentDocument(
-        name=name,
-        file_id=file_id,
-        total_pages=0,
-    )
+            name=file.filename,
+            file_id=file_id,
+            total_pages=0,
+        )
     await document.create()
+    return file_id, document.id
 
-def upload_document_from_id(pdf_name: str, file_id: PydanticObjectId, file_data, db: MongoClient, filename: str):
+# async def save_tmp_loading_document_to_database(pdf_name: str, file_id: PydanticObjectId):
+#     name = pdf_name + '.LOADING'
+#     document = DocumentDocument(
+#         name=name,
+#         file_id=file_id,
+#         total_pages=0,
+#     )
+#     await document.create()
+
+def upload_document_from_id(pdf_name: str, file_id: PydanticObjectId, doc_id: PydanticObjectId, file_data, db: MongoClient, filename: str):
     """
     Carica un documento dal database usando l'ID del file.
     """
@@ -119,23 +130,23 @@ def upload_document_from_id(pdf_name: str, file_id: PydanticObjectId, file_data,
         asyncio.set_event_loop(loop)
 
         structure = loop.run_until_complete(analyze(pdf_name, file_id, file_data))
-        loop.run_until_complete(upload(pdf_name, file_id, structure, db))
-        loop.run_until_complete(delete_tmp_loading_document(pdf_name, db))
+        structure_id = loop.run_until_complete(upload(pdf_name, file_id, doc_id, structure, db))
+        # loop.run_until_complete(delete_tmp_loading_document(pdf_name, db))
         loop.close()
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.submit(upload_sync)
     
-async def delete_tmp_loading_document(pdf_name: str, db: MongoClient):
-    name = pdf_name + '.LOADING'
-    try:
-        document = DocumentDocument.find_one(DocumentDocument.name == name)
-        if document:
-            try:
-                await document.delete()
-            except Exception as e:
-                pass
-    except Exception as e:
-        pass
+# async def delete_tmp_loading_document(pdf_name: str, db: MongoClient):
+#     name = pdf_name + '.LOADING'
+#     try:
+#         document = DocumentDocument.find_one(DocumentDocument.name == name)
+#         if document:
+#             try:
+#                 await document.delete()
+#             except Exception as e:
+#                 pass
+#     except Exception as e:
+#         pass
 
 
 async def analyze(filename: str, file_id: PydanticObjectId, file_data):
@@ -143,26 +154,57 @@ async def analyze(filename: str, file_id: PydanticObjectId, file_data):
 
     return structure
 
-async def upload(filename: str, file_id: PydanticObjectId, structure, db: MongoClient = Depends(get_db)):
-    npages = len(structure)
-    document = DocumentDocument(
-        name=filename,
-        file_id=file_id,
-        total_pages=npages,
-    )
+async def upload(filename: str, file_id: PydanticObjectId, doc_id: PydanticObjectId, structure, db: MongoClient = Depends(get_db)):
+    # document_id = ObjectId()
     
-    try:
-        await document.create()
-    except Exception as e:
-        pass
+    # npages = len(structure)
+    # try:
+    #     document = DocumentDocument(
+    #         id = str(document_id),
+    #         name=filename,
+    #         file_id=file_id,
+    #         total_pages=npages,
+    #     )
+    # except Exception as e:
+    #     print(e)
+
+    # try:
+    #     await document.create()
+    # except Exception as e:
+    #     pass
+
+    # npages = len(structure)
+
+    # try:
+    #     document = await DocumentDocument.find_one(DocumentDocument.id == file_id)
+    # except Exception as e:
+    #     print("SAE 1")
+    #     print(e)
+    # try:
+    #     document.total_pages = npages    
+    #     await document.save()
+    # except Exception as e:
+    #     print("SAE 2")
+    #     print(e)
+    # try:
+    #     npages = len(structure)
+    #     await DocumentDocument.get(doc_id).update(Set({DocumentDocument.total_pages: npages}))
+    # except Exception as e:
+    #     print("ase")
+    #     print(e)
+
+
     try:
         doc_structure = DocStructureDocument(   
-            doc_id=document.id,
+            doc_id=str(doc_id),
             structure=structure
         )
         await doc_structure.create()
     except Exception as e:
         pass
+    
+
+    
 
 # @router.post("/doc", response_model=DocumentOutResponse)
 # async def upload_document(
@@ -218,47 +260,47 @@ async def upload(filename: str, file_id: PydanticObjectId, structure, db: MongoC
 @router.post("/ontology", response_model=OntologyData)
 async def upload_ontology(
     user: UserDocument = Depends(get_current_admin),
-    file: UploadFile = File(...),
+    files: List[UploadFile] = File(...),
     db: MongoClient = Depends(get_db)
 ) -> OntologyData:
     """
     Uploads an ontology file.
     It also extracts the ontology data (classes and properties) for later use.
     """
-    # TODO: Use transactions to ensure atomicity
-    onto = str(file.filename)
-    onto_name = Path(onto).stem
-    stored_onto = await OntologyDocument.find_one(OntologyDocument.name == onto_name)
+    files_duplicate = []
+    for file in files:
+        onto = str(file.filename)
+        onto_name = Path(onto).stem
+        stored_onto = await OntologyDocument.find_one(OntologyDocument.name == onto_name)
 
-    if stored_onto:
+        if stored_onto:
+            files_duplicate.append(file.filename)
+
+    if files_duplicate:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Ontology {onto_name} already exists."
+                status_code=status.HTTP_409_CONFLICT,
+                detail=files_duplicate
+            )
+
+    for file in files:
+        # Analyzing the contents of the uploaded ontology file
+        result = analyze_ontology(file.file)
+
+        # Upload the ontology file with GridFS
+        file.file.seek(0)
+        file_id = await db.gridFS.upload_from_stream(
+            file.filename,
+            file.file,
+            metadata={"contentType": file.content_type}
         )
 
-    print(f"File: {file.filename}")
-    print(f"Content Type: {file.content_type}")
-    print(f"Size: {file.size}")
-    print(f"Headers: {file.headers}")
-
-    # Analyzing the contents of the uploaded ontology file
-    result = analyze_ontology(file.file)
-
-    # Upload the ontology file with GridFS
-    file.file.seek(0)
-    file_id = await db.gridFS.upload_from_stream(
-        file.filename,
-        file.file,
-        metadata={"contentType": file.content_type}
-    )
-
-    # Store the ontology document in the database
-    ontology = OntologyDocument(
-        name=onto_name,
-        file_id=ObjectId(file_id),
-        data=result
-    )
-    await ontology.create()
+        # Store the ontology document in the database
+        ontology = OntologyDocument(
+            name=onto_name,
+            file_id=ObjectId(file_id),
+            data=result
+        )
+        await ontology.create()
 
     return result
 

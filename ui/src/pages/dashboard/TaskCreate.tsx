@@ -34,7 +34,7 @@ const TaskCreatePage = () => {
     useEffect(() => {
         getAllDocs()
             .then((docs) => {
-                const filteredDocs = docs.filter((doc) => !doc.name.endsWith('.LOADING'));
+                const filteredDocs = docs.filter((doc) => doc.analyzed);
                 
                 const options = buildDocumentOptions(filteredDocs);
                 setDocOptions(options);

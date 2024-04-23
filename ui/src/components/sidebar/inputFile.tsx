@@ -8,8 +8,8 @@ const InputFile = ({
     addFile,
     supportedFiles,
 }: {
-    files: File[];
-    addFile: (file: File) => void;
+    files: any;
+    addFile: any;
     supportedFiles: string;
 }) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -25,7 +25,7 @@ const InputFile = ({
         }
         const fileAlreadyUploaded = files.some((file: any) => file.name === fileObj.name);
         if (fileAlreadyUploaded) {
-            alert('File già caricato, seleziona un file con un nome diverso.');
+            alert('Duplicate File');
             return;
         }
         addFile(fileObj);
