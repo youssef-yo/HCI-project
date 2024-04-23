@@ -148,6 +148,10 @@ async def delete_doc(doc_id: PydanticObjectId):
             for task in tasks:
                 await task.delete()
             
+            doc_commits = await DocCommitDocument.find({"doc_id": doc_id}).to_list()
+            for doc_commit in doc_commits:
+                await doc_commit.delete()
+            
             await document.delete()
     except Exception as e:
         raise e
