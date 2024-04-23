@@ -26,7 +26,7 @@ const TasksPage = () => {
                 <h1>Assigned Tasks</h1>
             </Header>
 
-            <Table>
+            <Table color="#0077B6">
                 <thead>
                     <tr>
                         <th>Document</th>
@@ -37,30 +37,35 @@ const TasksPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {tasks.map((task) => (
-                        <tr key={task._id}>
-                            <td>{task.document?.name}</td>
-                            <td>{new Date(task.createdAt).toUTCString()}</td>
-                            <td style={{ textAlign: 'center' }}>
-                                {task.pageRange.start} - {task.pageRange.end}
-                            </td>
-                            <td style={{ textAlign: 'center' }}>{task.status}</td>
-                            <td
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                }}>
-                                <IconButton
-                                    title="View Task"
-                                    onClick={() => navigate(`${task._id}`)}>
-                                    <MdOpenInNew />
-                                </IconButton>
-                            </td>
+                    {tasks.length === 0 ? (
+                        <tr>
+                            <td colSpan="7" style={{ textAlign: 'center' }}>Nothing to show</td>
                         </tr>
-                    ))}
+                    ) : (tasks.map((task) => (
+                            <tr key={task._id}>
+                                <td>{task.document?.name}</td>
+                                <td>{new Date(task.createdAt).toUTCString()}</td>
+                                <td style={{ textAlign: 'center' }}>
+                                    {task.pageRange.start} - {task.pageRange.end}
+                                </td>
+                                <td style={{ textAlign: 'center' }}>{task.status}</td>
+                                <td
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                    }}>
+                                    <IconButton
+                                        title="View Task"
+                                        onClick={() => navigate(`${task._id}`)}>
+                                        <MdOpenInNew />
+                                    </IconButton>
+                                </td>
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </Table>
         </section>

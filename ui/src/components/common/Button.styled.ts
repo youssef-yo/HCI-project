@@ -57,11 +57,11 @@ const COLOR = {
     `,
 
     login: css`
-        background: #023E8A;
-        color: #eee;
+        background: #48CAE4;
+        color: #000;
 
         &:hover {
-            background: #0077B6;
+            background: #ADE8F4;
         }
     `,
 };

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Header } from '../../components/common';
 import { Doc, Task, useDocumentApi, useTaskApi } from '../../api';
+import styled from 'styled-components';
 
 const TaskPage = () => {
     const { taskId } = useParams<{ taskId: string }>();
@@ -38,19 +39,18 @@ const TaskPage = () => {
         <section>
             <Header>
                 <h1>Task Information</h1>
-                <Button
-                    color="secondary"
-                    icon={<MdOpenInNew />}
-                    onClick={() => navigate(`/pdf-task/${task?._id}`)}>
-                    Go to document annotations
-                </Button>
+                <ButtonContainer>
+                    <Button
+                        color="secondary"
+                        icon={<MdOpenInNew />}
+                        onClick={() => navigate(`/pdf-task/${task?._id}`)}>
+                        Go to document annotations
+                    </Button>
+                </ButtonContainer>
             </Header>
 
             <div className="taskInfo">
                 <h3>Task</h3>
-                <p>
-                    <b>ID:</b> {task?._id}
-                </p>
                 <p>
                     <b>Pages:</b> {task?.pageRange.start} - {task?.pageRange.end}
                 </p>
@@ -70,9 +70,6 @@ const TaskPage = () => {
             <div className="docInfo">
                 <h3>Document</h3>
                 <p>
-                    <b>ID:</b> {doc?._id}
-                </p>
-                <p>
                     <b>Name:</b> {doc?.name}
                 </p>
                 <p>
@@ -84,3 +81,9 @@ const TaskPage = () => {
 };
 
 export default TaskPage;
+
+const ButtonContainer = styled.div`
+    margin-left: auto;
+    display: flex;
+    gap: 8px; 
+`;
