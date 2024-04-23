@@ -7,10 +7,12 @@ const InputFile = ({
     files,
     addFile,
     supportedFiles,
+    updateText,
 }: {
     files: any;
     addFile: any;
     supportedFiles: string;
+    updateText: any;
 }) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const handleClick = () => {
@@ -18,14 +20,23 @@ const InputFile = ({
         inputRef?.current?.click();
     };
     const handleFileChange = async (event: any) => {
+        updateText('');
+        
         event.preventDefault();
         const fileObj = event.target.files && event.target.files[0];
         if (!fileObj) {
             return;
         }
+
+        if (supportedFiles.includes(fileObj.type)) {
+            updateText('Unsupported File Type');
+            return;
+        }
+
         const fileAlreadyUploaded = files.some((file: any) => file.name === fileObj.name);
         if (fileAlreadyUploaded) {
-            alert('Duplicate File');
+            // alert('Duplicate File');
+            updateText('Duplicate File');
             return;
         }
         addFile(fileObj);

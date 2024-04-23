@@ -75,11 +75,12 @@ async def upload(
         pdf = str(file.filename)
         pdf_name = Path(pdf).stem
         file_id, doc_id = await save_file_to_database(file, db)
-        file_ids.append(file_id)
+        file_ids.append((file_id, doc_id))
         # await save_tmp_loading_document_to_database(pdf_name, file_id)
             
 
-    for file, file_id in zip(files, file_ids):
+    for file, ids in zip(files, file_ids):
+        file_id, doc_id = ids
         file_data = await find_document_by_id(db, file_id)
         if file_data:
             pdf = str(file.filename)
