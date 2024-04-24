@@ -123,16 +123,22 @@ async def update_documents(
     for doc_id in ids:
         try:
             document = await DocumentDocument.get(doc_id)
-            structure = await DocStructureDocument.find_one(DocStructureDocument.doc_id == PydanticObjectId(doc_id))
-            if structure:
-                npages = len(structure.structure)
-                document.total_pages = npages
-                document.analyzed = True
-                await document.save()
-            else:
+            try:
+                
+                structure = await DocStructureDocument.find_one(DocStructureDocument.doc_id == PydanticObjectId(doc_id))
+                if structure: 
+                    npages = len(structure.structure)
+                    document.total_pages = npages
+                    document.analyzed = True
+                    await document.save()
+                else:
+                    raise HTTPException(status_code=404, detail=f"Structure not found for document with id {doc_id}")
+            except Exception as e:
                 raise HTTPException(status_code=404, detail=f"Structure not found for document with id {doc_id}")
         except Exception as e:
-            print(f"Error updating document with id {doc_id}: {e}")
+            raise HTTPException(status_code=500, detail=f"Doc not found with id {doc_id}")
+
+
 
 @router.delete("/{doc_id}")
 async def delete_doc(doc_id: PydanticObjectId):

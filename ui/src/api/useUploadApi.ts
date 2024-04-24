@@ -34,7 +34,6 @@ const useUploadApi = () => {
      * @returns Promise
      */
     const uploadDocument = async (file: FormData) => {
-        console.log('File in uploadDocument: ', file);
         try {
             const response = await axiosPrivate({
                 method: 'post',
@@ -42,7 +41,6 @@ const useUploadApi = () => {
                 data: file,
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            console.log('FINISH');
             return response;
         } catch (error) {
             console.log(error);

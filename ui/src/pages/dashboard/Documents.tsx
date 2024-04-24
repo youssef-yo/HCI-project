@@ -6,6 +6,7 @@ import { UploadDocModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
 import '../../assets/styles/Documents.scss';
 import { useDialog } from '../../hooks';
+import { notification } from '@allenai/varnish';
 
 
 const DocumentsPage = () => {
@@ -31,16 +32,25 @@ const DocumentsPage = () => {
     const checkAnalyzed = () => {
         if (docs.some(doc => !doc.analyzed) && !polling) {
             setPolling(true);
-            const intervalId = setInterval(() => {
+            const intervalId = setInterval(async () => {
                 const uncheckedDocumentIds = docs.filter(doc => !doc.analyzed).map(doc => doc._id);
                 try {
-                    updateDocumentInformation(uncheckedDocumentIds);
+                    await updateDocumentInformation(uncheckedDocumentIds);
                     loadDocs();
+                    notification.success({
+                        message: 'Document Analyzed!',
+                        placement: 'bottomRight',
+                    });
                     clearInterval(intervalId);
                     setPolling(false);
-                } catch (error) {
-                    console.log(error);
-                    // TODO: manage error
+                } catch (error: any) {
+                    if (error.response && error.response.status !== 500 && error.response.status !== 404) {
+                        notification.error({
+                            message: 'Could not analyze the document!',
+                            description: error.response.data.detail, 
+                            placement: 'bottomRight',
+                        });
+                    }
                 }
             }, 5000);
             
