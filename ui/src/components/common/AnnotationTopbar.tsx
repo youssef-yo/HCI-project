@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { MdOutlineHouse, MdOutlineSave } from 'react-icons/md';
-import { StyledTopbar } from './Topbar.styled';
+import { StyledAnnotationTopbar } from './Topbar.styled';
 import AccountInfoPopover from '../../components/dashboard/AccountInfoPopover';
 import { notification } from '@allenai/varnish';
 import ChoiceClass from './ChoiceClass';
@@ -55,7 +55,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
     });
     return (
         <>
-            <StyledTopbar height={height} leftOffset={leftOffset}>
+            <StyledAnnotationTopbar height={height} leftOffset={leftOffset}>
                 <div
                     style={{
                         marginLeft: '20px',
@@ -122,7 +122,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
                         setAccountInfoPopoverShow={setAccountInfoPopoverShow}
                     />
                 </div>
-            </StyledTopbar>
+            </StyledAnnotationTopbar>
 
             {relationModeActive && (
                 <AnnotationRelationModeTopbar

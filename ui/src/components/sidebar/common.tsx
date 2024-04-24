@@ -43,12 +43,17 @@ export const SidebarItemTitle = styled.h5(
     border-bottom: 1px solid black;
     width: 100%;
     display: flex;
-    align-items: center; /* Centra verticalmente */
-    justify-content: center; /* Centra orizzontalmente */
+    align-items: center;
+    justify-content: center;
     word-break: break-all;
     color: black;
+    position: relative;
+    text-align: center;
+    margin: 0 auto;
+    background: lightblue;
 `
 );
+
 
 export const Contrast = styled.div`
     a[href] {

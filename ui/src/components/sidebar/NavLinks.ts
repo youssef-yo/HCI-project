@@ -3,7 +3,7 @@ import styled from 'styled-components';
 const NavLinks = styled.div`
     .navGroup__title {
         color: #FFFFFF;
-        margin: 2px 0 0 0;
+        margin: 0 0 0 0;
         font-size: 2.5rem;
         text-transform: uppercase;
     }

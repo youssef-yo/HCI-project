@@ -35,6 +35,40 @@ export const StyledRelationModeTopbar = styled.div<TopbarProps>(
     `
 );
 
+export const StyledAnnotationTopbar = styled.div<TopbarProps>(
+    ({ theme, height, leftOffset }) => `
+        position: fixed;
+        top: 0;
+        left: ${leftOffset};
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        height: ${height};
+        background: white; 
+        color: black;
+        padding: ${theme.spacing.md};
+        z-index: 1000;
+        border-bottom: 1px solid black;
+
+        & div > button {
+            &:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+    
+            svg {
+                fill: #ddd;
+                stroke: #ddd;
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+            &:hover > svg {
+                fill: #fff;
+                stroke: #fff;
+            }
+        }
+    `
+);
+
 export const StyledTopbar = styled.div<TopbarProps>(
     ({ theme, height, leftOffset }) => `
         position: fixed;
