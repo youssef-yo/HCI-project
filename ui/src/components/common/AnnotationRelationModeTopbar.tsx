@@ -169,7 +169,7 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                         'shift+click to select'
                     )}
                 </div>
-                <Button variant="success" className="btn m-1" onClick={handleCreationRelation}>
+                <Button variant="success" onClick={handleCreationRelation}>
                     create
                 </Button>
             </div>

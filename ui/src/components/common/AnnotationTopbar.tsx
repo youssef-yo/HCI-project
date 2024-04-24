@@ -64,7 +64,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
                         justifyContent: 'center',
                         alignItems: 'center',
                     }}>
-                    <MdOutlineHouse style={{ color: 'black', fontSize: '25px' }} />
+                    <MdOutlineHouse style={{ color: 'black', fontSize: '25px' , cursor: 'pointer'}} />
                 </div>
                 <Divider />
                 <div
@@ -104,7 +104,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
                     }}>
                     <MdOutlineSave
                         onClick={() => setSaveShowNotification(true)}
-                        style={{ color: 'black', fontSize: '25px' }}
+                        style={{ color: 'black', fontSize: '25px' , cursor: 'pointer'}}
                     />
                 </div>
                 <Divider />

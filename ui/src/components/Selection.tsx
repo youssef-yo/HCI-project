@@ -4,7 +4,7 @@ import { Modal, Select, notification } from '@allenai/varnish';
 
 import { Bounds, TokenId, PDFPageInfo, Annotation, AnnotationStore } from '../context';
 import { CloseCircleFilled, EditFilled } from '@ant-design/icons';
-
+import { OntoClass } from '../api';
 /*
 function hexToRgb(hex: string) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -137,7 +137,6 @@ interface EditLabelModalProps {
 
 const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
     const annotationStore = useContext(AnnotationStore);
-
     const [selectedLabel, setSelectedLabel] = useState(annotation.ontoClass);
 
     // There are onMouseDown listeners on the <canvas> that handle the
@@ -147,6 +146,11 @@ const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
         e.stopPropagation();
     };
 
+    const ontoClassFromId = (id: string) => {
+        return annotationStore.ontoClasses.find((ontoClass: OntoClass) => {
+            return ontoClass.id === id;
+        });
+    };
     useEffect(() => {
         const onKeyPress = (e: KeyboardEvent) => {
             // Ref to https://github.com/allenai/pawls/blob/0f3e5153241502eb68e46f582ed4b28112e2f765/ui/src/components/sidebar/Labels.tsx#L20
@@ -175,9 +179,6 @@ const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
             title="Edit Label"
             onCancel={onHide}
             onOk={() => {
-                // Remove the annotation and add a copy with the updated label.
-                // TODO: This might have side-effects to the relation mechanism.
-                // Some additional testing is warranted.
                 annotationStore.setPdfAnnotations(
                     annotationStore.pdfAnnotations.updateAnnotation(annotation, {
                         ontoClass: selectedLabel,
@@ -188,7 +189,19 @@ const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
             cancelButtonProps={{ onMouseDown }}
             okButtonProps={{ onMouseDown }}
             visible>
-            <Select<string>
+            <Select
+                options={annotationStore.ontoClasses.map((ontoClass: OntoClass) => ({
+                    value: ontoClass.id,
+                    label: ontoClass.text
+                }))}
+                value={selectedLabel?.text}
+                onChange={(choice: any) => {
+                    const resultClass: OntoClass | undefined = ontoClassFromId(choice.value);
+                    setSelectedLabel(resultClass);
+                }}
+                style={{  width: '100%' }}
+            />
+            {/* <Select<string>
                 value={selectedLabel.text}
                 onMouseDown={onMouseDown}
                 onChange={(labelText) => {
@@ -204,7 +217,7 @@ const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
                         {l.text}
                     </Select.Option>
                 ))}
-            </Select>
+            </Select> */}
         </Modal>
     );
 };
