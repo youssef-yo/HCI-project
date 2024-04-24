@@ -1,6 +1,7 @@
 import React, { MouseEvent, useContext, useState, useEffect } from 'react';
 import styled, { ThemeContext } from 'styled-components';
-import { Modal, Select, notification } from '@allenai/varnish';
+import { Modal, notification } from '@allenai/varnish';
+import Select from 'react-select';
 
 import { Bounds, TokenId, PDFPageInfo, Annotation, AnnotationStore } from '../context';
 import { CloseCircleFilled, EditFilled } from '@ant-design/icons';
@@ -137,15 +138,14 @@ interface EditLabelModalProps {
 
 const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
     const annotationStore = useContext(AnnotationStore);
-    const [selectedLabel, setSelectedLabel] = useState(annotation.ontoClass);
-
+    const [selectedLabel, setSelectedLabel] = useState({ value: annotation.ontoClass.id, label: annotation.ontoClass.text });
+    console.log('a', selectedLabel);
     // There are onMouseDown listeners on the <canvas> that handle the
     // creation of new annotations. We use this function to prevent that
     // from being triggered when the user engages with other UI elements.
     const onMouseDown = (e: MouseEvent) => {
         e.stopPropagation();
     };
-
     const ontoClassFromId = (id: string) => {
         return annotationStore.ontoClasses.find((ontoClass: OntoClass) => {
             return ontoClass.id === id;
@@ -194,7 +194,7 @@ const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
                     value: ontoClass.id,
                     label: ontoClass.text
                 }))}
-                value={selectedLabel?.text}
+                value={selectedLabel}
                 onChange={(choice: any) => {
                     const resultClass: OntoClass | undefined = ontoClassFromId(choice.value);
                     setSelectedLabel(resultClass);
