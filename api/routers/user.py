@@ -9,7 +9,10 @@ from fastapi import (
 
 from core.config import Settings, get_settings
 
-from models.domain import UserDocument
+from models.domain import ( 
+    UserDocument,
+    TaskDocument,
+)
 from models.schemas import (
     PydanticObjectId,
     UserInCreate,
@@ -132,5 +135,10 @@ async def delete_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="This user cannot be deleted."
         )
+    
+    # Delete associated tasks
+    tasks = await TaskDocument.find({"user_id": user.id}).to_list()
+    for task in tasks:
+        await task.delete()
 
     await user.delete()
