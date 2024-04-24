@@ -3,7 +3,7 @@ import { SidebarItem, SidebarItemTitle } from './common';
 import { Annotation } from '../../context';
 
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { AnnotationSummary } from '../AnnotationSummary';
+import { AnnotationSummary } from '../AnnotationsByClass';
 
 interface AnnotationsProps {
     annotations: Annotation[];

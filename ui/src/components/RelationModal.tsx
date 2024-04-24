@@ -3,7 +3,7 @@ import { Modal, Transfer, notification } from '@allenai/varnish';
 import Form from 'react-bootstrap/Form';
 import { Annotation, RelationGroup, AnnotationStore } from '../context';
 import { OntoProperty } from '../api';
-import { AnnotationSummary } from './AnnotationSummary';
+import { AnnotationSummary } from './AnnotationsByClass';
 import { DropdownOntoProperties } from './sidebar';
 
 interface RelationModalProps {

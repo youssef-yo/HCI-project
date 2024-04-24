@@ -218,10 +218,9 @@ interface SelectionProps {
 export const Selection = ({ pageInfo, annotation, showInfo = true }: SelectionProps) => {
     const label = annotation.ontoClass;
     const theme = useContext(ThemeContext);
+    const annotationStore = useContext(AnnotationStore);
 
     const [isEditLabelModalVisible, setIsEditLabelModalVisible] = useState(false);
-
-    const annotationStore = useContext(AnnotationStore);
 
     let color;
     if (!label) {
@@ -289,56 +288,58 @@ export const Selection = ({ pageInfo, annotation, showInfo = true }: SelectionPr
     const selected = annotationStore.selectedAnnotations.includes(annotation);
 
     return (
-        <div id={'onPDF_' + annotation.id}>
-            <SelectionBoundary
-                color={color}
-                bounds={bounds}
-                onClick={onShiftClick}
-                selected={selected}>
-                {showInfo && !annotationStore.hideLabels ? (
-                    <SelectionInfo border={border} color={color}>
-                        <span>{label.text}</span>
-                        <EditFilled
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsEditLabelModalVisible(true);
-                            }}
-                            onMouseDown={(e) => {
-                                e.stopPropagation();
-                            }}
-                        />
-                        <CloseCircleFilled
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                removeAnnotation();
-                            }}
-                            // We have to prevent the default behaviour for
-                            // the pdf canvas here, in order to be able to capture
-                            // the click event.
-                            onMouseDown={(e) => {
-                                e.stopPropagation();
-                            }}
-                        />
-                    </SelectionInfo>
+        annotation.show && (
+            <div id={'onPDF_' + annotation.id}>
+                <SelectionBoundary
+                    color={color}
+                    bounds={bounds}
+                    onClick={onShiftClick}
+                    selected={selected}>
+                    {showInfo && !annotationStore.hideLabels ? (
+                        <SelectionInfo border={border} color={color}>
+                            <span>{label.text}</span>
+                            <EditFilled
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsEditLabelModalVisible(true);
+                                }}
+                                onMouseDown={(e) => {
+                                    e.stopPropagation();
+                                }}
+                            />
+                            <CloseCircleFilled
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeAnnotation();
+                                }}
+                                // We have to prevent the default behaviour for
+                                // the pdf canvas here, in order to be able to capture
+                                // the click event.
+                                onMouseDown={(e) => {
+                                    e.stopPropagation();
+                                }}
+                            />
+                        </SelectionInfo>
+                    ) : null}
+                </SelectionBoundary>
+                {
+                    // NOTE: It's important that the parent element of the tokens
+                    // is the PDF canvas, because we need their absolute position
+                    // to be relative to that and not another absolute/relatively
+                    // positioned element. This is why SelectionTokens are not inside
+                    // SelectionBoundary.
+                    annotation.tokens ? (
+                        <SelectionTokens pageInfo={pageInfo} tokens={annotation.tokens} />
+                    ) : null
+                }
+                {isEditLabelModalVisible ? (
+                    <EditLabelModal
+                        annotation={annotation}
+                        onHide={() => setIsEditLabelModalVisible(false)}
+                    />
                 ) : null}
-            </SelectionBoundary>
-            {
-                // NOTE: It's important that the parent element of the tokens
-                // is the PDF canvas, because we need their absolute position
-                // to be relative to that and not another absolute/relatively
-                // positioned element. This is why SelectionTokens are not inside
-                // SelectionBoundary.
-                annotation.tokens ? (
-                    <SelectionTokens pageInfo={pageInfo} tokens={annotation.tokens} />
-                ) : null
-            }
-            {isEditLabelModalVisible ? (
-                <EditLabelModal
-                    annotation={annotation}
-                    onHide={() => setIsEditLabelModalVisible(false)}
-                />
-            ) : null}
-        </div>
+            </div>
+        )
     );
 };
 

@@ -25,10 +25,10 @@ const Relations: React.FC<RelationProps> = ({ annotations, relations }) => {
             <SidebarItem>
                 <div>
                     {relations.length === 0 ? (
-                        <>None</>
+                        <span style={{ color: 'black' }}>No Relations Yet </span>
                     ) : (
                         <div>
-                            return <RelationList relations={relations} />
+                            <RelationList relations={relations} />
                         </div>
                     )}
                 </div>

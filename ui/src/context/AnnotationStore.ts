@@ -101,6 +101,7 @@ export class RelationGroup {
 export class Annotation {
     public readonly id: string;
     public readonly date: string;
+    public show: boolean;
 
     constructor(
         public bounds: Bounds,
@@ -109,10 +110,12 @@ export class Annotation {
         public readonly tokens: TokenId[] | null = null,
         id: string | undefined = undefined,
         public readonly text: string | null,
+        show: boolean = true,
         date: string | undefined = undefined
     ) {
         this.id = id || uuidv4();
         this.date = date || getDate();
+        this.show = show;
     }
 
     toString() {
@@ -130,8 +133,13 @@ export class Annotation {
             delta.ontoClass ?? Object.assign({}, this.ontoClass),
             delta.tokens ?? this.tokens?.map((t) => Object.assign({}, t)),
             this.id,
-            delta.text ?? this.text
+            delta.text ?? this.text,
+            delta.show ?? this.show
         );
+    }
+
+    setShow(show: boolean) {
+        this.show = show; // Imposta direttamente il valore di show
     }
 
     static fromObject(obj: Annotation) {
