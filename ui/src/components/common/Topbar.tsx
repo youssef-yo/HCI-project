@@ -39,7 +39,7 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
             if (segment.match(/^[0-9a-fA-F]{24}$/)) {
                 const type  = pathSegments[i-1];
                 try {
-                    var response = null;
+                    let response = null;
                     if (type === 'docs'){
                         response = await getDocumentByID(segment);
                         formattedSegments.push(response.name || 'Untitled Document');

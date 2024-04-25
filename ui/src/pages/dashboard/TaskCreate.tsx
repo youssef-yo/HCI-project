@@ -5,6 +5,7 @@ import { Header, Input, InputType, Option, Table } from '../../components/common
 import { Doc, User, getApiError, useDocumentApi, useTaskApi, useUserApi, TaskExtended, TaskStatus } from '../../api';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Select from "react-select";
+import { notification } from '@allenai/varnish';
 
 const TaskCreatePage = () => {
     const [description, setDescription] = useState<string>('');
@@ -122,8 +123,11 @@ const TaskCreatePage = () => {
 
         createTask(newTask)
             .then((task) => {
-                console.log(`Task ${task._id} successfully created.`);
                 navigate(`/dash/tasks/${task._id}`);
+                notification.success({
+                    message: 'Task created succesfully!',
+                    placement: 'bottomRight',
+                });
             })
             .catch((err) => setErrorMsg(getApiError(err)));
     };

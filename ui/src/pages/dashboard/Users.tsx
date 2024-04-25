@@ -45,12 +45,20 @@ const UsersPage = () => {
     const onDeleteUser = async (user: User) => {
         const confirm = await dialog.showConfirmation(
             'Delete User',
-            `Are you sure you want to delete the user ${user.email}? This action cannot be undone.`
+            `Are you sure you want to delete the user ${user.email}? All the tasks associated with this user will be
+            also deleted. This action cannot be undone.`
         );
         if (!confirm) return;
 
         await deleteUser(user._id)
-            .then((_) => setUsers(users.filter((u) => u._id !== user._id)))
+            .then((_) => {
+                    setUsers(users.filter((u) => u._id !== user._id));
+                    notification.success({
+                        message: 'User deleted succesfully!',
+                        placement: 'bottomRight',
+                    });
+                }
+            )
             .catch((err) =>
                 notification.error({
                     message: 'Error deleting user!',

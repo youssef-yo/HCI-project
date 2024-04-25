@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { InputFile, FileList } from '../sidebar';
 import { useUploadApi } from '../../api';
+import { notification } from '@allenai/varnish';
 
 type UploadOntoModalProps = {
     updateTable: () => void;
@@ -45,12 +46,16 @@ const UploadOntoModal: React.FC<UploadOntoModalProps> = ({ updateTable, show, on
             onHide();
             setFiles([]);
             setDuplicateFiles([]);
+            notification.success({
+                message: 'Ontology uploaded!',
+                placement: 'bottomRight',
+            });
         } catch (error: any) {
             if (error.response.status === 409) {
                 setIsUploading(false);
                 const duplicateFiles = error.response.data.detail;
                 setDuplicateFiles(duplicateFiles);
-                setErrorText('Duplicate Ontology');
+                setErrorText('One of the ontologies has already been uploaded.');
             } else if (error.response.status === 404) {
                 setErrorText('Ontology not found');
             } else {

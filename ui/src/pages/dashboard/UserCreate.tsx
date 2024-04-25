@@ -6,6 +6,7 @@ import { getApiError, useUserApi } from '../../api';
 import { Header, Input, InputType, Option } from '../../components/common';
 import ChooseTypeUser from '../../components/common/ChooseTypeUser';
 import { ROLES } from '../../config/roles';
+import { notification } from '@allenai/varnish';
 
 const UserCreatePage = () => {
     const [email, setEmail] = useState<string>('');
@@ -83,8 +84,11 @@ const UserCreatePage = () => {
 
         createUser(newUser)
             .then((user) => {
-                console.log(`User ${user.email} successfully created!`);
                 navigate(`/dash/users/${user._id}`);
+                notification.success({
+                    message: 'User created succesfully!',
+                    placement: 'bottomRight',
+                });    
             })
             .catch((err) => setErrorMsg(getApiError(err)));
     };

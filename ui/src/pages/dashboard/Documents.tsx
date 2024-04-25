@@ -1,13 +1,12 @@
-import { MdDeleteOutline, MdOpenInNew, MdOutlineNoteAdd } from 'react-icons/md';
+import { MdDeleteOutline, MdOpenInNew, MdOutlineNoteAdd, MdInfoOutline, MdCircle } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { Button, Header, IconButton, Table } from '../../components/common';
-import { Doc, useDocumentApi } from '../../api';
+import { Doc, useDocumentApi, getApiError } from '../../api';
 import { UploadDocModal } from '../../components/dashboard';
 import { useNavigate } from 'react-router-dom';
 import '../../assets/styles/Documents.scss';
 import { useDialog } from '../../hooks';
 import { notification } from '@allenai/varnish';
-
 
 const DocumentsPage = () => {
     const [docs, setDocs] = useState<Doc[]>([]);
@@ -15,6 +14,9 @@ const DocumentsPage = () => {
     const [uploadDocModal, setUploadDocModal] = useState<boolean>(false);
     
     const { getAllDocs, updateDocumentInformation, deleteDocument } = useDocumentApi();
+
+    const [showExplanation, setShowExplanation] = useState(false);
+
     const navigate = useNavigate();
     const dialog = useDialog();
 
@@ -39,6 +41,7 @@ const DocumentsPage = () => {
                     loadDocs();
                     notification.success({
                         message: 'Document Analyzed!',
+                        description: 'One of the document you uploaded is ready to be annotated.',
                         placement: 'bottomRight',
                     });
                     clearInterval(intervalId);
@@ -72,13 +75,25 @@ const DocumentsPage = () => {
     const onDeleteDoc = async (doc: Doc) => {
         const confirm = await dialog.showConfirmation(
             'Delete Document',
-            `Are you sure you want to delete the document ${doc.name}? All tasks related to this document will also be eliminated. This action cannot be undone.`
+            `Are you sure you want to delete the document ${doc.name}? All the tasks associated with this document will be
+            also deleted. This action cannot be undone.`
         );
         if (!confirm) return;
 
         await deleteDocument(doc._id)
-            .then((_) => loadDocs())
-            .catch((err) => console.log(err));
+            .then((_) => {
+                loadDocs();
+                notification.success({
+                    message: 'Document deleted succesfully!',
+                    placement: 'bottomRight',
+                });
+            })
+            .catch((err) =>
+                notification.error({
+                    message: 'Error deleting document!',
+                    description: getApiError(err),
+                    placement: 'bottomRight',
+            }));
     }
 
     return (
@@ -97,7 +112,36 @@ const DocumentsPage = () => {
             <Table color="#0077B6">
                 <thead>
                     <tr>
-                        <th>Status</th>
+                        <th>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                Status 
+                                <MdInfoOutline
+                                        style={{ marginLeft: '4px', color: 'black' }}
+                                        onMouseEnter={() => setShowExplanation(true)}
+                                        onMouseLeave={() => setShowExplanation(false)}
+                                    />
+                                {showExplanation && (
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            top: 'calc(100% + 5px)',
+                                            left: '67%',
+                                            transform: 'translateX(-50%)',
+                                            padding: '10px',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '4px',
+                                            backgroundColor: 'white',
+                                            zIndex: '999',
+                                            fontSize: '0.8em',
+                                            minWidth: '6em', 
+                                        }}
+                                    >
+                                        <p style={{ whiteSpace: 'nowrap' }}><MdCircle style={{ color: 'green' }}/>: Document ready</p>
+                                        <p style={{ whiteSpace: 'nowrap' }}><MdCircle style={{ color: 'yellow' }}/>: analyzing document</p>
+                                    </div>
+                                    )}
+                            </div>                        
+                        </th>
                         <th>Name</th>
                         <th style={{ textAlign: 'center' }}>Pages</th>
                         <th style={{ textAlign: 'center' }}>Actions</th>
@@ -106,7 +150,7 @@ const DocumentsPage = () => {
                 <tbody>
                     {docs.length === 0 ? (
                         <tr>
-                            <td colSpan="3" style={{ textAlign: 'center' }}>Nothing to show</td>
+                            <td colSpan="4" style={{ textAlign: 'center' }}>Nothing to show</td>
                         </tr>
                     ) : (docs.map((doc) => (
                          <tr

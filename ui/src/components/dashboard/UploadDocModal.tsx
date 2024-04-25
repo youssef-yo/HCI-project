@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { InputFile, FileList } from '../sidebar';
 import { useUploadApi } from '../../api';
+import { notification } from '@allenai/varnish';
 
 type UploadDocModalProps = {
     updateTable: () => void;
@@ -38,6 +39,11 @@ const UploadDocModal: React.FC<UploadDocModalProps> = ({ updateTable, checkAnaly
             onHide();
             setFiles([]);
             setDuplicateFiles([]);
+            notification.info({
+                message: 'Document upload in progress',
+                description: 'Please wait while we analyze the document. You will be notified once the analysis is complete.',
+                placement: 'bottomRight',
+            });
         } catch (error: any) {
             if (error.response.status === 409) {
                 setIsUploading(false);

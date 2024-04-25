@@ -4,6 +4,7 @@ import { Ontology, useOntologyApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { EditOntoModal, UploadOntoModal } from '../../components/dashboard';
 import { useDialog } from '../../hooks';
+import { notification } from '@allenai/varnish';
 
 const OntologiesPage = () => {
     const [ontos, setOntos] = useState<Ontology[]>([]);
@@ -57,6 +58,10 @@ const OntologiesPage = () => {
 
         await deleteOntology(onto._id);
         setOntos(ontos.filter((o) => o._id !== onto._id));
+        notification.success({
+            message: 'Ontology deleted!',
+            placement: 'bottomRight',
+        });
     };
 
     return (
