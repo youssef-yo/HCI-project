@@ -99,6 +99,8 @@ const Page = ({ pageInfo, onError }: PageProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [selection, setSelection] = useState<Bounds>();
 
+    const [isEditLabelModalVisible, setIsEditLabelModalVisible] = useState(false);
+
     const annotations = annotationStore.pdfAnnotations.docAnnotations.annotations.filter(
         (a) => a.page === pageInfo.page.pageNumber - 1
     );
@@ -159,6 +161,8 @@ const Page = ({ pageInfo, onError }: PageProps) => {
             ref={containerRef}
             id={pageInfo.page.pageNumber.toString()}
             onMouseDown={(event) => {
+                if (isEditLabelModalVisible) return;
+
                 if (containerRef.current === null) {
                     throw new Error('No Container');
                 }
@@ -185,48 +189,48 @@ const Page = ({ pageInfo, onError }: PageProps) => {
             onMouseMove={
                 selection
                     ? (event) => {
-                          if (containerRef.current === null) {
-                              throw new Error('No Container');
-                          }
+                        if (containerRef.current === null) {
+                            throw new Error('No Container');
+                        }
 
-                          //   console.log(
-                          //       `===Current===\n[Event] Page-X: ${event.pageX}\n[Event] Page-Y: ${
-                          //           event.pageY
-                          //       }\n[ContainerRef] Offset-Left: ${
-                          //           containerRef.current.getBoundingClientRect().left
-                          //       }\n[ContainerRef] Offset-Top: ${containerRef.current.offsetTop}`
-                          //   );
+                        //   console.log(
+                        //       `===Current===\n[Event] Page-X: ${event.pageX}\n[Event] Page-Y: ${
+                        //           event.pageY
+                        //       }\n[ContainerRef] Offset-Left: ${
+                        //           containerRef.current.getBoundingClientRect().left
+                        //       }\n[ContainerRef] Offset-Top: ${containerRef.current.offsetTop}`
+                        //   );
 
-                          setSelection({
-                              ...selection,
-                              right:
-                                  event.pageX - containerRef.current.getBoundingClientRect().left,
-                              bottom: event.pageY - containerRef.current.offsetTop,
-                          });
-                      }
+                        setSelection({
+                            ...selection,
+                            right:
+                                event.pageX - containerRef.current.getBoundingClientRect().left,
+                            bottom: event.pageY - containerRef.current.offsetTop,
+                        });
+                    }
                     : undefined
             }
             onMouseUp={
                 selection
                     ? () => {
-                          if (annotationStore.activeOntoClass) {
-                              const newAnnotation = getNewAnnotation(
-                                  // TODO(Mark): Change
-                                  pageInfo,
-                                  selection,
-                                  annotationStore.activeOntoClass,
-                                  annotationStore.freeFormAnnotations
-                              );
-                              if (newAnnotation) {
-                                  annotationStore.setPdfAnnotations(
-                                      annotationStore.pdfAnnotations.withNewAnnotation(
-                                          newAnnotation
-                                      )
-                                  );
-                              }
-                          }
-                          setSelection(undefined);
-                      }
+                        if (annotationStore.activeOntoClass) {
+                            const newAnnotation = getNewAnnotation(
+                                // TODO(Mark): Change
+                                pageInfo,
+                                selection,
+                                annotationStore.activeOntoClass,
+                                annotationStore.freeFormAnnotations
+                            );
+                            if (newAnnotation) {
+                                annotationStore.setPdfAnnotations(
+                                    annotationStore.pdfAnnotations.withNewAnnotation(
+                                        newAnnotation
+                                    )
+                                );
+                            }
+                        }
+                        setSelection(undefined);
+                    }
                     : undefined
             }>
             <PageCanvas ref={canvasRef} />
@@ -243,6 +247,9 @@ const Page = ({ pageInfo, onError }: PageProps) => {
                             pageInfo={pageInfo}
                             annotation={annotation}
                             key={annotation.toString()}
+                            isModalVisible={isEditLabelModalVisible}
+                            onHide={() => setIsEditLabelModalVisible(false)}
+                            showEditLabelModal={() => setIsEditLabelModalVisible(true)}
                         />
                     ))
             }

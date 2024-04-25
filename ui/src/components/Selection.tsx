@@ -1,6 +1,7 @@
-import React, { MouseEvent, useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled, { ThemeContext } from 'styled-components';
-import { Modal, notification } from '@allenai/varnish';
+import { notification } from '@allenai/varnish';
+import { Modal, Button } from 'react-bootstrap';
 import Select from 'react-select';
 
 import { Bounds, TokenId, PDFPageInfo, Annotation, AnnotationStore } from '../context';
@@ -132,24 +133,24 @@ export const SelectionTokens = ({ pageInfo, tokens }: SelectionTokenProps) => {
 };
 
 interface EditLabelModalProps {
+    visible: boolean;
     annotation: Annotation;
     onHide: () => void;
 }
 
-const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
+const EditLabelModal = ({ visible, annotation, onHide }: EditLabelModalProps) => {
     const annotationStore = useContext(AnnotationStore);
     const [selectedLabel, setSelectedLabel] = useState({ value: annotation.ontoClass.id, label: annotation.ontoClass.text });
-    console.log('a', selectedLabel);
+    const [currentOntoClass, setCurrentOntoClass] = useState();
+
     // There are onMouseDown listeners on the <canvas> that handle the
     // creation of new annotations. We use this function to prevent that
     // from being triggered when the user engages with other UI elements.
-    const onMouseDown = (e: MouseEvent) => {
-        e.stopPropagation();
-    };
     const ontoClassFromId = (id: string) => {
         return annotationStore.ontoClasses.find((ontoClass: OntoClass) => {
             return ontoClass.id === id;
         });
+        
     };
     useEffect(() => {
         const onKeyPress = (e: KeyboardEvent) => {
@@ -175,20 +176,11 @@ const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
     }, [annotationStore, annotation]);
 
     return (
-        <Modal
-            title="Edit Label"
-            onCancel={onHide}
-            onOk={() => {
-                annotationStore.setPdfAnnotations(
-                    annotationStore.pdfAnnotations.updateAnnotation(annotation, {
-                        ontoClass: selectedLabel,
-                    })
-                );
-                onHide();
-            }}
-            cancelButtonProps={{ onMouseDown }}
-            okButtonProps={{ onMouseDown }}
-            visible>
+        <Modal show={visible} onHide={onHide}>
+        <Modal.Header closeButton>
+            <Modal.Title>Edit class</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
             <Select
                 options={annotationStore.ontoClasses.map((ontoClass: OntoClass) => ({
                     value: ontoClass.id,
@@ -197,28 +189,26 @@ const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
                 value={selectedLabel}
                 onChange={(choice: any) => {
                     const resultClass: OntoClass | undefined = ontoClassFromId(choice.value);
-                    setSelectedLabel(resultClass);
+                    setCurrentOntoClass(resultClass);
+                    setSelectedLabel({ value: resultClass.id, label: resultClass.text });
                 }}
                 style={{  width: '100%' }}
-            />
-            {/* <Select<string>
-                value={selectedLabel.text}
-                onMouseDown={onMouseDown}
-                onChange={(labelText) => {
-                    const label = annotationStore.ontoClasses.find((l) => l.text === labelText);
-                    if (!label) {
-                        return;
-                    }
-                    setSelectedLabel(label);
-                }}
-                style={{ display: 'block' }}>
-                {annotationStore.ontoClasses.map((l) => (
-                    <Select.Option value={l.text} key={l.text}>
-                        {l.text}
-                    </Select.Option>
-                ))}
-            </Select> */}
-        </Modal>
+                />
+        </Modal.Body>
+        <Modal.Footer>
+            <Button variant="secondary" onClick={() => {
+                onHide();
+                annotationStore.setPdfAnnotations(
+                    annotationStore.pdfAnnotations.updateAnnotation(annotation, {
+                        ontoClass: currentOntoClass,
+                    })
+                );
+                onHide();
+            }}>
+                Close
+            </Button>
+        </Modal.Footer>
+    </Modal>
     );
 };
 
@@ -226,14 +216,15 @@ interface SelectionProps {
     pageInfo: PDFPageInfo;
     annotation: Annotation;
     showInfo?: boolean;
+    isModalVisible: boolean;
+    onHide: () => void;
+    showEditLabelModal: () => void;
 }
 
-export const Selection = ({ pageInfo, annotation, showInfo = true }: SelectionProps) => {
+export const Selection = ({ pageInfo, annotation, showInfo = true, isModalVisible, onHide, showEditLabelModal }: SelectionProps) => {
     const label = annotation.ontoClass;
     const theme = useContext(ThemeContext);
     const annotationStore = useContext(AnnotationStore);
-
-    const [isEditLabelModalVisible, setIsEditLabelModalVisible] = useState(false);
 
     let color;
     if (!label) {
@@ -314,7 +305,7 @@ export const Selection = ({ pageInfo, annotation, showInfo = true }: SelectionPr
                             <EditFilled
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setIsEditLabelModalVisible(true);
+                                    showEditLabelModal();
                                 }}
                                 onMouseDown={(e) => {
                                     e.stopPropagation();
@@ -345,10 +336,11 @@ export const Selection = ({ pageInfo, annotation, showInfo = true }: SelectionPr
                         <SelectionTokens pageInfo={pageInfo} tokens={annotation.tokens} />
                     ) : null
                 }
-                {isEditLabelModalVisible ? (
+                {isModalVisible ? (
                     <EditLabelModal
                         annotation={annotation}
-                        onHide={() => setIsEditLabelModalVisible(false)}
+                        visible={isModalVisible}
+                        onHide={onHide}
                     />
                 ) : null}
             </div>
