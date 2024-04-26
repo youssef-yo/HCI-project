@@ -8,18 +8,24 @@ import FreeFormToggle from './FreeFormToggle';
 import RelationModeToggle from './RelationModeToggle';
 import AnnotationRelationModeTopbar from './AnnotationRelationModeTopbar';
 import { AnnotationStore, RelationGroup } from '../../context';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks';
+import { ROLES } from '../../config/roles';
 
 export type AnnotationTopbarProps = {
     onCreate: (group: RelationGroup) => void;
     height: string;
     leftOffset?: string;
+    taskId: string;
 };
 
-const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, leftOffset }) => {
+const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, leftOffset, taskId }) => {
     const annotationStore = useContext(AnnotationStore);
     const [accountInfoPopoverShow, setAccountInfoPopoverShow] = useState<boolean>(false);
     const [showSaveNotification, setSaveShowNotification] = useState<boolean>(false);
     const [relationModeActive, setRelationModeActive] = useState<boolean>(false);
+    const navigate = useNavigate();
+    const { auth } = useAuth();
 
     const handleToggleRelationMode = () => {
         setRelationModeActive(!relationModeActive);
@@ -64,7 +70,15 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
                         justifyContent: 'center',
                         alignItems: 'center',
                     }}>
-                    <MdOutlineHouse style={{ color: 'black', fontSize: '25px' , cursor: 'pointer'}} />
+                    <MdOutlineHouse
+                        onClick={() => {
+                            if (auth.role === ROLES.Admin) {
+                                navigate(`/dash/tasks/${taskId}`)
+                            } else if (auth.role === ROLES.Annotator) {
+                                navigate(`/home/tasks/${taskId}`)
+                            }                            
+                        }}
+                        style={{ color: 'black', fontSize: '25px' , cursor: 'pointer'}} />
                 </div>
                 <Divider />
                 <div

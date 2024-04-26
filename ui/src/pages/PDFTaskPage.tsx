@@ -303,6 +303,7 @@ const PDFTaskPage = () => {
                             onCreate={onRelationModalOk}
                             height={topbarHeight}
                             leftOffset={sidebarWidth}
+                            taskId={taskId}
                         />
                         <CenterOnPage>
                             <Progress
@@ -326,6 +327,7 @@ const PDFTaskPage = () => {
                             onCreate={onRelationModalOk}
                             height={topbarHeight}
                             leftOffset={sidebarWidth}
+                            taskId={taskId}
                         />
                         <CenterOnPage>
                             <Result icon={<QuestionCircleOutlined />} title="PDF Not Found" />
@@ -399,6 +401,7 @@ const PDFTaskPage = () => {
                                         onCreate={onRelationModalOk}
                                         height={topbarHeight}
                                         leftOffset={sidebarWidth}
+                                        taskId={taskId}
                                     />
                                     <PDFContainer relationMode={relationMode}>
                                         {activeOntoProperty && (
@@ -433,6 +436,7 @@ const PDFTaskPage = () => {
                             onCreate={onRelationModalOk}
                             height={topbarHeight}
                             leftOffset={sidebarWidth}
+                            taskId={taskId}
                         />
                         <CenterOnPage>
                             <Result status="warning" title="Unable to Render Document" />
