@@ -14,7 +14,7 @@ const App = ({ ontoProperties }: DropdownPropertiesProps) => {
         const listLabels = ontoProperties.map((ontoProperty: OntoProperty) => ({
             value: ontoProperty.id,
             label: ontoProperty.text,
-        }));
+        })).sort((a, b) => a.label.localeCompare(b.label));
         setProperties(listLabels);
     }, [ontoProperties]);
     useEffect(() => {

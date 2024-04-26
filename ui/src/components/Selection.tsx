@@ -186,7 +186,7 @@ const EditLabelModal = ({ visible, annotation, onHide }: EditLabelModalProps) =>
                 options={annotationStore.ontoClasses.map((ontoClass: OntoClass) => ({
                     value: ontoClass.id,
                     label: ontoClass.text
-                }))}
+                })).sort((a, b) => a.label.localeCompare(b.label))}
                 value={selectedLabel}
                 onChange={(choice: any) => {
                     const resultClass: OntoClass | undefined = ontoClassFromId(choice.value);

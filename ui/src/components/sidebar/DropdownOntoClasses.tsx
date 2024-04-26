@@ -12,7 +12,9 @@ const App = ({ annotationStore }: { annotationStore: any }) => {
         const listLabels = annotationStore.ontoClasses.map((ontoClass: OntoClass) => ({
             value: ontoClass.id,
             label: ontoClass.text,
-        }));
+        })).sort((a, b) => a.label.localeCompare(b.label));
+
+
         setClasses(listLabels);
     }, [annotationStore.ontoClasses]);
     useEffect(() => {
