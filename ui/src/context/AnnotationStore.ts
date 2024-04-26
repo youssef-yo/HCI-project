@@ -196,7 +196,7 @@ export class DocAnnotations {
             .filter((r) => r !== undefined);
 
         console.log('Deleted Relations: ', deletedRelations);
-
+        
         return new DocAnnotations(newAnnotations, newRelations as RelationGroup[], true);
     }
 

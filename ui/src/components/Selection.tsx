@@ -245,6 +245,14 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
     const border = getBorderWidthFromBounds(bounds);
 
     const removeAnnotation = () => {
+        // redundant code in AnnotationRelationModeTopbar: removeAnnotation
+        annotationStore.setSrc((prevSrc) => (prevSrc && prevSrc.id === annotation.id ? null : prevSrc));
+        annotationStore.setDst((prevDst) => (prevDst && prevDst.id === annotation.id ? null : prevDst));
+        const updatedSelectedAnnotations = annotationStore.selectedAnnotations.filter(
+            (_annotation) => _annotation.id !== annotation.id
+        );
+        annotationStore.setSelectedAnnotations(updatedSelectedAnnotations);
+
         annotationStore.setPdfAnnotations(
             annotationStore.pdfAnnotations.deleteAnnotation(annotation)
         );

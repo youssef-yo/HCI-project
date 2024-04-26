@@ -72,22 +72,16 @@ export const RelationInfo = ({ info }: RelationInfoProps) => {
                 <>
                     <h4>Source Annotation</h4>
                     <p>
-                        <b>ID</b>: {info.sourceAnnotation.toString()}
-                    </p>
-                    <p>
                         <b>Class</b>: {info.sourceAnnotation.ontoClass.text}
                     </p>
                     <p>
                         <b>Text</b>: {info.sourceAnnotation.text}
                     </p>
                     <p>
-                        <b>Page</b>: {info.sourceAnnotation.page}
+                        <b>Page</b>: {info.sourceAnnotation.page+1}
                     </p>
                     <hr></hr>
                     <h4>Target Annotation</h4>
-                    <p>
-                        <b>ID</b>: {info.targetAnnotation.toString()}
-                    </p>
                     <p>
                         <b>Class</b>: {info.targetAnnotation.ontoClass.text}
                     </p>
@@ -95,7 +89,7 @@ export const RelationInfo = ({ info }: RelationInfoProps) => {
                         <b>Text</b>: {info.targetAnnotation.text}
                     </p>
                     <p>
-                        <b>Page</b>: {info.targetAnnotation.page}
+                        <b>Page</b>: {info.targetAnnotation.page+1}
                     </p>
                     <hr></hr>
                     <h4>Relation details</h4>

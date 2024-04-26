@@ -6,6 +6,7 @@ import { RelationInfo } from './sidebar/RelationInfo';
 import { AnnotationStore, RelationGroup } from '../context';
 import { MdArrowDropDown, MdArrowRight } from 'react-icons/md';
 import { IoEyeOutline, IoEyeOffOutline, IoInformationCircleOutline } from "react-icons/io5";
+import { useDialog } from '../hooks';
 
 export const RelationList = ({ relations }) => {
     const groupedRelations = {};
@@ -63,32 +64,32 @@ const RelationSummary = ({
     index: number;
 }) => {
     const { pdfAnnotations, setPdfAnnotations } = useContext(AnnotationStore);
-    const [relationState, setRelationState] = useState({});
     const infoR = pdfAnnotations.getAnnotationsOfRelation(relation);
-    const selectedRelation = relationState[relation.id] || null;
-    const show = selectedRelation !== null;
-    const handleClose = () => updateRelationState(relation, null);
+    const [showModal, setShowModal] = useState(false);
     const [showRel, setShowRel] = useState<boolean>(true);
     const [showSrc, setShowSrc] = useState<boolean>(true);
     const [showDst, setShowDst] = useState<boolean>(true);
+    const dialog = useDialog();
 
-    // Aggiungi una funzione per gestire lo stato delle relazioni
-    const updateRelationState = (relation, newState) => {
-        setRelationState((prevState) => ({
-            ...prevState,
-            [relation.id]: newState,
-        }));
+    const handleClose = () => {
+        setShowModal(false);
+    };
+    const handleShowModal = () => {
+        setShowModal(true);
     };
 
-    const deleteRelation = (relation) => {
-        setPdfAnnotations(pdfAnnotations.deleteRelation(relation));
+    const deleteRelation = async () => {
         handleClose();
-    };
-
-    const handleShowModal = (relation) => {
-        return () => {
-            updateRelationState(relation, true);
-        };
+        const confirm = await dialog.showConfirmation(
+            'Delete relation',
+            `Are you sure you want to delete this relation?`
+        );
+        
+        if (confirm) {
+            setPdfAnnotations(pdfAnnotations.deleteRelation(relation));
+        } else {
+            handleShowModal();
+        }        
     };
 
     const onChangeShowSrcAnnotation = () => {
@@ -126,7 +127,10 @@ const RelationSummary = ({
                         <SmallerTag color={'white'}>
                             {property} - {index}
                         </SmallerTag>
-                        <IoInformationCircleOutline style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto', marginTop: '3px' }} onClick={handleShowModal(relation)} />
+                        <IoInformationCircleOutline
+                            style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto', marginTop: '3px' }}
+                            onClick={() => handleShowModal()}
+                        />
                     </div>
                     {showRel && (
                         <>
@@ -150,18 +154,18 @@ const RelationSummary = ({
                                     <ClosedEyeIcon onClick={() => setShowDst(!showDst)} />
                                 )}
                             </PaddedRow>
-                            <Modal show={show} onHide={handleClose}>
+                            <Modal show={showModal} onHide={handleClose}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Manage Relation</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    {selectedRelation && <RelationInfo info={infoR} />}
+                                    <RelationInfo info={infoR} />
                                 </Modal.Body>
                                 <Modal.Footer>
-                                    <Button variant="danger" onClick={deleteRelation}>
+                                    <Button variant="danger" onClick={() => deleteRelation()}>
                                         Delete Relation
                                     </Button>
-                                    <Button variant="secondary" onClick={handleClose}>
+                                    <Button variant="secondary" onClick={() => handleClose()}>
                                         Close
                                     </Button>
                                 </Modal.Footer>
