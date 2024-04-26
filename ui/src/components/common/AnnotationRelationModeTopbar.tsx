@@ -130,7 +130,18 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                     }}>
                     {annotationStore.src ? (
                         <>
-                            <span style={{ marginRight: '5px' }}>{annotationStore.src.text}</span>
+                            <span
+                                style={{
+                                    marginRight: '5px',
+                                    whiteSpace: 'nowrap',
+                                    textOverflow: 'ellipsis',
+                                    overflow: 'hidden',
+                                    width: '90%',
+                                }}
+                                title={annotationStore.src.text}
+                            >
+                                {annotationStore.src.text}
+                            </span>
                             <MdCancel
                                 style={{
                                     marginLeft: 'auto',
@@ -156,7 +167,18 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                     }}>
                     {annotationStore.dst ? (
                         <>
-                            <span style={{ marginRight: '5px' }}>{annotationStore.dst.text}</span>
+                            <span
+                                style={{
+                                    marginRight: '5px',
+                                    whiteSpace: 'nowrap',
+                                    textOverflow: 'ellipsis',
+                                    overflow: 'hidden',
+                                    width: '90%',
+                                }}
+                                title={annotationStore.dst.text}
+                            >
+                                {annotationStore.dst.text}
+                            </span>
                             <MdCancel
                                 style={{
                                     marginLeft: 'auto',
