@@ -1,6 +1,5 @@
 import { OverlayTrigger, Popover, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { useAuth, useLogout } from '../../hooks';
 import { MdAccountCircle } from 'react-icons/md';
 
@@ -18,7 +17,6 @@ const AccountInfoPopover: React.FC<AccountInfoPopoverProps> = ({
     const logout = useLogout();
     const navigate = useNavigate();
     const { auth } = useAuth();
-    const [hovered, setHovered] = useState(false);
 
     const onLogout = async () => {
         await logout();
@@ -73,13 +71,11 @@ const AccountInfoPopover: React.FC<AccountInfoPopoverProps> = ({
                     display: 'inline-block',
                 }}>
                 <MdAccountCircle
-                    onMouseEnter={() => setHovered(true)}
-                    onMouseLeave={() => setHovered(false)}
                     onClick={() => setAccountInfoPopoverShow(!show)}
                     style={{
                         color: 'black',
-                        fontSize: hovered ? '27px' : '25px',
-                        transition: 'font-size 0.3s',
+                        fontSize: '25px',
+                        cursor: 'pointer',
                     }}
                 />
             </div>

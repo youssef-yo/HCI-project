@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Annotation } from '../context';
-import { AnnotationSummary } from './AnnotationSummary';
+import React, { useState, useContext, useEffect } from 'react';
+import { Annotation, PDFStore, AnnotationStore } from '../context';
 import { Tag } from '@allenai/varnish';
 import styled from 'styled-components';
-import { MdArrowDropDown, MdArrowRight } from 'react-icons/md';
+import { MdArrowDropDown, MdArrowRight, MdOutlineClose } from 'react-icons/md';
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 
 export const AnnotationsByClass = ({ annotations }: { annotations: Annotation[] }) => {
     // Creare un oggetto che raggruppa le annotazioni per ontoClass
@@ -40,17 +40,77 @@ const AnnotationGroup = ({
 
     return (
         <div>
-            <ToggleIcon onClick={() => setShowAnnotations(!showAnnotations)}>
-                {showAnnotations ? <MdArrowDropDown /> : <MdArrowRight />}
-            </ToggleIcon>
-            <SmallTag title={annotations[0].ontoClass.text} color={annotations[0].ontoClass.color}>
-                {ontoClass}
-            </SmallTag>
+            <div style={{ display: 'flex', alignItems: 'center' }} >
+                <ToggleIcon onClick={() => setShowAnnotations(!showAnnotations)}>
+                    {showAnnotations ? <MdArrowDropDown /> : <MdArrowRight />}
+                </ToggleIcon>
+                <SmallTag title={annotations[0].ontoClass.text} color={annotations[0].ontoClass.color}>
+                    {ontoClass}
+                </SmallTag>
+            </div>
             {showAnnotations &&
                 annotations.map((annotation) => (
                     <AnnotationSummary key={annotation.id} annotation={annotation} />
                 ))}
         </div>
+    );
+};
+
+export const AnnotationSummary = ({
+    annotation,
+}: {
+    annotation: Annotation;
+}) => {
+    const pdfStore = useContext(PDFStore);
+    const { pdfAnnotations, setPdfAnnotations } = useContext(AnnotationStore);
+    const [showAnnotation, setShowAnnotation] = useState<boolean>(true);
+
+    const onDelete = () => {
+        setPdfAnnotations(pdfAnnotations.deleteAnnotation(annotation));
+    };
+
+    const onChangeShowAnnotation = () => {
+        const updatedPdfAnnotations = pdfAnnotations.updateAnnotation(annotation, { show: showAnnotation });
+        setPdfAnnotations(updatedPdfAnnotations);
+    };
+
+    const handleScrolling = () => {
+        if (!pageInfo) return;
+        const divPage = document.getElementById(pageInfo.page.pageNumber.toString());
+        divPage?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    if (!pdfStore.pages) {
+        return null;
+    }
+
+    useEffect(() => {
+        annotation.setShow(showAnnotation);
+        onChangeShowAnnotation();
+    }, [showAnnotation]);
+
+    // Since the starting page might differ from the very first of the PDF,
+    // we must filter the page info based on the page index,
+    // not based on the array position.
+    const pageInfo = pdfStore.pages.find((pInfo) => annotation.page === pInfo.page.pageNumber - 1);
+    if (!pageInfo) return null;
+
+    const text =
+        annotation.tokens === null
+            ? 'Freeform'
+            : annotation.tokens.map((t) => pageInfo.tokens[t.tokenIndex].text).join(' ');
+    return (
+        <PaddedRow className={annotation.show ? '' : 'opaco'}>
+            <ClickableText onClick={handleScrolling} title={text}>
+                {text}
+            </ClickableText>
+            <DeleteIcon onClick={onDelete} />
+            {annotation.show ? (
+                <OpenEyeIcon onClick={() => setShowAnnotation(!showAnnotation)} />
+            ) : (
+                <ClosedEyeIcon onClick={() => setShowAnnotation(!showAnnotation)} />
+            )}
+        </PaddedRow>
     );
 };
 
@@ -68,4 +128,41 @@ const SmallTag = styled(Tag)`
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+`;
+
+const PaddedRow = styled.div`
+    padding: 4px 0;
+    border-radius: 2px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) min-content min-content min-content;
+
+    &.opaco {
+        opacity: 0.5;
+    }
+`;
+
+const Overflow = styled.span`
+    line-height: 1;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: black;
+    margin-left: 20px;
+`;
+
+const ClickableText = styled(Overflow)`
+    cursor: pointer;
+`;
+
+const DeleteIcon = styled(MdOutlineClose)`
+    cursor: pointer;
+`;
+
+const OpenEyeIcon = styled(IoEyeOutline)`
+    cursor: pointer;
+`;
+
+const ClosedEyeIcon = styled(IoEyeOffOutline)`
+    cursor: pointer;
 `;

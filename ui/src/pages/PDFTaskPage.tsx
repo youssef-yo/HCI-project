@@ -5,6 +5,9 @@ import { PDFDocumentProxy, PDFDocumentLoadingTask } from 'pdfjs-dist/types/displ
 import styled, { ThemeContext } from 'styled-components';
 import { useContext, useCallback, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import AnnotationSidebar from '../components/common/AnnotationSidebar';
+import NavLinks from '../components/sidebar/NavLinks';
+import LogoWrapper from '../components/sidebar/LogoWrapper';
 
 import { PDF, CenterOnPage, RelationModal } from '../components';
 import { WithSidebar, Sidebar, WithTopbar } from '../components/common';
@@ -300,6 +303,7 @@ const PDFTaskPage = () => {
                             onCreate={onRelationModalOk}
                             height={topbarHeight}
                             leftOffset={sidebarWidth}
+                            taskId={taskId}
                         />
                         <CenterOnPage>
                             <Progress
@@ -323,6 +327,7 @@ const PDFTaskPage = () => {
                             onCreate={onRelationModalOk}
                             height={topbarHeight}
                             leftOffset={sidebarWidth}
+                            taskId={taskId}
                         />
                         <CenterOnPage>
                             <Result icon={<QuestionCircleOutlined />} title="PDF Not Found" />
@@ -371,9 +376,12 @@ const PDFTaskPage = () => {
                             {canAnnotate && <listeners.SaveBeforeUnload taskId={taskId} />}
                             <listeners.HideAnnotationLabels />
                             <WithSidebar width={sidebarWidth}>
-                                <Sidebar width={sidebarWidth}>
-                                    {/* <Labels _setRelationModalVisible={setRelationModalVisible} /> */}
-                                    {/* <AssignedTaskList tasks={assignedTasks} /> */}
+                                <AnnotationSidebar width={sidebarWidth}>
+                                    <LogoWrapper>
+                                        <NavLinks>
+                                            <p className="navGroup__title">ONTO-PAWLS</p>
+                                        </NavLinks>
+                                    </LogoWrapper>
                                     {activeTask && (
                                         <Annotations
                                             taskId={taskId}
@@ -387,15 +395,13 @@ const PDFTaskPage = () => {
                                             relations={pdfAnnotations.docAnnotations.relations}
                                         />
                                     )}
-                                    {/* {activeTask && (
-                                        <Comment taskId={taskId} activeTask={activeTask} />
-                                    )} */}
-                                </Sidebar>
+                                </AnnotationSidebar>
                                 <WithTopbar height={topbarHeight}>
                                     <AnnotationTopbar
                                         onCreate={onRelationModalOk}
                                         height={topbarHeight}
                                         leftOffset={sidebarWidth}
+                                        taskId={taskId}
                                     />
                                     <PDFContainer relationMode={relationMode}>
                                         {activeOntoProperty && (
@@ -430,6 +436,7 @@ const PDFTaskPage = () => {
                             onCreate={onRelationModalOk}
                             height={topbarHeight}
                             leftOffset={sidebarWidth}
+                            taskId={taskId}
                         />
                         <CenterOnPage>
                             <Result status="warning" title="Unable to Render Document" />

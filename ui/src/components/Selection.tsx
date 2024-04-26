@@ -1,10 +1,12 @@
-import React, { MouseEvent, useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled, { ThemeContext } from 'styled-components';
-import { Modal, Select, notification } from '@allenai/varnish';
+import { notification } from '@allenai/varnish';
+import { Modal, Button } from 'react-bootstrap';
+import Select from 'react-select';
 
 import { Bounds, TokenId, PDFPageInfo, Annotation, AnnotationStore } from '../context';
 import { CloseCircleFilled, EditFilled } from '@ant-design/icons';
-
+import { OntoClass } from '../api';
 /*
 function hexToRgb(hex: string) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -131,22 +133,26 @@ export const SelectionTokens = ({ pageInfo, tokens }: SelectionTokenProps) => {
 };
 
 interface EditLabelModalProps {
+    visible: boolean;
     annotation: Annotation;
     onHide: () => void;
 }
 
-const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
+const EditLabelModal = ({ visible, annotation, onHide }: EditLabelModalProps) => {
     const annotationStore = useContext(AnnotationStore);
 
-    const [selectedLabel, setSelectedLabel] = useState(annotation.ontoClass);
+    const [selectedLabel, setSelectedLabel] = useState({ value: annotation.ontoClass.id, label: annotation.ontoClass.text });
+    const [currentOntoClass, setCurrentOntoClass] = useState();
 
     // There are onMouseDown listeners on the <canvas> that handle the
     // creation of new annotations. We use this function to prevent that
     // from being triggered when the user engages with other UI elements.
-    const onMouseDown = (e: MouseEvent) => {
-        e.stopPropagation();
+    const ontoClassFromId = (id: string) => {
+        return annotationStore.ontoClasses.find((ontoClass: OntoClass) => {
+            return ontoClass.id === id;
+        });
+        
     };
-
     useEffect(() => {
         const onKeyPress = (e: KeyboardEvent) => {
             // Ref to https://github.com/allenai/pawls/blob/0f3e5153241502eb68e46f582ed4b28112e2f765/ui/src/components/sidebar/Labels.tsx#L20
@@ -171,41 +177,39 @@ const EditLabelModal = ({ annotation, onHide }: EditLabelModalProps) => {
     }, [annotationStore, annotation]);
 
     return (
-        <Modal
-            title="Edit Label"
-            onCancel={onHide}
-            onOk={() => {
-                // Remove the annotation and add a copy with the updated label.
-                // TODO: This might have side-effects to the relation mechanism.
-                // Some additional testing is warranted.
+        <Modal show={visible} onHide={onHide}>
+        <Modal.Header closeButton>
+            <Modal.Title>Edit class</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <Select
+                options={annotationStore.ontoClasses.map((ontoClass: OntoClass) => ({
+                    value: ontoClass.id,
+                    label: ontoClass.text
+                }))}
+                value={selectedLabel}
+                onChange={(choice: any) => {
+                    const resultClass: OntoClass | undefined = ontoClassFromId(choice.value);
+                    setCurrentOntoClass(resultClass);
+                    setSelectedLabel({ value: resultClass.id, label: resultClass.text });
+                }}
+                style={{  width: '100%' }}
+                />
+        </Modal.Body>
+        <Modal.Footer>
+            <Button variant="secondary" onClick={() => {
+                onHide();
                 annotationStore.setPdfAnnotations(
                     annotationStore.pdfAnnotations.updateAnnotation(annotation, {
-                        ontoClass: selectedLabel,
+                        ontoClass: currentOntoClass,
                     })
                 );
                 onHide();
-            }}
-            cancelButtonProps={{ onMouseDown }}
-            okButtonProps={{ onMouseDown }}
-            visible>
-            <Select<string>
-                value={selectedLabel.text}
-                onMouseDown={onMouseDown}
-                onChange={(labelText) => {
-                    const label = annotationStore.ontoClasses.find((l) => l.text === labelText);
-                    if (!label) {
-                        return;
-                    }
-                    setSelectedLabel(label);
-                }}
-                style={{ display: 'block' }}>
-                {annotationStore.ontoClasses.map((l) => (
-                    <Select.Option value={l.text} key={l.text}>
-                        {l.text}
-                    </Select.Option>
-                ))}
-            </Select>
-        </Modal>
+            }}>
+                Close
+            </Button>
+        </Modal.Footer>
+    </Modal>
     );
 };
 
@@ -213,15 +217,19 @@ interface SelectionProps {
     pageInfo: PDFPageInfo;
     annotation: Annotation;
     showInfo?: boolean;
+    changeVisibilityModal: (value: boolean) => void;
 }
 
-export const Selection = ({ pageInfo, annotation, showInfo = true }: SelectionProps) => {
+export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibilityModal }: SelectionProps) => {
     const label = annotation.ontoClass;
     const theme = useContext(ThemeContext);
-
+    const annotationStore = useContext(AnnotationStore);
     const [isEditLabelModalVisible, setIsEditLabelModalVisible] = useState(false);
 
-    const annotationStore = useContext(AnnotationStore);
+    const onHide = () => {
+        setIsEditLabelModalVisible(false);
+        changeVisibilityModal(false);
+    };
 
     let color;
     if (!label) {
@@ -289,56 +297,60 @@ export const Selection = ({ pageInfo, annotation, showInfo = true }: SelectionPr
     const selected = annotationStore.selectedAnnotations.includes(annotation);
 
     return (
-        <div id={'onPDF_' + annotation.id}>
-            <SelectionBoundary
-                color={color}
-                bounds={bounds}
-                onClick={onShiftClick}
-                selected={selected}>
-                {showInfo && !annotationStore.hideLabels ? (
-                    <SelectionInfo border={border} color={color}>
-                        <span>{label.text}</span>
-                        <EditFilled
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsEditLabelModalVisible(true);
-                            }}
-                            onMouseDown={(e) => {
-                                e.stopPropagation();
-                            }}
-                        />
-                        <CloseCircleFilled
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                removeAnnotation();
-                            }}
-                            // We have to prevent the default behaviour for
-                            // the pdf canvas here, in order to be able to capture
-                            // the click event.
-                            onMouseDown={(e) => {
-                                e.stopPropagation();
-                            }}
-                        />
-                    </SelectionInfo>
+        annotation.show && (
+            <div id={'onPDF_' + annotation.id}>
+                <SelectionBoundary
+                    color={color}
+                    bounds={bounds}
+                    onClick={onShiftClick}
+                    selected={selected}>
+                    {showInfo && !annotationStore.hideLabels ? (
+                        <SelectionInfo border={border} color={color}>
+                            <span>{label.text}</span>
+                            <EditFilled
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsEditLabelModalVisible(true);
+                                    changeVisibilityModal(true);
+                                }}
+                                onMouseDown={(e) => {
+                                    e.stopPropagation();
+                                }}
+                            />
+                            <CloseCircleFilled
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeAnnotation();
+                                }}
+                                // We have to prevent the default behaviour for
+                                // the pdf canvas here, in order to be able to capture
+                                // the click event.
+                                onMouseDown={(e) => {
+                                    e.stopPropagation();
+                                }}
+                            />
+                        </SelectionInfo>
+                    ) : null}
+                </SelectionBoundary>
+                {
+                    // NOTE: It's important that the parent element of the tokens
+                    // is the PDF canvas, because we need their absolute position
+                    // to be relative to that and not another absolute/relatively
+                    // positioned element. This is why SelectionTokens are not inside
+                    // SelectionBoundary.
+                    annotation.tokens ? (
+                        <SelectionTokens pageInfo={pageInfo} tokens={annotation.tokens} />
+                    ) : null
+                }
+                {isEditLabelModalVisible ? (
+                    <EditLabelModal
+                        annotation={annotation}
+                        visible={isEditLabelModalVisible}
+                        onHide={onHide}
+                    />
                 ) : null}
-            </SelectionBoundary>
-            {
-                // NOTE: It's important that the parent element of the tokens
-                // is the PDF canvas, because we need their absolute position
-                // to be relative to that and not another absolute/relatively
-                // positioned element. This is why SelectionTokens are not inside
-                // SelectionBoundary.
-                annotation.tokens ? (
-                    <SelectionTokens pageInfo={pageInfo} tokens={annotation.tokens} />
-                ) : null
-            }
-            {isEditLabelModalVisible ? (
-                <EditLabelModal
-                    annotation={annotation}
-                    onHide={() => setIsEditLabelModalVisible(false)}
-                />
-            ) : null}
-        </div>
+            </div>
+        )
     );
 };
 

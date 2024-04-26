@@ -1,11 +1,32 @@
 import styled from 'styled-components';
 import { SidebarProps } from './Sidebar';
+import { AnnotationSidebarProps } from './AnnotationSidebar';
+
+export const StyledAnnotationSidebar = styled.div<AnnotationSidebarProps>(
+    ({ theme, width }) => `
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: ${width};
+    position: fixed;
+    left: 0;
+    overflow-y: auto;
+    background: white;
+    color: ${theme.color.N2};
+    padding: 0;
+    height: 100vh;
+    * {
+        color: black;
+    }
+    border-right: 1px solid black;
+`
+);
 
 export const StyledSidebar = styled.div<SidebarProps>(
     ({ theme, width }) => `
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing.md};
+    gap: ${theme.spacing.md} ;
     width: ${width};
     position: fixed;
     left: 0;
