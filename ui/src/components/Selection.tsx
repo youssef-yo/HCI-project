@@ -140,6 +140,7 @@ interface EditLabelModalProps {
 
 const EditLabelModal = ({ visible, annotation, onHide }: EditLabelModalProps) => {
     const annotationStore = useContext(AnnotationStore);
+
     const [selectedLabel, setSelectedLabel] = useState({ value: annotation.ontoClass.id, label: annotation.ontoClass.text });
     const [currentOntoClass, setCurrentOntoClass] = useState();
 
@@ -216,15 +217,19 @@ interface SelectionProps {
     pageInfo: PDFPageInfo;
     annotation: Annotation;
     showInfo?: boolean;
-    isModalVisible: boolean;
-    onHide: () => void;
-    showEditLabelModal: () => void;
+    changeVisibilityModal: (value: boolean) => void;
 }
 
-export const Selection = ({ pageInfo, annotation, showInfo = true, isModalVisible, onHide, showEditLabelModal }: SelectionProps) => {
+export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibilityModal }: SelectionProps) => {
     const label = annotation.ontoClass;
     const theme = useContext(ThemeContext);
     const annotationStore = useContext(AnnotationStore);
+    const [isEditLabelModalVisible, setIsEditLabelModalVisible] = useState(false);
+
+    const onHide = () => {
+        setIsEditLabelModalVisible(false);
+        changeVisibilityModal(false);
+    };
 
     let color;
     if (!label) {
@@ -305,7 +310,8 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, isModalVisibl
                             <EditFilled
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    showEditLabelModal();
+                                    setIsEditLabelModalVisible(true);
+                                    changeVisibilityModal(true);
                                 }}
                                 onMouseDown={(e) => {
                                     e.stopPropagation();
@@ -336,10 +342,10 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, isModalVisibl
                         <SelectionTokens pageInfo={pageInfo} tokens={annotation.tokens} />
                     ) : null
                 }
-                {isModalVisible ? (
+                {isEditLabelModalVisible ? (
                     <EditLabelModal
                         annotation={annotation}
-                        visible={isModalVisible}
+                        visible={isEditLabelModalVisible}
                         onHide={onHide}
                     />
                 ) : null}

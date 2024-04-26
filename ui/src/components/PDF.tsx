@@ -247,9 +247,7 @@ const Page = ({ pageInfo, onError }: PageProps) => {
                             pageInfo={pageInfo}
                             annotation={annotation}
                             key={annotation.toString()}
-                            isModalVisible={isEditLabelModalVisible}
-                            onHide={() => setIsEditLabelModalVisible(false)}
-                            showEditLabelModal={() => setIsEditLabelModalVisible(true)}
+                            changeVisibilityModal={(value) => setIsEditLabelModalVisible(value)}
                         />
                     ))
             }
