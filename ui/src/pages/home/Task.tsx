@@ -9,11 +9,13 @@ const TaskPage = () => {
     const { taskId } = useParams<{ taskId: string }>();
     const [task, setTask] = useState<Task>();
     const [doc, setDoc] = useState<Doc>();
+    const [taskCompleted, setTaskCompleted] = useState(task?.markedComplete || false);
 
-    const { getTaskByID } = useTaskApi();
+
+    const { getTaskByID, markTaskComplete } = useTaskApi();
     const { getDocumentByID } = useDocumentApi();
     const navigate = useNavigate();
-
+    
     const loadDocument = (docId: string) => {
         getDocumentByID(docId)
             .then((doc) => setDoc(doc))
@@ -30,10 +32,23 @@ const TaskPage = () => {
         getTaskByID(taskId)
             .then((task) => {
                 setTask(task);
+                setTaskCompleted(task.markedComplete);
                 loadDocument(task.docId);
             })
             .catch((err) => console.error(err));
+        
     }, [taskId]);
+
+    const handleCheckboxStatusChange = (id: string, completed: boolean) => {
+        try {
+            markTaskComplete(id, completed);
+            setTaskCompleted(completed);
+        } catch (error) {
+            console.log(error);
+        }
+        
+        
+    };
 
     return (
         <section>
@@ -60,9 +75,14 @@ const TaskPage = () => {
                 <p>
                     <b>Status:</b> {task?.status}
                 </p>
-                <p>
-                    <b>Marked as complete:</b> {task?.markedComplete ? 'True' : 'False'}
-                </p>
+                <label htmlFor="completed"><b>Mark as complete: {' '} </b></label>
+                <input
+                    id="completed"
+                    type="checkbox"
+                    checked={taskCompleted}
+                    onChange={() => handleCheckboxStatusChange(task?._id, !taskCompleted)}
+                    style={{ width: '20px', height: '20px' }}
+                />
             </div>
 
             <hr />
