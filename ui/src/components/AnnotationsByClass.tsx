@@ -100,8 +100,6 @@ export const AnnotationSummary = ({
             ? annotation.text
             : annotation.tokens.map((t) => pageInfo.tokens[t.tokenIndex].text).join(' ');
     
-    console.log(annotation);
-    
     return (
         <PaddedRow className={annotation.show ? '' : 'opaco'}>
             <ClickableText onClick={handleScrolling} title={text}>
