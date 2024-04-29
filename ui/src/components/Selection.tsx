@@ -225,11 +225,24 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
     const theme = useContext(ThemeContext);
     const annotationStore = useContext(AnnotationStore);
     const [isEditLabelModalVisible, setIsEditLabelModalVisible] = useState(false);
+    const [editedText, setEditedText] = useState('Freeform');
 
     const onHide = () => {
         setIsEditLabelModalVisible(false);
         changeVisibilityModal(false);
     };
+
+    const handleTextChange = (event) => {
+        setEditedText(event.target.value);
+    };
+
+    useEffect(() => {
+        annotationStore.setPdfAnnotations(
+            annotationStore.pdfAnnotations.updateAnnotation(annotation, {
+                text: editedText
+            })
+        );
+    }, [editedText]);
 
     let color;
     if (!label) {
@@ -337,9 +350,21 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                                     e.stopPropagation();
                                 }}
                             />
+                            {annotation.tokens === null && (
+                                <EditableLabel>
+                                    <input
+                                        type="text"
+                                        value={editedText}
+                                        onChange={handleTextChange}
+                                        onMouseDown={(e) => e.stopPropagation()}
+                                        onMouseUp={(e) => e.stopPropagation()}
+                                    />
+                                </EditableLabel>
+                            )}
                         </SelectionInfo>
                     ) : null}
                 </SelectionBoundary>
+                
                 {
                     // NOTE: It's important that the parent element of the tokens
                     // is the PDF canvas, because we need their absolute position
@@ -369,6 +394,30 @@ interface SelectionInfoProps {
     border: number;
     color: string;
 }
+
+const EditableLabel = styled.div`
+    display: flex;
+    align-items: center;
+
+    input {
+        border: 3px solid transparent;
+        outline: none;
+        font-size: 12px;
+        padding: 2px 5px;
+        margin-right: 5px;
+        transition: border-bottom-color 0.2s ease;
+        flex: 1;
+
+        &:focus {
+            border-color: #70ddba;
+        }
+    }
+
+    svg {
+        cursor: pointer;
+    }
+`;
+
 const SelectionInfo = styled.div<SelectionInfoProps>(
     ({ border, color }) => `
         position: absolute;

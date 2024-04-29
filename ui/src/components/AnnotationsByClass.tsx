@@ -97,8 +97,9 @@ export const AnnotationSummary = ({
 
     const text =
         annotation.tokens === null
-            ? 'Freeform'
+            ? annotation.text
             : annotation.tokens.map((t) => pageInfo.tokens[t.tokenIndex].text).join(' ');
+    
     return (
         <PaddedRow className={annotation.show ? '' : 'opaco'}>
             <ClickableText onClick={handleScrolling} title={text}>
