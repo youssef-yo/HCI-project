@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-// import { useLogout } from '../../hooks';
 import { StyledTopbar } from './Topbar.styled';
-// import IconButton from './IconButton';
 import '../../assets/styles/TopBar.scss';
-import { useDocumentApi, useTaskApi } from '../../api';
+import { useDocumentApi, useTaskApi, useUserApi } from '../../api';
 import AccountInfoPopover from '../dashboard/AccountInfoPopover';
 
 export type TopbarProps = {
@@ -13,31 +11,20 @@ export type TopbarProps = {
 };
 
 const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
-    // const { auth } = useAuth();
     const [accountInfoPopoverShow, setAccountInfoPopoverShow] = useState<boolean>(false);
-    // const logout = useLogout();
-    // const navigate = useNavigate();
 
     const [breadcrumb, setBreadcrumb] = useState<string[]>([]);
 
     const { getDocumentByID } = useDocumentApi();
     const { getTaskByID } = useTaskApi();
+    const { getUserByID } = useUserApi();
+
     const location = useLocation();
-    // const onLogout = async () => {
-    //     await logout();
-    //     navigate('/login');
-    // };
 
     const handleAccountInfoModalClose = () => {
         console.log('Closing account info modal');
         setAccountInfoPopoverShow(false);
     };
-
-    // useEffect(() => {
-    //     const pathname = location.pathname;
-    //     const pathSegments = pathname.split('/').filter(segment => segment !== '');
-    //     setBreadcrumb(pathSegments);
-    // }, [location.pathname]);
 
     const formatSegment = async (pathSegments: string[]) => {
         const formattedSegments = [];
@@ -54,6 +41,11 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
                     } else if (type === 'tasks') {
                         response = await getTaskByID(segment);
                         formattedSegments.push(response.description || 'Untitled Task');
+                        continue;
+                    } else if (type === 'users') {
+                        response = await getUserByID(segment);
+                        console.log(response);
+                        formattedSegments.push(response.fullName || 'Untitled User');
                         continue;
                     }
                 } catch (error) {
