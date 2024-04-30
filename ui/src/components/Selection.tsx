@@ -225,7 +225,7 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
     const theme = useContext(ThemeContext);
     const annotationStore = useContext(AnnotationStore);
     const [isEditLabelModalVisible, setIsEditLabelModalVisible] = useState(false);
-    const [editedText, setEditedText] = useState('Freeform');
+    const [editedText, setEditedText] = useState(annotation.text ?? 'Freeform');
 
     const onHide = () => {
         setIsEditLabelModalVisible(false);
