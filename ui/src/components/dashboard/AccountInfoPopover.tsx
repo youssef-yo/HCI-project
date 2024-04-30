@@ -7,12 +7,14 @@ type AccountInfoPopoverProps = {
     show: boolean;
     onHide: () => void;
     setAccountInfoModal: (boolean) => void;
+    iconColor: string;
 };
 
 const AccountInfoPopover: React.FC<AccountInfoPopoverProps> = ({
     show,
     onHide,
     setAccountInfoPopoverShow,
+    iconColor,
 }) => {
     const logout = useLogout();
     const navigate = useNavigate();
@@ -73,7 +75,7 @@ const AccountInfoPopover: React.FC<AccountInfoPopoverProps> = ({
                 <MdAccountCircle
                     onClick={() => setAccountInfoPopoverShow(!show)}
                     style={{
-                        color: 'black',
+                        color: iconColor,
                         fontSize: '25px',
                         cursor: 'pointer',
                     }}

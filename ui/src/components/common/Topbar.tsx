@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { MdLogout } from 'react-icons/md';
-import { Link, useNavigate } from 'react-router-dom';
-import { useLogout } from '../../hooks';
+import { Link } from 'react-router-dom';
+// import { useLogout } from '../../hooks';
 import { StyledTopbar } from './Topbar.styled';
-import IconButton from './IconButton';
+// import IconButton from './IconButton';
 import '../../assets/styles/TopBar.scss';
 import { useDocumentApi, useTaskApi } from '../../api';
+import AccountInfoPopover from '../dashboard/AccountInfoPopover';
 
 export type TopbarProps = {
     height: string;
@@ -14,16 +14,22 @@ export type TopbarProps = {
 
 const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
     // const { auth } = useAuth();
-    const logout = useLogout();
-    const navigate = useNavigate();
+    const [accountInfoPopoverShow, setAccountInfoPopoverShow] = useState<boolean>(false);
+    // const logout = useLogout();
+    // const navigate = useNavigate();
 
     const [breadcrumb, setBreadcrumb] = useState<string[]>([]);
 
     const { getDocumentByID } = useDocumentApi();
     const { getTaskByID } = useTaskApi();
-    const onLogout = async () => {
-        await logout();
-        navigate('/login');
+    // const onLogout = async () => {
+    //     await logout();
+    //     navigate('/login');
+    // };
+
+    const handleAccountInfoModalClose = () => {
+        console.log('Closing account info modal');
+        setAccountInfoPopoverShow(false);
     };
 
     // useEffect(() => {
@@ -93,9 +99,12 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}>
-                <IconButton title="Logout" onClick={onLogout}>
-                    <MdLogout />
-                </IconButton>
+                <AccountInfoPopover
+                    show={accountInfoPopoverShow}
+                    onHide={handleAccountInfoModalClose}
+                    setAccountInfoPopoverShow={setAccountInfoPopoverShow}
+                    iconColor="white"
+                />
             </div>
         </StyledTopbar>
     );

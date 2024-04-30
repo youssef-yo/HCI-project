@@ -134,6 +134,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
                         show={accountInfoPopoverShow}
                         onHide={handleAccountInfoModalClose}
                         setAccountInfoPopoverShow={setAccountInfoPopoverShow}
+                        iconColor="black"
                     />
                 </div>
             </StyledAnnotationTopbar>
