@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 // import { useLogout } from '../../hooks';
 import { StyledTopbar } from './Topbar.styled';
 // import IconButton from './IconButton';
@@ -22,6 +22,7 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
 
     const { getDocumentByID } = useDocumentApi();
     const { getTaskByID } = useTaskApi();
+    const location = useLocation();
     // const onLogout = async () => {
     //     await logout();
     //     navigate('/login');
@@ -90,7 +91,6 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
                     </React.Fragment>
                 ))}
             </div>
-
 
             <div
                 style={{
