@@ -1,4 +1,4 @@
-import { MdOpenInNew } from 'react-icons/md';
+import { MdOpenInNew, MdInfoOutline } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { Header, IconButton, Table } from '../../components/common';
 import { TaskExtended, useTaskApi } from '../../api';
@@ -60,6 +60,11 @@ const TasksPage = () => {
                                     <IconButton
                                         title="View Task"
                                         onClick={() => navigate(`${task._id}`)}>
+                                        <MdInfoOutline />
+                                    </IconButton>
+                                    <IconButton
+                                        title="Go to document annotations"
+                                        onClick={() => navigate(`/pdf-task/${task?._id}`)}>
                                         <MdOpenInNew />
                                     </IconButton>
                                 </td>
