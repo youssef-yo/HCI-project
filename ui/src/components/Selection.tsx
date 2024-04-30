@@ -359,6 +359,7 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                                         onMouseDown={(e) => e.stopPropagation()}
                                         onMouseUp={(e) => e.stopPropagation()}
                                     />
+                                    {editedText.trim() === "" && <div style={{ color: "red", marginTop: "5px" }}>Label cannot be empty</div>}
                                 </EditableLabel>
                             )}
                         </SelectionInfo>
