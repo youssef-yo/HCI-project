@@ -34,6 +34,7 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
                 const type  = pathSegments[i-1];
                 try {
                     let response = null;
+                    console.log(type);
                     if (type === 'docs'){
                         response = await getDocumentByID(segment);
                         formattedSegments.push(response.name || 'Untitled Document');
@@ -43,8 +44,7 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
                         formattedSegments.push(response.description || 'Untitled Task');
                         continue;
                     } else if (type === 'users') {
-                        response = await getUserByID(segment);
-                        console.log(response);
+                        response = await getUserByID(segment); 
                         formattedSegments.push(response.fullName || 'Untitled User');
                         continue;
                     }
@@ -61,7 +61,6 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
     useEffect(() => {
         const updateBreadcrumb = async () => {
             const pathname = location.pathname;
-            console.log(pathname);
             const pathSegments = pathname.split('/').filter(segment => segment !== '');
             const formattedSegments = await formatSegment(pathSegments);
             setBreadcrumb(formattedSegments);
