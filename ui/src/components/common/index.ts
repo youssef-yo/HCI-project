@@ -3,6 +3,7 @@ export { default as Card } from './Card';
 export { default as Header } from './Header';
 export { default as IconButton } from './IconButton';
 export { default as Input, InputType } from './Input';
+export { default as InputError } from './InputError';
 export { default as Select, MultiSelect } from './Select';
 export type { Option } from './Select';
 export { default as Sidebar, WithSidebar } from './Sidebar';

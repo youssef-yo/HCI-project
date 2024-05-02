@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components';
 import { InputBoxProps, InputProps } from './Input';
+import { InputPropsError } from './InputError';
 
 const INPUT_COLOR = {
     primary: css`
@@ -22,6 +23,24 @@ export const StyledInput = styled.input<InputProps>(
     padding: 25px 10px 7.5px;
     font-weight: 500;
     font-size: 1em;
+
+    ${(props) => props.color && INPUT_COLOR[props.color]}
+`);
+
+export const StyledInputError = styled.input<InputPropsError>(
+    ({ width }) =>`
+    position: relative;
+    width: ${width};
+    border: 1px solid red;
+    border-radius: 8px;
+    outline: none;
+    padding: 25px 10px 7.5px;
+    font-weight: 500;
+    font-size: 1em;
+
+    ::placeholder {
+        color: red;
+    }
 
     ${(props) => props.color && INPUT_COLOR[props.color]}
 `);
