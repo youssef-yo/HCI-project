@@ -98,6 +98,28 @@ const TaskCreatePage = () => {
         return userOptions;
     };
 
+    const updateUserInput = (user: string) => {
+        if (user) {
+            errorMsg.user = null;
+            setUserOption(user);
+        }
+    }
+
+    const updateDescriptionInput = (description: string) => {
+        errorMsg.description = null;
+        setDescription(description);
+    }
+
+    const updateStartPageInput = (startPage: string) => {
+        errorMsg.startPage = null;
+        setStartPage(startPage);
+    }
+
+    const updateEndPageInput = (endPage: string) => {
+        errorMsg.endPage = null;
+        setEndPage(endPage);
+    }
+
     const onCreateTask = async (e: FormEvent) => {
         e.preventDefault();
 
@@ -153,12 +175,11 @@ const TaskCreatePage = () => {
     };
 
     const selectDoc = (docOption: any) => {
+        errorMsg.document = null;
         setDocOption(docOption);
         const tasksAssociatedWithDoc = tasks.filter(task =>
             task.document._id === docOption.id && task.status === TaskStatus.ACTIVE);
-        console.log("Task associated with doc: ", tasksAssociatedWithDoc);
-        console.log("DocOption ID: ", docOption.id);
-        console.log("Tasks: ", tasks);
+        
         setSelectedDocTasks(tasksAssociatedWithDoc);
     };
 
@@ -213,7 +234,7 @@ const TaskCreatePage = () => {
                                 placeholder="Select User"
                                 options={userOptions}
                                 value={userOption}
-                                onChange={(user) => setUserOption(user)}
+                                onChange={(user) => updateUserInput(user)}
                                 isSearchable
                             />
                             <span style={{color: "red"}}>{errorMsg.user}</span>
@@ -230,7 +251,7 @@ const TaskCreatePage = () => {
                             placeholder="Select User"
                             options={userOptions}
                             value={userOption}
-                            onChange={(user) => setUserOption(user)}
+                            onChange={(user) => updateUserInput(user)}
                             isSearchable
                         />
                     }
@@ -294,7 +315,7 @@ const TaskCreatePage = () => {
                                 variant={InputType.STANDARD}
                                 id="description"
                                 placeholder="Task Description"
-                                onChange={(e) => setDescription(e.target.value)}
+                                onChange={(e) => updateDescriptionInput(e.target.value)}
                                 value={description}
                                 width="100%"
                                 required
@@ -307,7 +328,7 @@ const TaskCreatePage = () => {
                             variant={InputType.STANDARD}
                             id="description"
                             placeholder="Task Description"
-                            onChange={(e) => setDescription(e.target.value)}
+                            onChange={(e) => updateDescriptionInput(e.target.value)}
                             value={description}
                             width="100%"
                             required
@@ -326,7 +347,7 @@ const TaskCreatePage = () => {
                                     variant={InputType.STANDARD}
                                     id="startPage"
                                     placeholder="Start Page"
-                                    onChange={(e) => setStartPage(Number(e.target.value))}
+                                    onChange={(e) => updateStartPageInput(Number(e.target.value))}
                                     value={startPage}
                                     width="100%"
                                     required
@@ -341,7 +362,7 @@ const TaskCreatePage = () => {
                             variant={InputType.STANDARD}
                             id="startPage"
                             placeholder="Start Page"
-                            onChange={(e) => setStartPage(Number(e.target.value))}
+                            onChange={(e) => updateStartPageInput(Number(e.target.value))}
                             value={startPage}
                             width="100%"
                             required
@@ -356,7 +377,7 @@ const TaskCreatePage = () => {
                                     variant={InputType.STANDARD}
                                     id="endPage"
                                     placeholder={`Final Page - max=${docOption.totalPages}`}
-                                    onChange={(e) => setEndPage(Number(e.target.value))}
+                                    onChange={(e) => updateEndPageInput(Number(e.target.value))}
                                     value={endPage}
                                     width="100%"
                                     required
@@ -371,7 +392,7 @@ const TaskCreatePage = () => {
                             variant={InputType.STANDARD}
                             id="endPage"
                             placeholder={`Final Page - max=${docOption.totalPages}`}
-                            onChange={(e) => setEndPage(Number(e.target.value))}
+                            onChange={(e) => updateEndPageInput(Number(e.target.value))}
                             value={endPage}
                             width="100%"
                             required

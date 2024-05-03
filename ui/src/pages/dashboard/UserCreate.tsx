@@ -47,6 +47,45 @@ const UserCreatePage = () => {
         return roleOptions;
     };
 
+    const updateUsernameInput = (username: string) => {
+        errorMsg.user = null;
+        setFullName(username);
+    }
+
+    const updateEmailInput = (email: string) => {
+        const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        if (email.trim().length > 0 && isValidEmail) {
+            errorMsg.email = null;
+            setEmail(email);
+        }
+        if (email.trim().length === 0) {
+            errorMsg.email = "An email must be specified!";
+        } else if (!isValidEmail) {
+            errorMsg.email = "Use a valid email!";
+        } 
+        setEmail(email);
+    }
+
+    const updatePasswordInput = (password: string) => {
+        if (password.length < 4 || password.length > 12) {
+            errorMsg.password = "Password must be between 4 and 12 characters.";
+        } else {
+            errorMsg.password = null;
+        }        
+        setPassword(password);
+    }
+
+    const updatePasswordConfirmInput = (password: string) => {
+        if (password.length < 4 || password.length > 12) {
+            errorMsg.password = "Password must be between 4 and 12 characters.";
+            // setErrorMsg('Password must be between 4 and 12 characters.');
+            // return;
+        } else { 
+            errorMsg.password = null;
+        }       
+        setConfirmPassword(password);
+    }
+
     const onCreateUser = async (e: FormEvent) => {
         e.preventDefault();
 
@@ -150,7 +189,7 @@ const UserCreatePage = () => {
                                 id="fullName"
                                 placeholder="Full Name"
                                 width="100%"
-                                onChange={(e) => setFullName(e.target.value)}
+                                onChange={(e) => updateUsernameInput(e.target.value)}
                                 value={fullName}
                                 required
                             />
@@ -178,7 +217,7 @@ const UserCreatePage = () => {
                                 id="email"
                                 placeholder="Email"
                                 width="100%"
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={(e) => updateEmailInput(e.target.value)}
                                 value={email}
                                 required
                             />
@@ -211,7 +250,7 @@ const UserCreatePage = () => {
                                 id="password"
                                 placeholder="Password"
                                 width="100%"
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(e) => updatePasswordInput(e.target.value)}
                                 value={password}
                                 required
                             />
@@ -248,7 +287,7 @@ const UserCreatePage = () => {
                                 id="confirmPassword"
                                 placeholder="Confirm Password"
                                 width="100%"
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                onChange={(e) => updatePasswordConfirmInput(e.target.value)}
                                 value={confirmPassword}
                                 required
                             />
