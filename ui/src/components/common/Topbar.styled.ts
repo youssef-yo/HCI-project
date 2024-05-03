@@ -78,8 +78,8 @@ export const StyledTopbar = styled.div<TopbarProps>(
         display: flex;
         justify-content: space-between;
         height: ${height};
-        background: #4577B7; 
-        color: #eee;
+        background: lightblue; 
+        color: black;
         padding: ${theme.spacing.md};
         z-index: 1000;
         border-bottom: 1px solid black;

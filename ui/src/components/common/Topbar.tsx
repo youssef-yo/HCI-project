@@ -78,7 +78,7 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
                 {breadcrumb.map((crumb, index) => (
                     <React.Fragment key={index}>
                         <Link to={`/${breadcrumb.slice(0, index + 1).join('/')}`} className="breadcrumb-link">{crumb}</Link>
-                        {index < breadcrumb.length - 1 && <span className="breadcrumb-separator"> / </span>}
+                        {index < breadcrumb.length - 1 && <span className="breadcrumb-separator"> {'>'} </span>}
                     </React.Fragment>
                 ))}
             </div>
@@ -94,7 +94,7 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
                     show={accountInfoPopoverShow}
                     onHide={handleAccountInfoModalClose}
                     setAccountInfoPopoverShow={setAccountInfoPopoverShow}
-                    iconColor="white"
+                    iconColor="black"
                 />
             </div>
         </StyledTopbar>
