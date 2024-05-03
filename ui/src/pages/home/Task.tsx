@@ -1,8 +1,9 @@
-import { MdOpenInNew } from 'react-icons/md';
+import { MdOpenInNew, MdLockOpen, MdLockOutline } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Header } from '../../components/common';
-import { Doc, Task, useDocumentApi, useTaskApi } from '../../api';
+import { Doc, Task, TaskStatus, useDocumentApi, useTaskApi } from '../../api';
+import { notification } from '@allenai/varnish';
 import styled from 'styled-components';
 
 const TaskPage = () => {
@@ -43,6 +44,17 @@ const TaskPage = () => {
         try {
             markTaskComplete(id, completed);
             setTaskCompleted(completed);
+            if (completed) {
+                notification.success({
+                    message: 'Task marked as completed!',
+                    placement: 'bottomRight',
+                });
+            } else {
+                notification.success({
+                    message: 'Task now is open!',
+                    placement: 'bottomRight',
+                });
+            }
         } catch (error) {
             console.log(error);
         }
@@ -55,11 +67,34 @@ const TaskPage = () => {
             <Header>
                 <h1>Task Information</h1>
                 <ButtonContainer>
+                {task && task.status === TaskStatus.ACTIVE ? (
+                    taskCompleted ? (
+                        <Button
+                            color="edit"
+                            icon={<MdLockOpen />}
+                            onClick={() =>  handleCheckboxStatusChange(task?._id, !taskCompleted)}>
+                            Re-open task
+                        </Button>
+                    ) : (
+                        <Button
+                            color="commit"
+                            icon={<MdLockOutline />}
+                            onClick={() =>  handleCheckboxStatusChange(task?._id, !taskCompleted)}>
+                            Complete task
+                        </Button>
+                    )
+                ) : null}
+                    
                     <Button
                         color="secondary"
                         icon={<MdOpenInNew />}
                         onClick={() => navigate(`/pdf-task/${task?._id}`)}>
-                        Go to document annotations
+                        {task && task.status === TaskStatus.ACTIVE ? 
+                            <>Annotate</>
+                        :
+                            <>Go to document annotations</>
+                        }
+                        
                     </Button>
                 </ButtonContainer>
             </Header>
@@ -75,14 +110,6 @@ const TaskPage = () => {
                 <p>
                     <b>Status:</b> {task?.status}
                 </p>
-                <label htmlFor="completed"><b>Mark as complete: {' '} </b></label>
-                <input
-                    id="completed"
-                    type="checkbox"
-                    checked={taskCompleted}
-                    onChange={() => handleCheckboxStatusChange(task?._id, !taskCompleted)}
-                    style={{ width: '20px', height: '20px' }}
-                />
             </div>
 
             <hr />

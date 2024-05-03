@@ -42,6 +42,7 @@ const TasksPage = () => {
                         <th>Created At</th>
                         <th style={{ textAlign: 'center' }}>Pages</th>
                         <th style={{ textAlign: 'center' }}>Status</th>
+                        <th style={{ textAlign: 'center' }}>Completed</th>
                         <th style={{ textAlign: 'center' }}>Actions</th>
                     </tr>
                 </thead>
@@ -60,6 +61,7 @@ const TasksPage = () => {
                                 {task.pageRange.start} - {task.pageRange.end}
                             </td>
                             <td style={{ textAlign: 'center' }}>{task.status}</td>
+                            <td style={{ textAlign: 'center' }}>{task.markedComplete ? <>Yes</> : <>No</>}</td>
                             <td
                                 style={{
                                     display: 'flex',
