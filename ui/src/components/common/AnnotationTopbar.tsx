@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { MdOutlineHouse, MdOutlineSave } from 'react-icons/md';
 import { StyledAnnotationTopbar } from './Topbar.styled';
 import AccountInfoPopover from '../../components/dashboard/AccountInfoPopover';
-import { notification } from '@allenai/varnish';
+// import { notification } from '@allenai/varnish';
 import ChoiceClass from './ChoiceClass';
 import FreeFormToggle from './FreeFormToggle';
 import RelationModeToggle from './RelationModeToggle';
@@ -11,6 +11,8 @@ import { AnnotationStore, RelationGroup } from '../../context';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks';
 import { ROLES } from '../../config/roles';
+import Toast from 'react-bootstrap/Toast';
+import ToastContainer from 'react-bootstrap/ToastContainer';
 
 export type AnnotationTopbarProps = {
     onCreate: (group: RelationGroup) => void;
@@ -26,6 +28,11 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
     const [relationModeActive, setRelationModeActive] = useState<boolean>(false);
     const navigate = useNavigate();
     const { auth } = useAuth();
+
+    const topbarHeight = '55px';
+    const relationModeTopbarHeight = '125px';
+
+    const savingMessage = 'Task Correctly Saved!';
 
     const handleToggleRelationMode = () => {
         setRelationModeActive(!relationModeActive);
@@ -51,14 +58,6 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
         setAccountInfoPopoverShow(false);
     };
 
-    useEffect(() => {
-        if (showSaveNotification === true) {
-            notification.success({
-                message: 'Saved',
-            });
-        }
-        setSaveShowNotification(false);
-    });
     return (
         <>
             <StyledAnnotationTopbar height={height} leftOffset={leftOffset}>
@@ -137,6 +136,29 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
                         iconColor="black"
                     />
                 </div>
+                <ToastContainer
+                    className="p-3"
+                    style={{
+                        position: 'fixed',
+                        top: relationModeActive ? relationModeTopbarHeight : topbarHeight,
+                        left: '50%',
+                        zIndex: 9999,
+                    }}
+                >
+                    <Toast
+                        show={showSaveNotification}
+                        onClose={() => setSaveShowNotification(false)}
+                        delay={2000}
+                        autohide
+                        className="bg-success"
+                        style={{ width: `${savingMessage.length * 12}px` }}
+                    >
+                        {/* <Toast.Header>
+                            <strong className="mr-auto">Notifica</strong>
+                        </Toast.Header> */}
+                        <Toast.Body className="text-white" style={{ textAlign: 'center' }}>{savingMessage}</Toast.Body>
+                    </Toast>
+                </ToastContainer>
             </StyledAnnotationTopbar>
 
             {relationModeActive && (

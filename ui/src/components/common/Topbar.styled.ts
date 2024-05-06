@@ -17,9 +17,9 @@ export const StyledRelationModeTopbar = styled.div<TopbarProps>(
         border-bottom: 1px solid black;
 
         & div > button {
-            &:hover {
-                background: rgba(255, 255, 255, 0.1);
-            }
+            // &:hover {
+            //     background: rgba(255, 255, 255, 0.1);
+            // }
     
             svg {
                 fill: #ddd;
@@ -78,8 +78,8 @@ export const StyledTopbar = styled.div<TopbarProps>(
         display: flex;
         justify-content: space-between;
         height: ${height};
-        background: #0077B6; 
-        color: #eee;
+        background: #9bcedd; 
+        color: black;
         padding: ${theme.spacing.md};
         z-index: 1000;
         border-bottom: 1px solid black;

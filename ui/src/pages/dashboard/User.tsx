@@ -118,7 +118,7 @@ const UserPage = () => {
                 </Button>
             </Header>
 
-            <Table color="#0077B6">
+            <Table color="#A3C4BC">
                 <thead>
                     <tr>
                         <th>Document</th>

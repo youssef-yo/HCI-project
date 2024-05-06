@@ -1,4 +1,4 @@
-import { MdDeleteOutline, MdOpenInNew, MdOutlineEdit, MdOutlinePersonAddAlt } from 'react-icons/md';
+import { MdDeleteOutline, MdInfoOutline, MdOutlineEdit, MdOutlinePersonAddAlt } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { User, getApiError, useUserApi } from '../../api';
 import { Button, Header, IconButton, Table } from '../../components/common';
@@ -79,7 +79,7 @@ const UsersPage = () => {
                     Create User
                 </Button>
             </Header>
-            <Table color="#0077B6">
+            <Table color="#A3C4BC">
                 <thead>
                     <tr>
                         <th>Email</th>
@@ -109,7 +109,7 @@ const UsersPage = () => {
                                 <IconButton
                                     title="View User"
                                     onClick={() => navigate(`${user._id}`)}>
-                                    <MdOpenInNew />
+                                    <MdInfoOutline />
                                 </IconButton>
                                 <IconButton title="Edit User" onClick={() => onEditUser(user._id)} disabled={user.role==='Administrator' && auth?.id!==user._id}>
                                     <MdOutlineEdit className={user.role === 'Administrator' && auth?.id !== user._id ? 'icon-disabled' : ''} />

@@ -419,7 +419,7 @@ const TaskCreatePage = () => {
                     </Header>
                     <TableWrapper>
                         
-                        <Table color="#0077B6">
+                        <Table color="#A3C4BC">
                             <thead>
                                 <tr>
                                     <th>Task description</th>

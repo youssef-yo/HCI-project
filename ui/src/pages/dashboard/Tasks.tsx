@@ -1,4 +1,4 @@
-import { MdAddTask, MdOpenInNew } from 'react-icons/md';
+import { MdAddTask, MdInfoOutline } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { TaskExtended, useTaskApi } from '../../api';
@@ -33,7 +33,7 @@ const TasksPage = () => {
                 </Button>
             </Header>
 
-            <Table color="#0077B6">
+            <Table color="#A3C4BC">
                 <thead>
                     <tr>
                         <th>Document</th>
@@ -73,7 +73,7 @@ const TasksPage = () => {
                                 <IconButton
                                     title="View Task"
                                     onClick={() => navigate(`${task._id}`)}>
-                                    <MdOpenInNew />
+                                    <MdInfoOutline />
                                 </IconButton>
                             </td>
                         </tr>

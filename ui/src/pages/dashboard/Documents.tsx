@@ -1,4 +1,4 @@
-import { MdDeleteOutline, MdOpenInNew, MdOutlineNoteAdd, MdInfoOutline, MdCircle } from 'react-icons/md';
+import { MdDeleteOutline, MdOutlineNoteAdd, MdInfoOutline, MdCircle } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { Button, Header, IconButton, Table } from '../../components/common';
 import { Doc, useDocumentApi, getApiError } from '../../api';
@@ -109,7 +109,7 @@ const DocumentsPage = () => {
                 </Button>
             </Header>
 
-            <Table color="#0077B6">
+            <Table color="#A3C4BC">
                 <thead>
                     <tr>
                         <th>
@@ -173,7 +173,7 @@ const DocumentsPage = () => {
                                     title="View Document"
                                     onClick={() => navigate(`${doc._id}`)}
                                     disabled={!doc.analyzed}>
-                                    <MdOpenInNew />
+                                    <MdInfoOutline />
                                 </IconButton>
                                 <IconButton title="Delete Doc" onClick={() => onDeleteDoc(doc)} disabled={!doc.analyzed}>
                                     <MdDeleteOutline/>

@@ -1,12 +1,18 @@
 import React, { useContext, useState, useEffect } from 'react';
 import styled, { ThemeContext } from 'styled-components';
-import { notification } from '@allenai/varnish';
+// import { notification } from '@allenai/varnish';
 import { Modal, Button } from 'react-bootstrap';
 import Select from 'react-select';
 
 import { Bounds, TokenId, PDFPageInfo, Annotation, AnnotationStore } from '../context';
 import { CloseCircleFilled, EditFilled } from '@ant-design/icons';
+import { MdWarningAmber, MdCheckCircleOutline, MdInfoOutline } from "react-icons/md";
 import { OntoClass } from '../api';
+
+import Toast from 'react-bootstrap/Toast';
+import ToastContainer from 'react-bootstrap/ToastContainer';
+
+import '../assets/styles/Toast.scss';
 /*
 function hexToRgb(hex: string) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -227,6 +233,14 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
     const [isEditLabelModalVisible, setIsEditLabelModalVisible] = useState(false);
     const [editedText, setEditedText] = useState(annotation.text ?? 'Freeform');
 
+    const [showDeselectedNotification, setShowDeselectedNotification] = useState<boolean>(false);
+    const [showSelectedNotification, setShowSelectedNotification] = useState<boolean>(false);
+    const [showDisactivatedNotification, setShowDisactivatedNotification] = useState<boolean>(false);
+
+    const unselectedMessage = 'Annotation unselected';
+    const selectedMessage = 'Annotation selected';
+    const disactivatedMessage = 'Relation Mode is not activated';
+
     const onHide = () => {
         setIsEditLabelModalVisible(false);
         changeVisibilityModal(false);
@@ -284,11 +298,12 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                 }
                 const next = current.filter((other) => other.id !== annotation.id);
                 annotationStore.setSelectedAnnotations(next);
-                notification.warning({
-                    message: 'Annotation unselected',
-                    description: annotation.text,
-                    placement: 'bottomRight',
-                });
+                setShowDeselectedNotification(true);
+                // notification.warning({
+                //     message: 'Annotation unselected',
+                //     description: annotation.text,
+                //     placement: 'bottomRight',
+                // });
                 // Otherwise we add it.
             } else {
                 current.push(annotation);
@@ -298,20 +313,21 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                     annotationStore.setDst(annotation);
                 }
                 annotationStore.setSelectedAnnotations(current);
-                console.log('Aggiunta annotazione ', current);
-                notification.info({
-                    message: 'Annotation selected',
-                    description: annotation.text,
-                    placement: 'bottomRight',
-                });
+                setShowSelectedNotification(true);
+                // notification.info({
+                //     message: 'Annotation selected',
+                //     description: annotation.text,
+                //     placement: 'bottomRight',
+                // });
             }
         } else {
-            notification.warning({
-                message: 'Relation Mode is not activated',
-                description:
-                    'If you want to select an annotation for a relation you need first to ' +
-                    'enable the Relation Mode.',
-            });
+            setShowDisactivatedNotification(true);
+            // notification.warning({
+            //     message: 'Relation Mode is not activated',
+            //     description:
+            //         'If you want to select an annotation for a relation you need first to ' +
+            //         'enable the Relation Mode.',
+            // });
         }
     };
 
@@ -319,71 +335,140 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
 
     return (
         annotation.show && (
-            <div id={'onPDF_' + annotation.id}>
-                <SelectionBoundary
-                    color={color}
-                    bounds={bounds}
-                    onClick={onShiftClick}
-                    selected={selected}>
-                    {showInfo && !annotationStore.hideLabels ? (
-                        <SelectionInfo border={border} color={color}>
-                            <span>{label.text}</span>
-                            <EditFilled
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setIsEditLabelModalVisible(true);
-                                    changeVisibilityModal(true);
-                                }}
-                                onMouseDown={(e) => {
-                                    e.stopPropagation();
-                                }}
-                            />
-                            <CloseCircleFilled
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeAnnotation();
-                                }}
-                                // We have to prevent the default behaviour for
-                                // the pdf canvas here, in order to be able to capture
-                                // the click event.
-                                onMouseDown={(e) => {
-                                    e.stopPropagation();
-                                }}
-                            />
-                            {annotation.tokens === null && (
-                                <EditableLabel>
-                                    <input
-                                        type="text"
-                                        value={editedText}
-                                        onChange={handleTextChange}
-                                        onMouseDown={(e) => e.stopPropagation()}
-                                        onMouseUp={(e) => e.stopPropagation()}
-                                    />
-                                    {editedText.trim() === "" && <div style={{ color: "red", marginTop: "5px" }}>Label cannot be empty</div>}
-                                </EditableLabel>
-                            )}
-                        </SelectionInfo>
+            <>
+                <div id={'onPDF_' + annotation.id}>
+                    <SelectionBoundary
+                        color={color}
+                        bounds={bounds}
+                        onClick={onShiftClick}
+                        selected={selected}>
+                        {showInfo && !annotationStore.hideLabels ? (
+                            <SelectionInfo border={border} color={color}>
+                                <span>{label.text}</span>
+                                <EditFilled
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsEditLabelModalVisible(true);
+                                        changeVisibilityModal(true);
+                                    }}
+                                    onMouseDown={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                />
+                                <CloseCircleFilled
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        removeAnnotation();
+                                    }}
+                                    // We have to prevent the default behaviour for
+                                    // the pdf canvas here, in order to be able to capture
+                                    // the click event.
+                                    onMouseDown={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                />
+                                {annotation.tokens === null && (
+                                    <EditableLabel>
+                                        <input
+                                            type="text"
+                                            value={editedText}
+                                            onChange={handleTextChange}
+                                            onMouseDown={(e) => e.stopPropagation()}
+                                            onMouseUp={(e) => e.stopPropagation()}
+                                        />
+                                        {editedText.trim() === "" && <div style={{ color: "red", marginTop: "5px" }}>Label cannot be empty</div>}
+                                    </EditableLabel>
+                                )}
+                            </SelectionInfo>
+                        ) : null}
+                    </SelectionBoundary>
+                    
+                    {
+                        // NOTE: It's important that the parent element of the tokens
+                        // is the PDF canvas, because we need their absolute position
+                        // to be relative to that and not another absolute/relatively
+                        // positioned element. This is why SelectionTokens are not inside
+                        // SelectionBoundary.
+                        annotation.tokens ? (
+                            <SelectionTokens pageInfo={pageInfo} tokens={annotation.tokens} />
+                        ) : null
+                    }
+                    {isEditLabelModalVisible ? (
+                        <EditLabelModal
+                            annotation={annotation}
+                            visible={isEditLabelModalVisible}
+                            onHide={onHide}
+                        />
                     ) : null}
-                </SelectionBoundary>
-                
-                {
-                    // NOTE: It's important that the parent element of the tokens
-                    // is the PDF canvas, because we need their absolute position
-                    // to be relative to that and not another absolute/relatively
-                    // positioned element. This is why SelectionTokens are not inside
-                    // SelectionBoundary.
-                    annotation.tokens ? (
-                        <SelectionTokens pageInfo={pageInfo} tokens={annotation.tokens} />
-                    ) : null
-                }
-                {isEditLabelModalVisible ? (
-                    <EditLabelModal
-                        annotation={annotation}
-                        visible={isEditLabelModalVisible}
-                        onHide={onHide}
-                    />
-                ) : null}
-            </div>
+                </div>
+                <ToastContainer
+                    className="p-3"
+                    style={{
+                        position: 'fixed',
+                        top: '125px',
+                        left: '50%',
+                        zIndex: 9999,
+                    }}
+                >
+                    <Toast
+                        show={showDeselectedNotification}
+                        onClose={() => setShowDeselectedNotification(false)}
+                        delay={2000}
+                        autohide
+                        className="warning-toast"
+                        style={{ width: `${unselectedMessage.length * 12}px` }}
+                    >
+                        <Toast.Body style={{ textAlign: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                                <MdWarningAmber/>
+                                {unselectedMessage}
+                            </div>
+                        </Toast.Body>
+                    </Toast>
+                    <Toast
+                        show={showSelectedNotification}
+                        onClose={() => setShowSelectedNotification(false)}
+                        delay={2000}
+                        autohide
+                        className="success-toast"
+                        style={{ width: `${selectedMessage.length * 12}px` }}
+                    >
+                        <Toast.Body style={{ textAlign: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                                <MdCheckCircleOutline/>
+                                {selectedMessage}
+                            </div>
+                        </Toast.Body>
+                    </Toast>
+                </ToastContainer>
+                <ToastContainer
+                    className="p-3"
+                    style={{
+                        position: 'fixed',
+                        top: '55px',
+                        left: '50%',
+                        zIndex: 9999,
+                    }}
+                >
+                    <Toast
+                        show={showDisactivatedNotification}
+                        onClose={() => setShowDisactivatedNotification(false)}
+                        delay={2000}
+                        autohide
+                        className='info-toast'
+                        style={{
+                            width: `${disactivatedMessage.length * 12}px`,
+                        }}
+                    >
+                        <Toast.Body style={{ textAlign: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                            <MdInfoOutline />
+                            {disactivatedMessage}
+                        </div>
+                        </Toast.Body>
+                    </Toast>
+                </ToastContainer>
+            </>
         )
     );
 };

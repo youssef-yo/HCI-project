@@ -122,7 +122,7 @@ const DocumentPage = () => {
                 </Button>
             </Header>
 
-            <Table color="#0077B6">
+            <Table color="#A3C4BC">
                 <thead>
                     <tr>
                         <th>Annotator</th>
@@ -171,7 +171,7 @@ const DocumentPage = () => {
                 <h3>Document Commits</h3>
             </Header>
 
-            <Table color="#0077B6">
+            <Table color="#A3C4BC">
                 <thead>
                     <tr>
                         <th>ID</th>

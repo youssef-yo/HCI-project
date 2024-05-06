@@ -26,7 +26,7 @@ const TasksPage = () => {
                 <h1>Assigned Tasks</h1>
             </Header>
 
-            <Table color="#0077B6">
+            <Table color="#A3C4BC">
                 <thead>
                     <tr>
                         <th>Document</th>
