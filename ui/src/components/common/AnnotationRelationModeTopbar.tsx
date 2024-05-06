@@ -10,7 +10,6 @@ import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 import '../../assets/styles/Toast.scss';
 
-
 export type AnnotationTopbarProps = {
     onCreate: (group: RelationGroup) => void;
     height: string;

@@ -36,13 +36,13 @@ const NavLinks = styled.div`
 
         &.active > span,
         &:hover > span {
-            color: #FF6B35;
+            color: #A5C2E7;
         }
 
         &.active > svg,
         &:hover > svg {
-            fill: #FF6B35;
-            stroke: #FF6B35;
+            fill: #A5C2E7;
+            stroke: #A5C2E7;
         }
     }
 `;
