@@ -25,6 +25,7 @@ const UserCreatePage = () => {
         user: null,
         password: null,
         confirmPassword: null, 
+        roleOption: null, 
     });
     
     const errorRef = useRef<HTMLParagraphElement>(null);
@@ -112,6 +113,7 @@ const UserCreatePage = () => {
                 message: 'A role must be selected.',
                 placement: 'bottomRight',
             })    
+            errors.roleOption = "Select a user role!";
             // setErrorMsg('A user role must be selected!');
             // return;
         }
