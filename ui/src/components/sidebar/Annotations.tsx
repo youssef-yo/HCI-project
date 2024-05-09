@@ -19,7 +19,7 @@ interface AnnotationsProps {
 
 const Annotations = ({ annotations }: AnnotationsProps) => {
     const tooltipText = (
-       " Se cliccato ctrl, spariscono le label delle annotazioni"
+       "Press CTRL to show/hide annotation labels for small annotations."
     );
     // const { markTaskComplete } = useTaskApi();
 
