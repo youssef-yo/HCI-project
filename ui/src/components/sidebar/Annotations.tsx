@@ -8,6 +8,9 @@ import { Annotation } from '../../context';
 import { AnnotationsByClass } from '../AnnotationsByClass';
 import { Task } from '../../api';
 
+import { CiCircleQuestion } from "react-icons/ci";
+import CustomTooltip from '../common/CustomTooltip';
+
 interface AnnotationsProps {
     taskId: string;
     activeTask: Task;
@@ -15,6 +18,9 @@ interface AnnotationsProps {
 }
 
 const Annotations = ({ annotations }: AnnotationsProps) => {
+    const tooltipText = (
+       " Se cliccato ctrl, spariscono le label delle annotazioni"
+    );
     // const { markTaskComplete } = useTaskApi();
 
     // const onFinishToggle = (isFinished: boolean) => {
@@ -28,8 +34,17 @@ const Annotations = ({ annotations }: AnnotationsProps) => {
     // };
 
     return (
-        <>
-            <SidebarItemTitle>Annotations</SidebarItemTitle>
+        <>  
+            <div style={{ display: "flex", alignItems: "center" }}>
+                <SidebarItemTitle>
+                Annotations
+                <CustomTooltip placement="right" tooltipText={tooltipText}>
+                    <div style={{ marginLeft: "10px", cursor: "pointer" }}>
+                        <CiCircleQuestion size={20} />
+                    </div>
+                </CustomTooltip>
+                </SidebarItemTitle>
+            </div>
             <SidebarItem>
                 {/* <ExplainerText>
                     <InfoCircleOutlined style={{ marginRight: '3px' }} />
