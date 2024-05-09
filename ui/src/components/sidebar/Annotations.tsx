@@ -19,7 +19,10 @@ interface AnnotationsProps {
 
 const Annotations = ({ annotations }: AnnotationsProps) => {
     const tooltipText = (
-       "Press CTRL to show/hide annotation labels for small annotations."
+        <>
+            <b>Useful tip:</b>
+            <p>Press CTRL to show/hide annotation labels.</p>
+        </>
     );
     // const { markTaskComplete } = useTaskApi();
 
