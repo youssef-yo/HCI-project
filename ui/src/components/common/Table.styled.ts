@@ -30,7 +30,7 @@ const StyledTable = styled.table<TableProps>(
         font-weight: 600;
         text-transform: uppercase;
         background-color: ${color};
-        color: black;
+        color: white;
     }
 
     & tbody td {
