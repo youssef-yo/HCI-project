@@ -33,7 +33,7 @@ const TasksPage = () => {
                 </Button>
             </Header>
 
-            <Table color="#A3C4BC">
+            <Table color="#0047AB">
                 <thead>
                     <tr>
                         <th>Document</th>

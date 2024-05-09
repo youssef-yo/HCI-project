@@ -109,14 +109,14 @@ const DocumentsPage = () => {
                 </Button>
             </Header>
 
-            <Table color="#A3C4BC">
+            <Table color="#0047AB">
                 <thead>
                     <tr>
                         <th>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 Status 
                                 <MdInfoOutline
-                                        style={{ marginLeft: '4px', color: 'black' }}
+                                        style={{ marginLeft: '4px', color: 'white' }}
                                         onMouseEnter={() => setShowExplanation(true)}
                                         onMouseLeave={() => setShowExplanation(false)}
                                     />
