@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { MdOutlineHouse, MdOutlineSave, MdOutlineQuestionMark  } from 'react-icons/md';
+import { MdOutlineHouse, MdOutlineSave  } from 'react-icons/md';
+import { IoMdInformationCircleOutline } from "react-icons/io";
 import { StyledAnnotationTopbar } from './Topbar.styled';
 import AccountInfoPopover from '../../components/dashboard/AccountInfoPopover';
 // import { notification } from '@allenai/varnish';
@@ -157,7 +158,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
                     }}>
                     <CustomTooltip placement="bottom" tooltipText={tooltipText}>
                         <div>
-                            <MdOutlineQuestionMark 
+                            <IoMdInformationCircleOutline 
                             style={{ color: 'black', fontSize: '25px', cursor: 'pointer'}}/>
                         </div>
                     </CustomTooltip>
