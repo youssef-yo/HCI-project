@@ -74,13 +74,15 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
             {/* <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 Welcome, {auth?.username}
             </div> */}
-            <div className="breadcrumb-container">
-                {breadcrumb.map((crumb, index) => (
-                    <React.Fragment key={index}>
-                        <Link to={`/${breadcrumb.slice(0, index + 1).join('/')}`} className="breadcrumb-link">{crumb}</Link>
-                        {index < breadcrumb.length - 1 && <span className="breadcrumb-separator"> {'>'} </span>}
-                    </React.Fragment>
-                ))}
+           <div className="breadcrumb-container">
+            {breadcrumb.map((crumb, index) => (
+                <React.Fragment key={index}>
+                <Link to={`/${breadcrumb.slice(0, index + 1).join('/')}`} className={`breadcrumb-link${index === breadcrumb.length - 1 ? ' current' : ''}`}>
+                    {crumb}
+                </Link>
+                {index < breadcrumb.length - 1 && <span className="breadcrumb-separator">&nbsp;&gt;&nbsp;</span>}
+                </React.Fragment>
+            ))}
             </div>
 
             <div

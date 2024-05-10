@@ -109,7 +109,7 @@ const DocumentsPage = () => {
                 </Button>
             </Header>
 
-            <Table color="#0047AB">
+            <Table color="#C0C0C0">
                 <thead>
                     <tr>
                         <th>

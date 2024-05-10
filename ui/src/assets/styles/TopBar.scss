@@ -1,17 +1,34 @@
-    .breadcrumb-container .breadcrumb-link {
-        color: white;
-        text-decoration: none;
-    }
-
-    .breadcrumb-container .breadcrumb-separator {
-        color: white;
-    }
-
-    .breadcrumb-container .breadcrumb-link:hover {
-        color: white;
-    }
-
-    .breadcrumb-container {
-        display: flex;
-        align-items: center;
-    }
+.breadcrumb-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .breadcrumb-container .breadcrumb-link {
+    color: white;
+    text-decoration: none;
+    position: relative;
+  }
+  
+  .breadcrumb-container .breadcrumb-link.current::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px; /* Sposta la sottolineatura in basso di 2px */
+    width: 100%;
+    border-bottom: 1px solid white; /* Spessore della sottolineatura */
+  }
+  
+  .breadcrumb-container .breadcrumb-link:hover::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px; /* Sposta la sottolineatura in basso di 2px */
+    width: 100%;
+    border-bottom: 1px solid white; /* Spessore della sottolineatura */
+  }
+  
+  .breadcrumb-container .breadcrumb-separator {
+    color: white;
+    margin: 0 5px;
+  }
+  
