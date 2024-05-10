@@ -17,14 +17,9 @@
     width: 100%;
     border-bottom: 1px solid white; /* Spessore della sottolineatura */
   }
-  
-  .breadcrumb-container .breadcrumb-link:hover::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -2px; /* Sposta la sottolineatura in basso di 2px */
-    width: 100%;
-    border-bottom: 1px solid white; /* Spessore della sottolineatura */
+
+  .breadcrumb-container .breadcrumb-link:hover {
+    text-decoration: none;
   }
   
   .breadcrumb-container .breadcrumb-separator {

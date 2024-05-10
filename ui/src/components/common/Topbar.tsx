@@ -62,7 +62,7 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
         const updateBreadcrumb = async () => {
             const pathname = location.pathname;
             const pathSegments = pathname.split('/').filter(segment => segment !== '');
-            const formattedSegments = await formatSegment(pathSegments.map(segment => segment === 'dash' ? 'home' : segment));
+            const formattedSegments = await formatSegment(pathSegments);
             setBreadcrumb(formattedSegments);
         };
 
@@ -78,7 +78,7 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
             {breadcrumb.map((crumb, index) => (
                 <React.Fragment key={index}>
                 <Link to={`/${breadcrumb.slice(0, index + 1).join('/')}`} className={`breadcrumb-link${index === breadcrumb.length - 1 ? ' current' : ''}`}>
-                    {crumb}
+                    {crumb === "dash" ? "home" : crumb}
                 </Link>
                 {index < breadcrumb.length - 1 && <span className="breadcrumb-separator">&nbsp;&gt;&nbsp;</span>}
                 </React.Fragment>
