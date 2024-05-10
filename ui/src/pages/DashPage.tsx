@@ -44,7 +44,7 @@ const DashPage = () => {
                         {/* <p className="navGroup__title">Dashboard</p> */}
                         <NavLink className="navGroup__link" to={''} end>
                             <MdOutlineHome style={iconStyle}/>
-                            <span>Dashboard</span>
+                            <span>Home</span>
                         </NavLink>
                     </div>
                     <ColoredLine color="white" />

@@ -62,7 +62,7 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
         const updateBreadcrumb = async () => {
             const pathname = location.pathname;
             const pathSegments = pathname.split('/').filter(segment => segment !== '');
-            const formattedSegments = await formatSegment(pathSegments);
+            const formattedSegments = await formatSegment(pathSegments.map(segment => segment === 'dash' ? 'home' : segment));
             setBreadcrumb(formattedSegments);
         };
 
