@@ -94,7 +94,7 @@ const Topbar: React.FC<TopbarProps> = ({ height, leftOffset }) => {
                     show={accountInfoPopoverShow}
                     onHide={handleAccountInfoModalClose}
                     setAccountInfoPopoverShow={setAccountInfoPopoverShow}
-                    iconColor="black"
+                    iconColor="white"
                 />
             </div>
         </StyledTopbar>
