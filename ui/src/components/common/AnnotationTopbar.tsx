@@ -1,5 +1,6 @@
-import React, { useState, useContext } from 'react';
-import { MdOutlineHouse, MdOutlineSave } from 'react-icons/md';
+import React, { useState, useContext, useEffect } from 'react';
+import { MdOutlineHouse, MdOutlineSave  } from 'react-icons/md';
+import { IoMdInformationCircleOutline } from "react-icons/io";
 import { StyledAnnotationTopbar } from './Topbar.styled';
 import AccountInfoPopover from '../../components/dashboard/AccountInfoPopover';
 // import { notification } from '@allenai/varnish';
@@ -13,6 +14,8 @@ import { useAuth } from '../../hooks';
 import { ROLES } from '../../config/roles';
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
+import { Task, useTaskApi } from '../../api';
+import CustomTooltip from './CustomTooltip';
 
 export type AnnotationTopbarProps = {
     onCreate: (group: RelationGroup) => void;
@@ -29,10 +32,35 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
     const navigate = useNavigate();
     const { auth } = useAuth();
 
+    const [task, setTask] = useState<Task>();
+    const { getTaskByID } = useTaskApi();
+
+    useEffect(() => {
+        if (!taskId) {
+            // TODO
+            console.error('No task has been selected!');
+            return;
+        }
+
+        getTaskByID(taskId)
+            .then((task) => {
+                setTask(task);
+            })
+            .catch((err) => console.error(err));
+    }, [taskId]);
+
     const topbarHeight = '55px';
     const relationModeTopbarHeight = '125px';
 
     const savingMessage = 'Task Correctly Saved!';
+
+    const tooltipText = (
+        <>
+            <b>Task description:</b>
+            <br />
+            {task?.description}
+        </>
+     );
 
     const handleToggleRelationMode = () => {
         setRelationModeActive(!relationModeActive);
@@ -119,6 +147,21 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
                         onClick={() => setSaveShowNotification(true)}
                         style={{ color: 'black', fontSize: '25px' , cursor: 'pointer'}}
                     />
+                </div>
+                <Divider />
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                    <CustomTooltip placement="bottom" tooltipText={tooltipText}>
+                        <div>
+                            <IoMdInformationCircleOutline 
+                            style={{ color: 'black', fontSize: '25px', cursor: 'pointer'}}/>
+                        </div>
+                    </CustomTooltip>
                 </div>
                 <Divider />
                 <div

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Tag } from '@allenai/varnish';
 import { RelationInfo } from './sidebar/RelationInfo';
 import { AnnotationStore, RelationGroup } from '../context';
-import { MdArrowDropDown, MdArrowRight } from 'react-icons/md';
+import { MdArrowDropDown, MdArrowRight, MdOutlineClose } from 'react-icons/md';
 import { IoEyeOutline, IoEyeOffOutline, IoInformationCircleOutline } from "react-icons/io5";
 import { useDialog } from '../hooks';
 
@@ -78,6 +78,10 @@ const RelationSummary = ({
         setShowModal(true);
     };
 
+    const handleDeleteRelation = () => {
+        setPdfAnnotations(pdfAnnotations.deleteRelation(relation));  
+    };
+
     const deleteRelation = async () => {
         handleClose();
         const confirm = await dialog.showConfirmation(
@@ -124,14 +128,15 @@ const RelationSummary = ({
                         <ToggleIcon style={{ marginLeft: '15px' }} onClick={() => setShowRel(!showRel)}>
                             {showRel ? <MdArrowDropDown /> : <MdArrowRight />}
                         </ToggleIcon>
-                        <SmallerTag color={'white'}>
+                        <SmallerTag color={'white'} fullText={`${property} - ${index}`}>
                             {property} - {index}
                         </SmallerTag>
-                        <IoInformationCircleOutline
-                            style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto', marginTop: '3px' }}
-                            onClick={() => handleShowModal()}
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <MdOutlineClose style={{ marginRight: '5px' }} onClick={() => handleDeleteRelation()} />
+                            <IoInformationCircleOutline onClick={() => handleShowModal()} />
+                        </div>
                     </div>
+
                     {showRel && (
                         <>
                             <PaddedRow className={infoR.sourceAnnotation.show ? '' : 'opaco'}>
@@ -205,7 +210,28 @@ const SmallerTag = styled(Tag)`
     font-size: 0.95rem;
     padding: 2px 2px;
     color: black;
+    position: relative;
+    cursor: pointer;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover::after {
+        content: "${props => props.fullText}";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px;
+        border-radius: 5px;
+        white-space: nowrap;
+        z-index: 1;
+    }
 `;
+
 
 const Overflow = styled.span`
     line-height: 1;

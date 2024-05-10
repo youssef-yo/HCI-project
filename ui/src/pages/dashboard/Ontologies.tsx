@@ -77,7 +77,7 @@ const OntologiesPage = () => {
                 </Button>
             </Header>
 
-            <Table color="#A3C4BC">
+            <Table color="#C0C0C0">
                 <thead>
                     <tr>
                         <th>Name</th>
