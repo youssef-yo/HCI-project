@@ -23,7 +23,7 @@ const Annotations = ({ annotations }: AnnotationsProps) => {
             <b>How to make an annotation:</b>
             <ul>
                 <li>select the annotation class from the label dropdown</li>
-                <li>click on any world in the pdf</li>
+                <li>click on any word in the pdf</li>
             </ul>
             <b>Useful tip:</b>
             <p>Press CTRL to show/hide annotation labels.</p>
