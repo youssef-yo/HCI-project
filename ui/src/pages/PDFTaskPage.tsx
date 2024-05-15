@@ -4,10 +4,11 @@ import * as pdfjs from 'pdfjs-dist';
 import { PDFDocumentProxy, PDFDocumentLoadingTask } from 'pdfjs-dist/types/display/api';
 import styled, { ThemeContext } from 'styled-components';
 import { useContext, useCallback, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import AnnotationSidebar from '../components/common/AnnotationSidebar';
 import NavLinks from '../components/sidebar/NavLinks';
 import LogoWrapper from '../components/sidebar/LogoWrapper';
+import { ROLES } from '../config/roles';
 
 import { PDF, CenterOnPage, RelationModal } from '../components';
 import { WithSidebar, Sidebar, WithTopbar } from '../components/common';
@@ -89,6 +90,7 @@ const PDFTaskPage = () => {
     const [dst, setDst] = useState<Annotation>();
 
     const { auth } = useAuth();
+    const navigate = useNavigate();
 
     const { getTokens } = useDocumentApi();
     const { getClasses, getProperties, getOntologiesList } = useOntologyApi();
@@ -127,6 +129,14 @@ const PDFTaskPage = () => {
     const onRelationModalCancel = () => {
         setRelationModalVisible(false);
         setSelectedAnnotations([]);
+    };
+
+    const handleClick = () => {
+        if (auth.role === ROLES.Admin) {
+            navigate(`/dash`);
+        } else if (auth.role === ROLES.Annotator) {
+            navigate(`/home`);
+        }
     };
 
     useEffect(() => {
@@ -379,7 +389,9 @@ const PDFTaskPage = () => {
                                 <AnnotationSidebar width={sidebarWidth}>
                                     <LogoWrapper>
                                         <NavLinks>
-                                            <p className="navGroup__title">ONTO-PAWLS</p>
+                                        <p className="navGroup__title" onClick={handleClick} style={{ cursor:'pointer' }}>
+                                            ONTO-PAWLS
+                                        </p>
                                         </NavLinks>
                                     </LogoWrapper>
                                     {activeTask && (

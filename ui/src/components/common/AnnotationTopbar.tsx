@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { MdOutlineHouse, MdOutlineSave  } from 'react-icons/md';
+import { MdOutlineSave, MdOutlineKeyboardReturn  } from 'react-icons/md';
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { StyledAnnotationTopbar } from './Topbar.styled';
 import AccountInfoPopover from '../../components/dashboard/AccountInfoPopover';
@@ -97,7 +97,7 @@ const AnnotationTopbar: React.FC<AnnotationTopbarProps> = ({ onCreate, height, l
                         justifyContent: 'center',
                         alignItems: 'center',
                     }}>
-                    <MdOutlineHouse
+                    <MdOutlineKeyboardReturn
                         onClick={() => {
                             if (auth.role === ROLES.Admin) {
                                 navigate(`/dash/tasks/${taskId}`)
