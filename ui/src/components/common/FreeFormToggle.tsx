@@ -14,13 +14,14 @@ const FreeFormToggle: React.FC = () => {
     return (
         <Container>
             <ToggleLabel>
-                <ToggleText>Free Form</ToggleText>
+                <ToggleText disabled={annotationStore.relationMode}>Free Form</ToggleText>
                 <ToggleSwitch
                     size="small"
                     onChange={onToggle}
                     checked={annotationStore.freeFormAnnotations}
                     checkedIcon={<CheckOutlined />}
                     uncheckedIcon={<CloseOutlined />}
+                    disabled={annotationStore.relationMode}
                 />
             </ToggleLabel>
         </Container>
@@ -51,7 +52,8 @@ const ToggleLabel = styled.label`
 `;
 
 const ToggleText = styled.p`
-    color: #333; /* Colore del testo */
+    color: ${(props) => (props.disabled ? '#999' : '#333')}; /* Colore del testo */
     margin: 0;
     margin-right: 8px; /* Spazio tra il testo e il pulsante */
+    opacity: ${(props) => (props.disabled ? 0.5 : 1)}; /* Opacità del testo quando è disabilitato */
 `;

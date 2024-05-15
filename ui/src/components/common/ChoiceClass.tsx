@@ -8,8 +8,8 @@ const ChoiceClass: React.FC = () => {
 
     return (
         <Container>
-            <LabelWrapper>
-                <p style={{ color: 'black', margin: 0 }}>Label</p>
+            <LabelWrapper disabled={annotationStore.relationMode}>
+                Label
             </LabelWrapper>
             <DropdownOntoClasses annotationStore={annotationStore}></DropdownOntoClasses>
         </Container>
@@ -28,4 +28,6 @@ const LabelWrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    opacity: ${(props) => (props.disabled ? 0.5 : 1)};
+    color: ${(props) => (props.disabled ? '#999' : '#333')};
 `;

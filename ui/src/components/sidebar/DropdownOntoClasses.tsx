@@ -36,6 +36,12 @@ const App = ({ annotationStore }: { annotationStore: any }) => {
                 zIndex: 300,
             };
         },
+        singleValue: (styles: any) => {
+            return {
+                ...styles,
+                color: annotationStore.relationMode ? 'rgba(153, 153, 153, 0.5)' : '#333', // Colore dinamico in base a relationMode
+            };
+        },
     };
     const ontoClassFromId = (id: string) => {
         return annotationStore.ontoClasses.find((ontoClass: OntoClass) => {
@@ -54,6 +60,7 @@ const App = ({ annotationStore }: { annotationStore: any }) => {
                 console.log('Class found from id ', choice.value, ' is: ', resultClass);
                 annotationStore.setActiveOntoClass(resultClass);
             }}
+            isDisabled={annotationStore.relationMode}
         />
     );
 };
