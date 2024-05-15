@@ -213,20 +213,40 @@ const Page = ({ pageInfo, onError }: PageProps) => {
             onMouseUp={
                 selection
                     ? () => {
-                        if (annotationStore.activeOntoClass) {
-                            const newAnnotation = getNewAnnotation(
-                                // TODO(Mark): Change
-                                pageInfo,
-                                selection,
-                                annotationStore.activeOntoClass,
-                                annotationStore.freeFormAnnotations
-                            );
-                            if (newAnnotation) {
-                                annotationStore.setPdfAnnotations(
-                                    annotationStore.pdfAnnotations.withNewAnnotation(
-                                        newAnnotation
-                                    )
+                        const widthPx = Math.abs(selection.right - selection.left);
+                        const heightPx = Math.abs(selection.bottom - selection.top);
+        
+                        if (annotationStore.freeFormAnnotations) {
+                            // Check drag distance only in Freeform mode
+                            if (widthPx >= 5 && heightPx >= 5) {
+                                if (annotationStore.activeOntoClass) {
+                                    const newAnnotation = getNewAnnotation(
+                                        pageInfo,
+                                        selection,
+                                        annotationStore.activeOntoClass,
+                                        annotationStore.freeFormAnnotations
+                                    );
+                                    if (newAnnotation) {
+                                        annotationStore.setPdfAnnotations(
+                                            annotationStore.pdfAnnotations.withNewAnnotation(newAnnotation)
+                                        );
+                                    }
+                                }
+                            }
+                        } else {
+                            // If not in Freeform mode, create the annotation regardless of the drag distance
+                            if (annotationStore.activeOntoClass) {
+                                const newAnnotation = getNewAnnotation(
+                                    pageInfo,
+                                    selection,
+                                    annotationStore.activeOntoClass,
+                                    annotationStore.freeFormAnnotations
                                 );
+                                if (newAnnotation) {
+                                    annotationStore.setPdfAnnotations(
+                                        annotationStore.pdfAnnotations.withNewAnnotation(newAnnotation)
+                                    );
+                                }
                             }
                         }
                         setSelection(undefined);

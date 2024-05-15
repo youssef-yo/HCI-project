@@ -350,7 +350,8 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                         {showInfo && !annotationStore.hideLabels ? (
                             <SelectionInfo border={border} color={color} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <span>{label.text}</span>
-                                <div style={{ display: 'flex' }}>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <div>
                                     <MdOutlineEdit
                                         style={{ fontSize: '15px', cursor: 'pointer' }}
                                         onClick={(e) => {
@@ -362,32 +363,33 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                                             e.stopPropagation();
                                         }}
                                     />
+                                </div>
+                                <div>
                                     <MdOutlineClose
                                         style={{ fontSize: '15px', cursor: 'pointer' }}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             removeAnnotation();
                                         }}
-                                        // We have to prevent the default behaviour for
-                                        // the pdf canvas here, in order to be able to capture
-                                        // the click event.
                                         onMouseDown={(e) => {
                                             e.stopPropagation();
                                         }}
                                     />
-                                    {annotation.tokens === null && (
-                                        <EditableLabel>
-                                            <input
-                                                type="text"
-                                                value={editedText}
-                                                onChange={handleTextChange}
-                                                onMouseDown={(e) => e.stopPropagation()}
-                                                onMouseUp={(e) => e.stopPropagation()}
-                                            />
-                                            {editedText.trim() === "" && <div style={{ color: "red", marginTop: "5px" }}>Label cannot be empty</div>}
-                                        </EditableLabel>
-                                    )}
                                 </div>
+                                {annotation.tokens === null && (
+                                    <EditableLabel>
+                                        <input
+                                            type="text"
+                                            value={editedText}
+                                            onChange={handleTextChange}
+                                            onMouseDown={(e) => e.stopPropagation()}
+                                            onMouseUp={(e) => e.stopPropagation()}
+                                        />
+                                        {editedText.trim() === "" && <div style={{ color: "red", marginTop: "5px" }}>Label cannot be empty</div>}
+                                    </EditableLabel>
+                                )}
+                            </div>
+
                             </SelectionInfo>
                         ) : null}
                     </SelectionBoundary>
