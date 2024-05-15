@@ -5,8 +5,7 @@ import { Modal, Button } from 'react-bootstrap';
 import Select from 'react-select';
 
 import { Bounds, TokenId, PDFPageInfo, Annotation, AnnotationStore } from '../context';
-import { CloseCircleFilled, EditFilled } from '@ant-design/icons';
-import { MdWarningAmber, MdCheckCircleOutline, MdInfoOutline } from "react-icons/md";
+import { MdWarningAmber, MdCheckCircleOutline, MdInfoOutline, MdOutlineClose, MdOutlineEdit} from "react-icons/md";
 import { OntoClass } from '../api';
 
 import Toast from 'react-bootstrap/Toast';
@@ -345,7 +344,8 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                         {showInfo && !annotationStore.hideLabels ? (
                             <SelectionInfo border={border} color={color}>
                                 <span>{label.text}</span>
-                                <EditFilled
+                                <MdOutlineEdit
+                                    style={{ fontSize: '15px' }}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setIsEditLabelModalVisible(true);
@@ -355,7 +355,9 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                                         e.stopPropagation();
                                     }}
                                 />
-                                <CloseCircleFilled
+                                <MdOutlineClose
+                                    style={{ fontSize: '15px' }}
+
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         removeAnnotation();
