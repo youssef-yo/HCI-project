@@ -59,6 +59,7 @@ export const SelectionBoundary = ({
     const rotateX = height < 0 ? -180 : 0;
     // const rgbColor = hexToRgb(color);
     const border = getBorderWidthFromBounds(bounds);
+    const annotationStore = useContext(AnnotationStore);
 
     return (
         <span
@@ -67,13 +68,13 @@ export const SelectionBoundary = ({
                 // behaviour of drawing a new bounding box if the shift key
                 // is pressed in order to allow users to select multiple
                 // annotations and associate them together with a relation.
-                if (e.shiftKey && onClick) {
+                if (annotationStore.relationMode && onClick) {
                     e.stopPropagation();
                     onClick();
                 }
             }}
             onMouseDown={(e) => {
-                if (e.shiftKey && onClick) {
+                if (annotationStore.relationMode && onClick) {
                     e.stopPropagation();
                 }
             }}

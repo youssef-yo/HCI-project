@@ -5,7 +5,7 @@ import { AnnotationStore, RelationGroup } from '../../context';
 // import { notification } from '@allenai/varnish';
 import { DropdownOntoProperties } from '../sidebar';
 import { OntoProperty } from '../api';
-import { MdCancel, MdWarningAmber, MdCheckCircleOutline } from 'react-icons/md';
+import { MdWarningAmber, MdCheckCircleOutline, MdOutlineClose } from 'react-icons/md';
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 import '../../assets/styles/Toast.scss';
@@ -150,12 +150,16 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                         style={{
                             display: 'flex',
                             alignItems: 'center',
-                            border: '1px solid lightgray',
+                            border: `1px solid ${!annotationStore.src ? 'lightblue' : 'lightgray'}`,
+                            borderWidth: !annotationStore.src ? '3px' : '1px', // Larghezza del bordo maggiore quando src è vuoto e dst è vuoto o src è pieno
+                            boxShadow: !annotationStore.src ? '0 0 5px 2px rgba(0, 0, 255, 0.5)' : 'none', // Effetto luminoso quando src è vuoto e dst è vuoto o src è pieno
+                            transition: 'border-color 0.3s ease, border-width 0.3s ease, box-shadow 0.3s ease', // Aggiunto per una transizione fluida del colore, della larghezza del bordo e dell'effetto luminoso
                             marginRight: '20px',
                             padding: '5px',
                             color: annotationStore.src ? 'black' : 'lightgray',
                             width: '225px',
-                        }}>
+                        }}
+                        >
                         {annotationStore.src ? (
                             <>
                                 <span
@@ -170,7 +174,7 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                                 >
                                     {annotationStore.src.text}
                                 </span>
-                                <MdCancel
+                                <MdOutlineClose
                                     style={{
                                         marginLeft: 'auto',
                                         cursor: 'pointer',
@@ -179,7 +183,7 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                                 />
                             </>
                         ) : (
-                            'shift+click to select'
+                            'click annotation to select'
                         )}
                     </div>
                     <label style={{ marginRight: '20px', color: 'black' }}>Destination:</label>
@@ -187,7 +191,10 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                         style={{
                             display: 'flex',
                             alignItems: 'center',
-                            border: '1px solid lightgray',
+                            border: `1px solid ${annotationStore.src && !annotationStore.dst ? 'lightblue' : 'lightgray'}`,
+                            borderWidth: annotationStore.src && !annotationStore.dst ? '3px' : '1px', // Larghezza del bordo maggiore quando src è pieno e dst è vuoto
+                            boxShadow: annotationStore.src && !annotationStore.dst ? '0 0 5px 2px rgba(0, 0, 255, 0.5)' : 'none', // Effetto luminoso quando src è pieno e dst è vuoto
+                            transition: 'border-color 0.3s ease, border-width 0.3s ease, box-shadow 0.3s ease', // Aggiunto per una transizione fluida del colore, della larghezza del bordo e dell'effetto luminoso
                             marginRight: '20px',
                             padding: '5px',
                             color: annotationStore.dst ? 'black' : 'lightgray',
@@ -207,7 +214,7 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                                 >
                                     {annotationStore.dst.text}
                                 </span>
-                                <MdCancel
+                                <MdOutlineClose
                                     style={{
                                         marginLeft: 'auto',
                                         cursor: 'pointer',
@@ -216,7 +223,7 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                                 />
                             </>
                         ) : (
-                            'shift+click to select'
+                            'click annotation to select'
                         )}
                     </div>
                     <Button variant="success" onClick={handleCreationRelation}>

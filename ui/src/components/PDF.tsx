@@ -161,7 +161,7 @@ const Page = ({ pageInfo, onError }: PageProps) => {
             ref={containerRef}
             id={pageInfo.page.pageNumber.toString()}
             onMouseDown={(event) => {
-                if (isEditLabelModalVisible) return;
+                if (isEditLabelModalVisible || annotationStore.relationMode) return;
 
                 if (containerRef.current === null) {
                     throw new Error('No Container');
