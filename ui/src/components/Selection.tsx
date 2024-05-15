@@ -202,7 +202,7 @@ const EditLabelModal = ({ visible, annotation, onHide }: EditLabelModalProps) =>
                 />
         </Modal.Body>
         <Modal.Footer>
-            <Button variant="secondary" onClick={() => {
+            <Button variant="success" onClick={() => {
                 onHide();
                 annotationStore.setPdfAnnotations(
                     annotationStore.pdfAnnotations.updateAnnotation(annotation, {
@@ -211,7 +211,13 @@ const EditLabelModal = ({ visible, annotation, onHide }: EditLabelModalProps) =>
                 );
                 onHide();
             }}>
-                Close
+                Confirm
+            </Button>
+
+            <Button variant="secondary" onClick={() => {
+                onHide();
+            }}>
+                Cancel
             </Button>
         </Modal.Footer>
     </Modal>
@@ -342,45 +348,46 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                         onClick={onShiftClick}
                         selected={selected}>
                         {showInfo && !annotationStore.hideLabels ? (
-                            <SelectionInfo border={border} color={color}>
+                            <SelectionInfo border={border} color={color} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <span>{label.text}</span>
-                                <MdOutlineEdit
-                                    style={{ fontSize: '15px' }}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setIsEditLabelModalVisible(true);
-                                        changeVisibilityModal(true);
-                                    }}
-                                    onMouseDown={(e) => {
-                                        e.stopPropagation();
-                                    }}
-                                />
-                                <MdOutlineClose
-                                    style={{ fontSize: '15px' }}
-
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        removeAnnotation();
-                                    }}
-                                    // We have to prevent the default behaviour for
-                                    // the pdf canvas here, in order to be able to capture
-                                    // the click event.
-                                    onMouseDown={(e) => {
-                                        e.stopPropagation();
-                                    }}
-                                />
-                                {annotation.tokens === null && (
-                                    <EditableLabel>
-                                        <input
-                                            type="text"
-                                            value={editedText}
-                                            onChange={handleTextChange}
-                                            onMouseDown={(e) => e.stopPropagation()}
-                                            onMouseUp={(e) => e.stopPropagation()}
-                                        />
-                                        {editedText.trim() === "" && <div style={{ color: "red", marginTop: "5px" }}>Label cannot be empty</div>}
-                                    </EditableLabel>
-                                )}
+                                <div style={{ display: 'flex' }}>
+                                    <MdOutlineEdit
+                                        style={{ fontSize: '15px', cursor: 'pointer' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setIsEditLabelModalVisible(true);
+                                            changeVisibilityModal(true);
+                                        }}
+                                        onMouseDown={(e) => {
+                                            e.stopPropagation();
+                                        }}
+                                    />
+                                    <MdOutlineClose
+                                        style={{ fontSize: '15px', cursor: 'pointer' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            removeAnnotation();
+                                        }}
+                                        // We have to prevent the default behaviour for
+                                        // the pdf canvas here, in order to be able to capture
+                                        // the click event.
+                                        onMouseDown={(e) => {
+                                            e.stopPropagation();
+                                        }}
+                                    />
+                                    {annotation.tokens === null && (
+                                        <EditableLabel>
+                                            <input
+                                                type="text"
+                                                value={editedText}
+                                                onChange={handleTextChange}
+                                                onMouseDown={(e) => e.stopPropagation()}
+                                                onMouseUp={(e) => e.stopPropagation()}
+                                            />
+                                            {editedText.trim() === "" && <div style={{ color: "red", marginTop: "5px" }}>Label cannot be empty</div>}
+                                        </EditableLabel>
+                                    )}
+                                </div>
                             </SelectionInfo>
                         ) : null}
                     </SelectionBoundary>
