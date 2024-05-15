@@ -382,6 +382,12 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                                             type="text"
                                             value={editedText}
                                             onChange={handleTextChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault(); // Previeni il comportamento predefinito dell'invio del modulo
+                                                    e.target.blur(); // Rimuovi il focus dall'input
+                                                }
+                                            }}
                                             onMouseDown={(e) => e.stopPropagation()}
                                             onMouseUp={(e) => e.stopPropagation()}
                                         />
