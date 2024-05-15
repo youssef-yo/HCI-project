@@ -1,3 +1,4 @@
+import React from 'react';
 import { OverlayTrigger, Popover, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, useLogout } from '../../hooks';
@@ -6,7 +7,7 @@ import { MdAccountCircle } from 'react-icons/md';
 type AccountInfoPopoverProps = {
     show: boolean;
     onHide: () => void;
-    setAccountInfoModal: (boolean) => void;
+    setAccountInfoPopoverShow: (show: boolean) => void;
     iconColor: string;
 };
 
@@ -60,28 +61,43 @@ const AccountInfoPopover: React.FC<AccountInfoPopoverProps> = ({
     );
 
     return (
-        <OverlayTrigger
-            trigger="click"
-            placement="bottom"
-            show={show}
-            onHide={onHide}
-            overlay={popover}
-            rootClose>
-            <div
-                style={{
-                    position: 'relative',
-                    display: 'inline-block',
-                }}>
-                <MdAccountCircle
-                    onClick={() => setAccountInfoPopoverShow(!show)}
+        <>
+            {show && (
+                <div
                     style={{
-                        color: iconColor,
-                        fontSize: '25px',
-                        cursor: 'pointer',
+                        position: 'fixed',
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        left: 0,
+                        zIndex: 999,
                     }}
+                    onClick={onHide}
                 />
-            </div>
-        </OverlayTrigger>
+            )}
+            <OverlayTrigger
+                trigger="click"
+                placement="bottom"
+                show={show}
+                onHide={onHide}
+                overlay={popover}
+                rootClose>
+                <div
+                    style={{
+                        position: 'relative',
+                        display: 'inline-block',
+                    }}>
+                    <MdAccountCircle
+                        onClick={() => setAccountInfoPopoverShow(!show)}
+                        style={{
+                            color: iconColor,
+                            fontSize: '25px',
+                            cursor: 'pointer',
+                        }}
+                    />
+                </div>
+            </OverlayTrigger>
+        </>
     );
 };
 
