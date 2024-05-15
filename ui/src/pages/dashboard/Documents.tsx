@@ -134,6 +134,7 @@ const DocumentsPage = () => {
                                             zIndex: '999',
                                             fontSize: '0.8em',
                                             minWidth: '6em', 
+                                            color: 'black',
                                         }}
                                     >
                                         <p style={{ whiteSpace: 'nowrap' }}><MdCircle style={{ color: 'green' }}/>: Document ready</p>
