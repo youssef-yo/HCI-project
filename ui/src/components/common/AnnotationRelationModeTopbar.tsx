@@ -151,7 +151,7 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                             display: 'flex',
                             alignItems: 'center',
                             border: `1px solid ${!annotationStore.src ? 'lightblue' : 'lightgray'}`,
-                            borderWidth: !annotationStore.src ? '3px' : '1px', // Larghezza del bordo maggiore quando src è vuoto e dst è vuoto o src è pieno
+                            borderWidth: '1px', // Larghezza del bordo maggiore quando src è vuoto e dst è vuoto o src è pieno
                             boxShadow: !annotationStore.src ? '0 0 5px 2px rgba(0, 0, 255, 0.5)' : 'none', // Effetto luminoso quando src è vuoto e dst è vuoto o src è pieno
                             transition: 'border-color 0.3s ease, border-width 0.3s ease, box-shadow 0.3s ease', // Aggiunto per una transizione fluida del colore, della larghezza del bordo e dell'effetto luminoso
                             marginRight: '20px',
@@ -192,7 +192,7 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                             display: 'flex',
                             alignItems: 'center',
                             border: `1px solid ${annotationStore.src && !annotationStore.dst ? 'lightblue' : 'lightgray'}`,
-                            borderWidth: annotationStore.src && !annotationStore.dst ? '3px' : '1px', // Larghezza del bordo maggiore quando src è pieno e dst è vuoto
+                            borderWidth: '1px', // Larghezza del bordo maggiore quando src è pieno e dst è vuoto
                             boxShadow: annotationStore.src && !annotationStore.dst ? '0 0 5px 2px rgba(0, 0, 255, 0.5)' : 'none', // Effetto luminoso quando src è pieno e dst è vuoto
                             transition: 'border-color 0.3s ease, border-width 0.3s ease, box-shadow 0.3s ease', // Aggiunto per una transizione fluida del colore, della larghezza del bordo e dell'effetto luminoso
                             marginRight: '20px',
