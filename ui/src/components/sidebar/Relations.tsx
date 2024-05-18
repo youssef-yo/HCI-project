@@ -21,7 +21,7 @@ const Relations: React.FC<RelationProps> = ({ annotations, relations }) => {
         <>
             <b>How to select an annotation:</b>
             <p>
-                Hold down the Shift key and left-click on an annotation in the PDF.
+                Activate the relation mode and select two different annotations.
             </p>
         </>
      );

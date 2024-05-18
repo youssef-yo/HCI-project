@@ -27,14 +27,12 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
     const [showNoPropertiesNotification, setShowNoPropertiesNotification] = useState<boolean>(false);
     const [showSourceTargetNotification, setShowSourceTargetNotification] = useState<boolean>(false);
     const [showRelationCreated, setShowRelationCreated] = useState<boolean>(false);
-    const [showImpossibleCreate, setShowImpossibleCreate] = useState<boolean>(false);
 
     const relationModeTopbarHeight = '125px';
 
     const createRelation = () => {
         if (propertiesCompatible.length === 0) {
             setShowNoPropertiesNotification(true);
-            setShowImpossibleCreate(false);
             setShowRelationCreated(false);
             setShowSourceTargetNotification(false);
             // notification.warning({
@@ -57,7 +55,6 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
             if (annotationStore.src === null || annotationStore.dst === null) {
                 setShowSourceTargetNotification(true);
                 setShowNoPropertiesNotification(false);
-                setShowImpossibleCreate(false);
                 setShowRelationCreated(false);
                 // notification.warning({
                 //     message: 'You need to have a source and a target annotation',
@@ -81,7 +78,6 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                     if (confirm(text) === true) {
                         onCreate(new RelationGroup(undefined, [source.id], [target.id], label));
                         setShowRelationCreated(true);
-                        setShowImpossibleCreate(false);
                         setShowNoPropertiesNotification(false);
                         setShowSourceTargetNotification(false);
 
@@ -93,7 +89,6 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                 } else {
                     onCreate(new RelationGroup(undefined, [source.id], [target.id], label));
                     setShowRelationCreated(true);
-                    setShowImpossibleCreate(false);
                     setShowNoPropertiesNotification(false);
                     setShowSourceTargetNotification(false);
                 }
@@ -124,18 +119,7 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
     };
 
     const handleCreationRelation = () => {
-        const numberAnn = annotationStore.selectedAnnotations.length;
-        if (numberAnn > 2) {
-            setShowImpossibleCreate(true);
-            // notification.warning({
-            //     message: 'Can not create the relation',
-            //     description:
-            //         'Remember that currently you can create a relation' +
-            //         ' beetween exactly 2 annotations',
-            // });
-        } else {
-            createRelation();
-        }
+        createRelation();
     };
     return (
         <>
@@ -252,20 +236,6 @@ const AnnotationRelationModeTopbar: React.FC<AnnotationTopbarProps> = ({
                     </Toast.Header>
                     <Toast.Body style={{ textAlign: 'center' }}>
                         Check if you did upload the correct ontology. You can also  toogle "Show all properties" to force the creation of the relation.
-                    </Toast.Body>
-                </Toast>
-                <Toast
-                    show={showImpossibleCreate}
-                    onClose={() => setShowImpossibleCreate(false)}
-                    delay={10000}
-                    autohide
-                    className="warning-toast"
-                >
-                    <Toast.Header className="text-center">
-                        <strong className="mr-auto" style={{ margin: 'auto' }}>Cannot create the relation</strong>
-                    </Toast.Header>
-                    <Toast.Body style={{ textAlign: 'center' }}>
-                        Remember that currently you can create a relation beetween exactly 2 annotations
                     </Toast.Body>
                 </Toast>
                 <Toast

@@ -242,6 +242,7 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
     const [showDeselectedNotification, setShowDeselectedNotification] = useState<boolean>(false);
     const [showSelectedNotification, setShowSelectedNotification] = useState<boolean>(false);
     const [showDisactivatedNotification, setShowDisactivatedNotification] = useState<boolean>(false);
+    const [showImpossibleCreate, setShowImpossibleCreate] = useState<boolean>(false);
 
     const unselectedMessage = 'Annotation unselected';
     const selectedMessage = 'Annotation selected';
@@ -295,7 +296,6 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
         if (annotationStore.relationMode === true) {
             const current = annotationStore.selectedAnnotations.slice(0);
 
-            // Current contains this annotation, so we remove it.
             if (current.some((other) => other.id === annotation.id)) {
                 if (annotationStore.src && annotationStore.src.id === annotation.id) {
                     annotationStore.setSrc(null);
@@ -311,7 +311,7 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                 //     placement: 'bottomRight',
                 // });
                 // Otherwise we add it.
-            } else {
+            } else if (annotationStore.selectedAnnotations.length < 2) {
                 current.push(annotation);
                 if (annotationStore.src == null) {
                     annotationStore.setSrc(annotation);
@@ -325,6 +325,8 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                 //     description: annotation.text,
                 //     placement: 'bottomRight',
                 // });
+            } else {
+                setShowImpossibleCreate(true);
             }
         } else {
             setShowDisactivatedNotification(true);
@@ -458,6 +460,20 @@ export const Selection = ({ pageInfo, annotation, showInfo = true, changeVisibil
                                 <MdCheckCircleOutline/>
                                 {selectedMessage}
                             </div>
+                        </Toast.Body>
+                    </Toast>
+                    <Toast
+                        show={showImpossibleCreate}
+                        onClose={() => setShowImpossibleCreate(false)}
+                        delay={10000}
+                        autohide
+                        className="warning-toast"
+                    >
+                        <Toast.Header className="text-center">
+                            <strong className="mr-auto" style={{ margin: 'auto' }}>Cannot create the relation</strong>
+                        </Toast.Header>
+                        <Toast.Body style={{ textAlign: 'center' }}>
+                            Remember that currently you can create a relation beetween exactly 2 annotations
                         </Toast.Body>
                     </Toast>
                 </ToastContainer>
