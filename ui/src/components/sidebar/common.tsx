@@ -40,6 +40,7 @@ export const SidebarItemTitle = styled.h5(
     padding-top: ${theme.spacing.xs};
     padding-bottom: ${theme.spacing.xs};
     border-bottom: 1px solid black;
+    border-top: 1px solid black;
     width: 100%;
     display: flex;
     align-items: center;
