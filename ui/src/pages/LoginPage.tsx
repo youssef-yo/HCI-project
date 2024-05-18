@@ -51,11 +51,9 @@ const LoginPage = () => {
         <Section>
             <div className="container">
                 <div className="content">
-                    
                     <p className="navGroup__title">
                         ONTO-PAWLS
                     </p>
-                    
 
                     <Form onSubmit={handleSubmit}>
                         {errorMsg && (
@@ -112,7 +110,8 @@ const Section = styled.section`
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: lightblue;
+    background: linear-gradient(180deg, lightblue, rgba(2, 62, 138, 0.7)); /* Example gradient */
+    backdrop-filter: blur(10px);
 
     .container {
         border: 2px solid black;
@@ -126,6 +125,7 @@ const Section = styled.section`
         align-items: center;
         padding: 40px;
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
     }
 
     .content {
@@ -157,10 +157,10 @@ const Form = styled.form`
         width: 100%;
         padding: 15px 7.5px;
         margin-bottom: 0;
-        border: 2px solid rgba(191, 11, 11, 1);
+        border: 2px solid #FF4C4C;
         border-radius: 4px;
-        background: #FF4C4C;
-        color: white;
+        background: rgba(255, 76, 76, 0.15);
+        color: #FF4C4C;
         font-size: 0.8em;
     }
 `;
