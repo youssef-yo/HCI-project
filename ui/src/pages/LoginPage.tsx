@@ -6,7 +6,6 @@ import { getApiError, useAuthApi } from '../api';
 import { useAuth } from '../hooks';
 import { Button, Input, InputType } from '../components/common';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Logo } from '../components/sidebar';
 
 const LoginPage = () => {
     const { login } = useAuthApi();
@@ -50,13 +49,13 @@ const LoginPage = () => {
 
     return (
         <Section>
-            {Array.from({ length: 200 }, (_, i) => (
-                <span key={i} className="bg-square"></span>
-            ))}
-
             <div className="container">
                 <div className="content">
-                    <Logo />
+                    
+                    <p className="navGroup__title">
+                        ONTO-PAWLS
+                    </p>
+                    
 
                     <Form onSubmit={handleSubmit}>
                         {errorMsg && (
@@ -66,6 +65,7 @@ const LoginPage = () => {
                         )}
 
                         <Input
+                            style={{ border: '2px solid black' }}
                             type="text"
                             variant={InputType.STANDARD}
                             width="100%"
@@ -77,6 +77,7 @@ const LoginPage = () => {
                         />
 
                         <Input
+                            style={{ border: '2px solid black' }}
                             type="password"
                             variant={InputType.STANDARD}
                             width="100%"
@@ -88,6 +89,7 @@ const LoginPage = () => {
                         />
 
                         <Button
+                            style={{ border: '2px solid black' }}
                             color="login"
                             icon={<MdLogin />}
                             size="large"
@@ -108,62 +110,21 @@ const Section = styled.section`
     width: 100vw;
     height: 100vh;
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 2px;
-    overflow: hidden;
-
-    &::before {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(#fff, #bf0b0b, #fff);
-        animation: animate 5s linear infinite;
-    }
-
-    @keyframes animate {
-        0% {
-            transform: translateY(-100%);
-        }
-        100% {
-            transform: translateY(100%);
-        }
-    }
-
-    .bg-square {
-        position: relative;
-        display: block;
-        width: calc(6.25vw - 2px);
-        height: calc(6.25vw - 2px);
-        background: #b3b3b3;
-        z-index: 2;
-    }
-
-    @media (max-width: 900px) {
-        .bg-square {
-            width: calc(10vw - 2px);
-            height: calc(10vw - 2px);
-        }
-    }
-    @media (max-width: 600px) {
-        .bg-square {
-            width: calc(20vw - 2px);
-            height: calc(20vw - 2px);
-        }
-    }
+    background-color: lightblue;
 
     .container {
-        position: absolute;
+        border: 2px solid black;
+        position: relative;
         width: 400px;
-        background: #222;
+        background: rgba(2, 62, 138, 0.8);
+        border-radius: 8px;
         z-index: 1000;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 40px;
-        border-radius: 4px;
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
     }
 
@@ -174,7 +135,14 @@ const Section = styled.section`
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        gap: 40px;
+        gap: 20px; /* Adjust gap as needed */
+    }
+
+    .navGroup__title {
+        color: #FFFFFF;
+        margin: 0 0 0 0;
+        font-size: 3.0rem;
+        text-transform: uppercase;
     }
 `;
 
@@ -191,8 +159,8 @@ const Form = styled.form`
         margin-bottom: 0;
         border: 2px solid rgba(191, 11, 11, 1);
         border-radius: 4px;
-        background: rgba(191, 11, 11, 0.15);
-        color: #bf3f3f;
+        background: #FF4C4C;
+        color: white;
         font-size: 0.8em;
     }
 `;
