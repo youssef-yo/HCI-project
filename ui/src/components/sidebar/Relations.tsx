@@ -4,6 +4,7 @@ import { Annotation, RelationGroup, AnnotationStore } from '../../context';
 import RelationList from '../RelationsByProperty';
 import { CiCircleQuestion } from "react-icons/ci";
 import CustomTooltip from '../common/CustomTooltip';
+import styled from 'styled-components';
 
 interface RelationProps {
     annotations: Annotation[];
@@ -31,7 +32,7 @@ const Relations: React.FC<RelationProps> = ({ annotations, relations }) => {
     // );
 
     return (
-        <>
+        <SidebarItemWrapper>
             <div style={{ display: "flex", alignItems: "center" }}>
                 <SidebarItemTitle>
                 Relations
@@ -53,8 +54,14 @@ const Relations: React.FC<RelationProps> = ({ annotations, relations }) => {
                     )}
                 </div>
             </SidebarItem>
-        </>
+        </SidebarItemWrapper>
     );
 };
+
+const SidebarItemWrapper = styled.div`
+  flex-grow: 1;
+  overflow-y: auto;
+  box-sizing: border-box;
+`;
 
 export default Relations;

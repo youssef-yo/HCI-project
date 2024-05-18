@@ -27,7 +27,6 @@ export const SidebarItem = styled.div(
     background: white;
     color: black;
     width: ${theme.sidebarWidth};
-    border-bottom: 1px solid black;
     min-height: 267px;
     max-height: 268px;
     padding: 10px;

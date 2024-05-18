@@ -14,7 +14,7 @@ export const StyledAnnotationSidebar = styled.div<AnnotationSidebarProps>(
     background: white;
     color: ${theme.color.N2};
     padding: 0;
-    height: 100vh;
+    height: 100%;
     * {
         color: black;
     }

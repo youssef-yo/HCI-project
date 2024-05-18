@@ -10,6 +10,7 @@ import { Task } from '../../api';
 
 import { CiCircleQuestion } from "react-icons/ci";
 import CustomTooltip from '../common/CustomTooltip';
+import styled from 'styled-components';
 
 interface AnnotationsProps {
     taskId: string;
@@ -42,7 +43,7 @@ const Annotations = ({ annotations }: AnnotationsProps) => {
     // };
 
     return (
-        <>  
+        <SidebarItemWrapper>
             <div style={{ display: "flex", alignItems: "center" }}>
                 <SidebarItemTitle>
                 Annotations
@@ -82,7 +83,7 @@ const Annotations = ({ annotations }: AnnotationsProps) => {
                     )}
                 </div>
             </SidebarItem>
-        </>
+        </SidebarItemWrapper> 
     );
 };
 
@@ -104,3 +105,10 @@ export default Annotations;
 //     font-size: 0.85rem;
 //     color: ${({ theme }) => theme.color.N6};
 // `;
+
+const SidebarItemWrapper = styled.div`
+  flex-grow: 1;
+  overflow-y: auto;
+  
+  box-sizing: border-box;
+`;

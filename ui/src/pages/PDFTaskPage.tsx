@@ -395,17 +395,17 @@ const PDFTaskPage = () => {
                                         </NavLinks>
                                     </LogoWrapper>
                                     {activeTask && (
+                                        <>
                                         <Annotations
                                             taskId={taskId}
                                             activeTask={activeTask}
                                             annotations={pdfAnnotations.docAnnotations.annotations}
                                         />
-                                    )}
-                                    {activeTask && (
                                         <Relations
                                             annotations={pdfAnnotations.docAnnotations.annotations}
                                             relations={pdfAnnotations.docAnnotations.relations}
                                         />
+                                        </>
                                     )}
                                 </AnnotationSidebar>
                                 <WithTopbar height={topbarHeight}>
