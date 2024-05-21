@@ -63,7 +63,7 @@ const LoginPage = () => {
                         )}
 
                         <Input
-                            style={{ border: '2px solid black' }}
+                            style={{ border: '1px solid black' }}
                             type="text"
                             variant={InputType.STANDARD}
                             width="100%"
@@ -75,7 +75,7 @@ const LoginPage = () => {
                         />
 
                         <Input
-                            style={{ border: '2px solid black' }}
+                            style={{ border: '1px solid black' }}
                             type="password"
                             variant={InputType.STANDARD}
                             width="100%"
@@ -87,7 +87,7 @@ const LoginPage = () => {
                         />
 
                         <Button
-                            style={{ border: '2px solid black' }}
+                            style={{ border: '1px solid black' }}
                             color="login"
                             icon={<MdLogin />}
                             size="large"
@@ -114,7 +114,7 @@ const Section = styled.section`
     backdrop-filter: blur(10px);
 
     .container {
-        border: 2px solid black;
+        border: 1px solid black;
         position: relative;
         width: 400px;
         background: rgba(2, 62, 138, 0.8);
